@@ -1,60 +1,14 @@
 import { Client } from "@notionhq/client";
-
-// Define interfaces for Notion property types
-interface NotionPropertyValue {
-  type: string;
-  [key: string]: unknown;
-}
-
-interface NotionTitleProperty extends NotionPropertyValue {
-  type: "title";
-  title: Array<{ plain_text: string }>;
-}
-
-interface NotionRichTextProperty extends NotionPropertyValue {
-  type: "rich_text";
-  rich_text: Array<{ plain_text: string }>;
-}
-
-interface NotionUrlProperty extends NotionPropertyValue {
-  type: "url";
-  url: string | null;
-}
-
-interface NotionDateProperty extends NotionPropertyValue {
-  type: "date";
-  date: { start: string } | null;
-}
-
-interface NotionMultiSelectProperty extends NotionPropertyValue {
-  type: "multi_select";
-  multi_select: Array<{ name: string }>;
-}
-
-interface NotionSelectProperty extends NotionPropertyValue {
-  type: "select";
-  select: { name: string } | null;
-}
-
-interface NotionFilesProperty extends NotionPropertyValue {
-  type: "files";
-  files: Array<{
-    type: string;
-    name: string;
-    external?: { url: string };
-    file?: { url: string };
-  }>;
-}
-
-type NotionProperty =
-  | NotionTitleProperty
-  | NotionRichTextProperty
-  | NotionUrlProperty
-  | NotionDateProperty
-  | NotionMultiSelectProperty
-  | NotionSelectProperty
-  | NotionFilesProperty
-  | NotionPropertyValue;
+import type {
+  NotionProperty,
+  NotionTitleProperty,
+  NotionRichTextProperty,
+  NotionUrlProperty,
+  NotionDateProperty,
+  NotionMultiSelectProperty,
+  NotionSelectProperty,
+  NotionFilesProperty,
+} from "../types/notion";
 
 // Initialize the Notion client with your API token
 const notion = new Client({

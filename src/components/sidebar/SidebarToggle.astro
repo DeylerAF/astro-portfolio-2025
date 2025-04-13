@@ -5,7 +5,6 @@ interface Props {
 }
 
 import { PanelLeft, PanelLeftClose } from "lucide-astro";
-import { isMobile } from "../../lib/utils/responsive";
 
 const { isOpen = true } = Astro.props;
 ---
@@ -27,133 +26,55 @@ const { isOpen = true } = Astro.props;
 </button>
 
 <script>
-  // Client-side script for toggling sidebar
-  // Define la función isMobile en el contexto del cliente
-  const isMobile = (breakpoint = 768) => {
-    // En SSR, window no está definido
-    if (typeof window === "undefined") return false;
-
-    return window.innerWidth < breakpoint;
-  };
+  // Import utility functions
+  import {
+    initializeSidebar,
+    toggleSidebar,
+    updateSidebarIcons,
+    type SidebarState,
+  } from "../../lib/utils/sidebar";
 
   document.addEventListener("DOMContentLoaded", () => {
     const sidebar = document.getElementById("sidebar");
     const toggleBtn = document.getElementsByClassName("toggle-sidebar");
     const content = document.getElementById("content");
+    const layoutToggle = document.getElementById("layout-sidebar-toggle");
 
-    // Estado inicial: abierto en desktop, cerrado en móvil
-    let isSidebarOpen = !isMobile();
+    if (!sidebar || !content) return;
 
-    // Función para actualizar los iconos según el estado
-    function updateIcons() {
-      const openIcon = document.getElementById("sidebar-open-icon");
-      const closeIcon = document.getElementById("sidebar-close-icon");
-      const layoutToggle = document.getElementById("layout-sidebar-toggle");
+    const openIcon = document.getElementById("sidebar-open-icon");
+    const closeIcon = document.getElementById("sidebar-close-icon");
 
-      if (openIcon && closeIcon) {
-        if (isSidebarOpen) {
-          openIcon.style.display = "none";
-          closeIcon.style.display = "block";
+    if (!openIcon || !closeIcon) return;
 
-          // Ocultar el botón de toggle en el layout cuando el sidebar está abierto
-          if (layoutToggle && isMobile()) {
-            layoutToggle.style.display = "none";
-          }
-        } else {
-          openIcon.style.display = "block";
-          closeIcon.style.display = "none";
+    // Initialize sidebar and state
+    let state: SidebarState = initializeSidebar(sidebar, content, layoutToggle);
 
-          // Mostrar el botón de toggle en el layout cuando el sidebar está cerrado
-          if (layoutToggle && isMobile()) {
-            layoutToggle.style.display = "block";
-          }
-        }
-      }
-    }
+    // Initial icon update
+    updateSidebarIcons(openIcon, closeIcon, state, layoutToggle);
 
-    // Función para inicializar el sidebar
-    function initializeSidebar() {
-      if (!sidebar || !content) return; // Verificar que los elementos existan
-
-      const layoutToggle = document.getElementById("layout-sidebar-toggle");
-
-      if (isMobile()) {
-        // En móvil, inicialmente oculto
-        sidebar.classList.add("-translate-x-full");
-        sidebar.classList.remove("translate-x-0");
-        isSidebarOpen = false;
-
-        // Mostrar el botón del layout solo en móvil
-        if (layoutToggle) {
-          layoutToggle.classList.remove("hidden");
-        }
-      } else {
-        // En desktop, sidebar expandido inicialmente
-        sidebar.classList.remove("md:w-16");
-        sidebar.classList.add("md:w-[16rem]");
-        content.classList.remove("md:ml-16");
-        content.classList.add("md:ml-64");
-
-        // Todos los textos visibles inicialmente en desktop
-        document.querySelectorAll("#sidebar span").forEach((span) => {
-          span.classList.remove("hidden");
-          span.classList.add("block");
-        });
-        isSidebarOpen = true;
-
-        // Ocultar el botón del layout en desktop
-        if (layoutToggle) {
-          layoutToggle.classList.add("hidden");
-        }
-      }
-
-      // Configurar el icono correcto
-      updateIcons();
-    }
-
-    // Inicializar
-    initializeSidebar();
-
-    // Asignar el event listener a todos los botones de toggle
+    // Add click handlers to all sidebar toggle buttons
     Array.from(toggleBtn).forEach((btn) => {
       btn.addEventListener("click", () => {
-        // Verificar que los elementos existan
         if (!sidebar || !content) return;
 
-        isSidebarOpen = !isSidebarOpen; // Invertir estado
+        // Toggle sidebar and get new state
+        state.isOpen = toggleSidebar(sidebar, content, state.isOpen);
 
-        if (isMobile()) {
-          // En móvil, control de visibilidad
-          sidebar.classList.toggle("-translate-x-full");
-          sidebar.classList.toggle("translate-x-0");
-        } else {
-          // En desktop, control de ancho
-          sidebar.classList.toggle("md:w-16");
-          sidebar.classList.toggle("md:w-[16rem]");
-          content.classList.toggle("md:ml-16");
-          content.classList.toggle("md:ml-64");
-
-          // Toggle textos
-          document.querySelectorAll("#sidebar span").forEach((span) => {
-            span.classList.toggle("hidden");
-            span.classList.toggle("block");
-          });
-        }
-
-        // Actualizar iconos
-        updateIcons();
+        // Update icons based on new state
+        updateSidebarIcons(openIcon, closeIcon, state, layoutToggle);
       });
     });
 
-    // Manejar cambios de tamaño de ventana
+    // Handle window resize
     window.addEventListener("resize", () => {
-      // Resetear a estado inicial cuando se cambia entre móvil y desktop
-      const wasMobile = !isMobile();
-      const isMobileNow = isMobile();
+      const previousState = { ...state };
+      const isMobileViewNow = window.innerWidth < 768;
 
-      if (wasMobile !== isMobileNow) {
-        isSidebarOpen = false;
-        initializeSidebar();
+      // Only reinitialize if viewport type changed (mobile/desktop switch)
+      if (previousState.isMobileView !== isMobileViewNow) {
+        state = initializeSidebar(sidebar, content, layoutToggle);
+        updateSidebarIcons(openIcon, closeIcon, state, layoutToggle);
       }
     });
   });

@@ -59,11 +59,21 @@ export const toggleSidebar = (
 
   const isMobileView = isMobile();
   const newIsOpen = !isCurrentlyOpen;
+  const overlay = document.getElementById("sidebar-overlay");
 
   if (isMobileView) {
     // On mobile, control visibility with translate classes
     sidebar.classList.toggle(SIDEBAR_CLASSES.mobile.closed);
     sidebar.classList.toggle(SIDEBAR_CLASSES.mobile.open);
+
+    // Toggle overlay visibility
+    if (overlay) {
+      if (newIsOpen) {
+        overlay.classList.remove("hidden");
+      } else {
+        overlay.classList.add("hidden");
+      }
+    }
   } else {
     // On desktop, control width
     sidebar.classList.toggle(SIDEBAR_CLASSES.desktop.closed.sidebar);

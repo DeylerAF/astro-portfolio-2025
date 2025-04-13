@@ -34,6 +34,14 @@ const { title = "Astro Portfolio" } = Astro.props;
     </script>
   </head>
   <body class="flex">
+    <!-- Backdrop overlay for mobile when sidebar is open -->
+    <div
+      id="sidebar-overlay"
+      class="fixed inset-0 bg-black/30 backdrop-blur-sm z-20 hidden md:hidden"
+      aria-hidden="true"
+    >
+    </div>
+
     <Sidebar />
     <div
       id="content"

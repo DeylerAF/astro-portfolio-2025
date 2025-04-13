@@ -30,10 +30,42 @@ const { isOpen = true } = Astro.props;
   document.addEventListener("DOMContentLoaded", () => {
     const sidebar = document.getElementById("sidebar");
     const toggleBtn = document.getElementsByClassName("toggle-sidebar");
-    const content = document.getElementById("content"); // Definir una función para verificar si estamos en móvil
-    const isMobileView = () => window.innerWidth < 768;
-    let isSidebarOpen = !isMobileView(); // Estado inicial: abierto en desktop, cerrado en móvil
+    const content = document.getElementById("content");
 
+    // Definir una función para verificar si estamos en móvil
+    const isMobileView = () => window.innerWidth < 768;
+
+    // Estado inicial: abierto en desktop, cerrado en móvil
+    let isSidebarOpen = !isMobileView();
+
+    // Función para actualizar los iconos según el estado
+    function updateIcons() {
+      const openIcon = document.getElementById("sidebar-open-icon");
+      const closeIcon = document.getElementById("sidebar-close-icon");
+      const layoutToggle = document.getElementById("layout-sidebar-toggle");
+
+      if (openIcon && closeIcon) {
+        if (isSidebarOpen) {
+          openIcon.style.display = "none";
+          closeIcon.style.display = "block";
+
+          // Ocultar el botón de toggle en el layout cuando el sidebar está abierto
+          if (layoutToggle && isMobileView()) {
+            layoutToggle.style.display = "none";
+          }
+        } else {
+          openIcon.style.display = "block";
+          closeIcon.style.display = "none";
+
+          // Mostrar el botón de toggle en el layout cuando el sidebar está cerrado
+          if (layoutToggle && isMobileView()) {
+            layoutToggle.style.display = "block";
+          }
+        }
+      }
+    }
+
+    // Función para inicializar el sidebar
     function initializeSidebar() {
       if (!sidebar || !content) return; // Verificar que los elementos existan
 
@@ -61,24 +93,10 @@ const { isOpen = true } = Astro.props;
       updateIcons();
     }
 
-    // Función para actualizar los iconos según el estado
-    function updateIcons() {
-      const openIcon = document.getElementById("sidebar-open-icon");
-      const closeIcon = document.getElementById("sidebar-close-icon");
-
-      if (openIcon && closeIcon) {
-        if (isSidebarOpen) {
-          openIcon.style.display = "none";
-          closeIcon.style.display = "block";
-        } else {
-          openIcon.style.display = "block";
-          closeIcon.style.display = "none";
-        }
-      }
-    }
-
     // Inicializar
-    initializeSidebar(); // Asignar el event listener a todos los botones de toggle
+    initializeSidebar();
+
+    // Asignar el event listener a todos los botones de toggle
     Array.from(toggleBtn).forEach((btn) => {
       btn.addEventListener("click", () => {
         // Verificar que los elementos existan

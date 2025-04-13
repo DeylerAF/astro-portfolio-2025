@@ -33,17 +33,16 @@ const projects = notionProjects.map((project) => {
     <p class="text-lg">
       These projects are pulled directly from my Notion database
     </p>
-
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
       {
         projects.length === 0 ? (
-          <p class="text-gray-600">
+          <p class="text-zinc-600">
             No projects found. Make sure your Notion credentials are correct and
             your database has content.
           </p>
         ) : (
           projects.map((project) => (
-            <article class="rounded-lg overflow-hidden bg-gray-50 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200">
+            <article class="rounded-lg overflow-hidden bg-zinc-50 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200">
               {project.Image && project.Image[0] && (
                 <img
                   src={project.Image[0]}
@@ -54,13 +53,13 @@ const projects = notionProjects.map((project) => {
               <div class="p-6">
                 <h2 class="text-2xl font-semibold mb-3">{project.Name}</h2>
                 {project.Description && (
-                  <p class="text-gray-700">{project.Description}</p>
+                  <p class="text-zinc-700">{project.Description}</p>
                 )}
 
                 {project.Tags && (
                   <ul class="flex flex-wrap gap-2 my-4">
                     {project.Tags.map((tag: string) => (
-                      <li class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-sm">
+                      <li class="bg-zinc-200 text-zinc-700 px-2 py-1 rounded text-sm">
                         {tag}
                       </li>
                     ))}

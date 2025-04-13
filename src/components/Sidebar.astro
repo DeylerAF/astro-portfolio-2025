@@ -19,13 +19,16 @@ const { isOpen = false } = Astro.props;
       class="p-2 rounded transition-colors hover:bg-[var(--sidebar-hover)]"
       aria-label="Toggle Sidebar"
     >
-      {
-        isOpen ? (
-          <PanelLeftClose id="sidebar-close-icon" class="w-5 h-5" />
-        ) : (
-          <PanelLeft id="sidebar-open-icon" class="w-5 h-5" />
-        )
-      }
+      <PanelLeftClose
+        id="sidebar-close-icon"
+        class="w-5 h-5"
+        style={isOpen ? "" : "display: none;"}
+      />
+      <PanelLeft
+        id="sidebar-open-icon"
+        class="w-5 h-5"
+        style={isOpen ? "display: none;" : ""}
+      />
     </button>
   </div>
 

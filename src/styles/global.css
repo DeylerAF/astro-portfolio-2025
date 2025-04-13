@@ -5,21 +5,31 @@
   --text-color: #1a202c;
   --bg-color: #fff;
   --hover-bg: #f7fafc;
-  --accent-color: #3b82f6;
+  --accent-color: #84cc16; /* Cambiado a lime-500 */
+  --accent-secondary: #a3e635; /* Color secundario (lime-400) */
+  --accent-tertiary: #65a30d; /* Color terciario (lime-600) */
   --sidebar-bg: #fff;
-  --sidebar-text: #4b5563;
-  --sidebar-hover: #f7fafc;
+  --sidebar-text: #71717a; /* Cambiado de gray a zinc-500 */
+  --sidebar-hover: #f4f4f5; /* Zinc-100 */
+  --border-color: #e4e4e7; /* Zinc-200 */
+  --card-bg: #fafafa;
+  --card-shadow: rgb(0 0 0 / 10%);
 }
 
 html.dark,
 html[data-theme="dark"] {
-  --text-color: #e2e8f0;
-  --bg-color: #1a202c;
-  --hover-bg: #2d3748;
-  --accent-color: #60a5fa;
-  --sidebar-bg: #1e293b;
-  --sidebar-text: #e2e8f0;
-  --sidebar-hover: #2d3748;
+  --text-color: #e4e4e7; /* Zinc-200 */
+  --bg-color: #18181b; /* Zinc-900 */
+  --hover-bg: #27272a; /* Zinc-800 */
+  --accent-color: #84cc16; /* Cambiado a lime-500 */
+  --accent-secondary: #a3e635; /* Color secundario (lime-400) */
+  --accent-tertiary: #65a30d; /* Color terciario (lime-600) */
+  --sidebar-bg: #27272a; /* Zinc-800 */
+  --sidebar-text: #d4d4d8; /* Zinc-300 */
+  --sidebar-hover: #3f3f46; /* Zinc-700 */
+  --border-color: #3f3f46; /* Zinc-700 */
+  --card-bg: #27272a; /* Zinc-800 */
+  --card-shadow: rgb(0 0 0 / 25%);
 }
 
 html,

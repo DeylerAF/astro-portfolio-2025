@@ -15,7 +15,7 @@ const { isOpen = false } = Astro.props;
   id="sidebar"
   class="fixed top-0 left-0 h-full shadow-md transition-all duration-300 ease-in-out z-30 overflow-y-auto overflow-x-hidden bg-[var(--sidebar-bg)] text-[var(--sidebar-text)]
   -translate-x-full md:translate-x-0
-  w-[16rem] md:w-16"
+  w-[16rem]"
 >
   <div class="hidden md:flex justify-end p-3">
     <SidebarToggle />
@@ -29,7 +29,7 @@ const { isOpen = false } = Astro.props;
           class="flex items-center py-2 px-4 transition-colors text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--accent-color)] md:justify-center"
         >
           <Home class="w-5 h-5" />
-          <span class="ml-3 hidden">Home</span>
+          <span class="ml-3 md:block">Home</span>
         </a>
       </li>
       <li class="mb-2">
@@ -38,7 +38,7 @@ const { isOpen = false } = Astro.props;
           class="flex items-center py-2 px-4 transition-colors text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--accent-color)] md:justify-center"
         >
           <FolderKanban class="w-5 h-5" />
-          <span class="ml-3 hidden">Projects</span>
+          <span class="ml-3 md:block">Projects</span>
         </a>
       </li>
       <!-- Add more navigation links as needed -->

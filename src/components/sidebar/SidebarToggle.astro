@@ -30,11 +30,10 @@ const { isOpen = true } = Astro.props;
   document.addEventListener("DOMContentLoaded", () => {
     const sidebar = document.getElementById("sidebar");
     const toggleBtn = document.getElementsByClassName("toggle-sidebar");
-    const content = document.getElementById("content");
-
-    // Definir una función para verificar si estamos en móvil
+    const content = document.getElementById("content"); // Definir una función para verificar si estamos en móvil
     const isMobileView = () => window.innerWidth < 768;
-    let isSidebarOpen = false; // Estado inicial: cerrado    // La configuración inicial depende del tamaño de la ventana
+    let isSidebarOpen = !isMobileView(); // Estado inicial: abierto en desktop, cerrado en móvil
+
     function initializeSidebar() {
       if (!sidebar || !content) return; // Verificar que los elementos existan
 
@@ -42,18 +41,20 @@ const { isOpen = true } = Astro.props;
         // En móvil, inicialmente oculto
         sidebar.classList.add("-translate-x-full");
         sidebar.classList.remove("translate-x-0");
+        isSidebarOpen = false;
       } else {
-        // En desktop, sidebar colapsado pero visible
-        sidebar.classList.add("md:w-16");
-        sidebar.classList.remove("md:w-[16rem]");
-        content.classList.add("md:ml-16");
-        content.classList.remove("md:ml-64");
+        // En desktop, sidebar expandido inicialmente
+        sidebar.classList.remove("md:w-16");
+        sidebar.classList.add("md:w-[16rem]");
+        content.classList.remove("md:ml-16");
+        content.classList.add("md:ml-64");
 
-        // Todos los textos ocultos inicialmente
+        // Todos los textos visibles inicialmente en desktop
         document.querySelectorAll("#sidebar span").forEach((span) => {
-          span.classList.add("hidden");
-          span.classList.remove("block");
+          span.classList.remove("hidden");
+          span.classList.add("block");
         });
+        isSidebarOpen = true;
       }
 
       // Configurar el icono correcto

@@ -34,10 +34,10 @@ const { isOpen = true } = Astro.props;
 
     // Definir una función para verificar si estamos en móvil
     const isMobileView = () => window.innerWidth < 768;
-    let isSidebarOpen = false; // Estado inicial: cerrado
-
-    // La configuración inicial depende del tamaño de la ventana
+    let isSidebarOpen = false; // Estado inicial: cerrado    // La configuración inicial depende del tamaño de la ventana
     function initializeSidebar() {
+      if (!sidebar || !content) return; // Verificar que los elementos existan
+
       if (isMobileView()) {
         // En móvil, inicialmente oculto
         sidebar.classList.add("-translate-x-full");
@@ -77,11 +77,12 @@ const { isOpen = true } = Astro.props;
     }
 
     // Inicializar
-    initializeSidebar();
-
-    // Asignar el event listener a todos los botones de toggle
+    initializeSidebar(); // Asignar el event listener a todos los botones de toggle
     Array.from(toggleBtn).forEach((btn) => {
       btn.addEventListener("click", () => {
+        // Verificar que los elementos existan
+        if (!sidebar || !content) return;
+
         isSidebarOpen = !isSidebarOpen; // Invertir estado
 
         if (isMobileView()) {

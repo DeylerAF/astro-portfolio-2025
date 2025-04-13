@@ -5,6 +5,7 @@ interface Props {
 }
 
 import { PanelLeft, PanelLeftClose } from "lucide-astro";
+import { isMobile } from "../../lib/utils/responsive";
 
 const { isOpen = true } = Astro.props;
 ---
@@ -27,16 +28,21 @@ const { isOpen = true } = Astro.props;
 
 <script>
   // Client-side script for toggling sidebar
+  // Define la función isMobile en el contexto del cliente
+  const isMobile = (breakpoint = 768) => {
+    // En SSR, window no está definido
+    if (typeof window === "undefined") return false;
+
+    return window.innerWidth < breakpoint;
+  };
+
   document.addEventListener("DOMContentLoaded", () => {
     const sidebar = document.getElementById("sidebar");
     const toggleBtn = document.getElementsByClassName("toggle-sidebar");
     const content = document.getElementById("content");
 
-    // Definir una función para verificar si estamos en móvil
-    const isMobileView = () => window.innerWidth < 768;
-
     // Estado inicial: abierto en desktop, cerrado en móvil
-    let isSidebarOpen = !isMobileView();
+    let isSidebarOpen = !isMobile();
 
     // Función para actualizar los iconos según el estado
     function updateIcons() {
@@ -50,7 +56,7 @@ const { isOpen = true } = Astro.props;
           closeIcon.style.display = "block";
 
           // Ocultar el botón de toggle en el layout cuando el sidebar está abierto
-          if (layoutToggle && isMobileView()) {
+          if (layoutToggle && isMobile()) {
             layoutToggle.style.display = "none";
           }
         } else {
@@ -58,18 +64,20 @@ const { isOpen = true } = Astro.props;
           closeIcon.style.display = "none";
 
           // Mostrar el botón de toggle en el layout cuando el sidebar está cerrado
-          if (layoutToggle && isMobileView()) {
+          if (layoutToggle && isMobile()) {
             layoutToggle.style.display = "block";
           }
         }
       }
-    } // Función para inicializar el sidebar
+    }
+
+    // Función para inicializar el sidebar
     function initializeSidebar() {
       if (!sidebar || !content) return; // Verificar que los elementos existan
 
       const layoutToggle = document.getElementById("layout-sidebar-toggle");
 
-      if (isMobileView()) {
+      if (isMobile()) {
         // En móvil, inicialmente oculto
         sidebar.classList.add("-translate-x-full");
         sidebar.classList.remove("translate-x-0");
@@ -114,7 +122,7 @@ const { isOpen = true } = Astro.props;
 
         isSidebarOpen = !isSidebarOpen; // Invertir estado
 
-        if (isMobileView()) {
+        if (isMobile()) {
           // En móvil, control de visibilidad
           sidebar.classList.toggle("-translate-x-full");
           sidebar.classList.toggle("translate-x-0");
@@ -140,8 +148,8 @@ const { isOpen = true } = Astro.props;
     // Manejar cambios de tamaño de ventana
     window.addEventListener("resize", () => {
       // Resetear a estado inicial cuando se cambia entre móvil y desktop
-      const wasMobile = !isMobileView();
-      const isMobileNow = isMobileView();
+      const wasMobile = !isMobile();
+      const isMobileNow = isMobile();
 
       if (wasMobile !== isMobileNow) {
         isSidebarOpen = false;

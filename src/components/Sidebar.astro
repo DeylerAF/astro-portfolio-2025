@@ -6,7 +6,7 @@ interface Props {
 
 import { Home, FolderKanban, PanelLeft, PanelLeftClose } from "lucide-astro";
 
-const { isOpen = false } = Astro.props;
+const { isOpen = true } = Astro.props;
 ---
 
 <div
@@ -63,6 +63,12 @@ const { isOpen = false } = Astro.props;
     const sidebar = document.getElementById("sidebar");
     const toggleBtn = document.getElementById("toggle-sidebar");
     const content = document.getElementById("content");
+
+    // Iniciar con el sidebar abierto
+    if (content) {
+      content.classList.remove("ml-16");
+      content.classList.add("ml-64");
+    }
 
     toggleBtn?.addEventListener("click", () => {
       // Toggle sidebar width class

@@ -1,0 +1,73 @@
+---
+// Props for the SidebarToggle component
+interface Props {
+  isOpen?: boolean;
+}
+
+import { PanelLeft, PanelLeftClose } from "lucide-astro";
+
+const { isOpen = true } = Astro.props;
+---
+
+<button
+  id="toggle-sidebar"
+  class="p-2 rounded transition-colors hover:bg-[var(--sidebar-hover)]"
+  aria-label="Toggle Sidebar"
+>
+  <PanelLeftClose
+    id="sidebar-close-icon"
+    class="w-5 h-5"
+    style={isOpen ? "" : "display: none;"}
+  />
+  <PanelLeft
+    id="sidebar-open-icon"
+    class="w-5 h-5"
+    style={isOpen ? "display: none;" : ""}
+  />
+</button>
+
+<script>
+  // Client-side script for toggling sidebar
+  document.addEventListener("DOMContentLoaded", () => {
+    const sidebar = document.getElementById("sidebar");
+    const toggleBtn = document.getElementById("toggle-sidebar");
+    const content = document.getElementById("content");
+
+    // Iniciar con el sidebar abierto
+    if (content) {
+      content.classList.remove("ml-16");
+      content.classList.add("ml-64");
+    }
+
+    toggleBtn?.addEventListener("click", () => {
+      // Toggle sidebar width class
+      sidebar?.classList.toggle("w-64");
+      sidebar?.classList.toggle("w-16");
+
+      // Toggle content margin when sidebar expands/collapses
+      content?.classList.toggle("ml-16");
+      content?.classList.toggle("ml-64");
+
+      // Toggle visibility of text in sidebar items
+      const textLabels = document.querySelectorAll("#sidebar span");
+      textLabels.forEach((label) => {
+        label.classList.toggle("hidden");
+        label.classList.toggle("block");
+      });
+
+      // Toggle between open/close icons
+      const openIcon = document.getElementById("sidebar-open-icon");
+      const closeIcon = document.getElementById("sidebar-close-icon");
+
+      if (openIcon && closeIcon) {
+        if (sidebar?.classList.contains("w-64")) {
+          openIcon.style.display = "none";
+          closeIcon.style.display = "block";
+        } else {
+          openIcon.style.display = "block";
+          closeIcon.style.display = "none";
+        }
+      }
+    });
+  });
+</script>

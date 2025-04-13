@@ -3,6 +3,7 @@ import "../styles/global.css";
 import Sidebar from "../components/Sidebar.astro";
 import ThemeToggle from "../components/ThemeToggle.astro";
 import { PanelLeft, PanelLeftClose } from "lucide-astro";
+import { initializeTheme } from "../lib/utils/theme";
 
 interface Props {
   title?: string;
@@ -20,32 +21,15 @@ const { title = "Astro Portfolio" } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
 
-    <!-- Theme initialization script -->
+    <!-- Minimal theme initialization script to prevent flash -->
     <script is:inline>
-      // Get the user's theme preference from local storage or system
-      const getThemePreference = () => {
-        if (
-          typeof localStorage !== "undefined" &&
-          localStorage.getItem("theme")
-        ) {
-          return localStorage.getItem("theme");
-        }
-        // Default to system preference
-        return "system";
-      };
+      const theme = localStorage.getItem("theme") || "system";
+      const isDark =
+        theme === "dark" ||
+        (theme === "system" &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches);
 
-      const themeValue = getThemePreference();
-
-      // Apply theme immediately to prevent flash
-      if (
-        themeValue === "dark" ||
-        (themeValue === "system" &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches)
-      ) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.add("light");
-      }
+      document.documentElement.classList.add(isDark ? "dark" : "light");
     </script>
   </head>
   <body>

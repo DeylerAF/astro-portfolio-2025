@@ -6,14 +6,22 @@ export type ThemeType = "light" | "dark" | "system";
  * @returns The current theme preference: 'light', 'dark', or 'system'
  */
 export const getThemePreference = (): ThemeType => {
-  if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
-    const theme = localStorage.getItem("theme");
-    if (theme === "light" || theme === "dark") {
-      return theme as ThemeType;
-    }
+  if (typeof localStorage === "undefined") return "system";
+
+  const theme = localStorage.getItem("theme");
+  if (theme === "light" || theme === "dark") {
+    return theme as ThemeType;
   }
   // Default to system preference
   return "system";
+};
+
+/**
+ * Checks if the system prefers dark mode
+ * @returns True if the system prefers dark mode
+ */
+export const systemPrefersDark = (): boolean => {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
 };
 
 /**
@@ -27,13 +35,9 @@ export const applyTheme = (theme: ThemeType): void => {
   // If system theme
   if (theme === "system") {
     localStorage.removeItem("theme");
-
-    // Apply theme based on system preference
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.add("light");
-    }
+    document.documentElement.classList.add(
+      systemPrefersDark() ? "dark" : "light",
+    );
   } else {
     // For explicit themes
     localStorage.setItem("theme", theme);
@@ -43,23 +47,19 @@ export const applyTheme = (theme: ThemeType): void => {
 
 /**
  * Initialize theme on page load to prevent flash of incorrect theme
+ * This can be used in a script tag with is:inline in the head
  */
 export const initializeTheme = (): void => {
   const themeValue = getThemePreference();
+  const isDark =
+    themeValue === "dark" || (themeValue === "system" && systemPrefersDark());
 
-  // Apply theme immediately to prevent flash
-  if (
-    themeValue === "dark" ||
-    (themeValue === "system" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches)
-  ) {
-    document.documentElement.classList.add("dark");
-  } else {
-    document.documentElement.classList.add("light");
-  }
+  document.documentElement.classList.add(isDark ? "dark" : "light");
 };
 
-// Setup listener for system preference changes
+/**
+ * Setup listener for system preference changes
+ */
 export const setupThemeListener = (): void => {
   window
     .matchMedia("(prefers-color-scheme: dark)")

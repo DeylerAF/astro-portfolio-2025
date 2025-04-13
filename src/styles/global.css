@@ -2,33 +2,47 @@
 @import "tailwindcss";
 
 :root {
+  /* Main colors */
   --text-color: #1a202c;
   --bg-color: #fff;
   --hover-bg: #f7fafc;
-  --accent-color: #84cc16; /* Cambiado a lime-500 */
-  --accent-secondary: #a3e635; /* Color secundario (lime-400) */
-  --accent-tertiary: #65a30d; /* Color terciario (lime-600) */
+
+  /* Accent colors - lime palette */
+  --accent-color: #84cc16; /* lime-500 */
+  --accent-secondary: #a3e635; /* lime-400 */
+  --accent-tertiary: #65a30d; /* lime-600 */
+
+  /* Sidebar colors */
   --sidebar-bg: #fff;
-  --sidebar-text: #71717a; /* Cambiado de gray a zinc-500 */
-  --sidebar-hover: #f4f4f5; /* Zinc-100 */
-  --border-color: #e4e4e7; /* Zinc-200 */
+  --sidebar-text: #71717a; /* zinc-500 */
+  --sidebar-hover: #f4f4f5; /* zinc-100 */
+
+  /* UI elements */
+  --border-color: #e4e4e7; /* zinc-200 */
   --card-bg: #fafafa;
   --card-shadow: rgb(0 0 0 / 10%);
 }
 
 html.dark,
 html[data-theme="dark"] {
-  --text-color: #e4e4e7; /* Zinc-200 */
-  --bg-color: #18181b; /* Zinc-900 */
-  --hover-bg: #27272a; /* Zinc-800 */
-  --accent-color: #84cc16; /* Cambiado a lime-500 */
-  --accent-secondary: #a3e635; /* Color secundario (lime-400) */
-  --accent-tertiary: #65a30d; /* Color terciario (lime-600) */
-  --sidebar-bg: #27272a; /* Zinc-800 */
-  --sidebar-text: #d4d4d8; /* Zinc-300 */
-  --sidebar-hover: #3f3f46; /* Zinc-700 */
-  --border-color: #3f3f46; /* Zinc-700 */
-  --card-bg: #27272a; /* Zinc-800 */
+  /* Main colors */
+  --text-color: #e4e4e7; /* zinc-200 */
+  --bg-color: #18181b; /* zinc-900 */
+  --hover-bg: #27272a; /* zinc-800 */
+
+  /* Accent colors - lime palette (consistent with light theme) */
+  --accent-color: #84cc16; /* lime-500 */
+  --accent-secondary: #a3e635; /* lime-400 */
+  --accent-tertiary: #65a30d; /* lime-600 */
+
+  /* Sidebar colors */
+  --sidebar-bg: #27272a; /* zinc-800 */
+  --sidebar-text: #d4d4d8; /* zinc-300 */
+  --sidebar-hover: #3f3f46; /* zinc-700 */
+
+  /* UI elements */
+  --border-color: #3f3f46; /* zinc-700 */
+  --card-bg: #27272a; /* zinc-800 */
   --card-shadow: rgb(0 0 0 / 25%);
 }
 

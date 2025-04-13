@@ -36,6 +36,14 @@ const SIDEBAR_CLASSES = {
 };
 
 /**
+ * Display states for elements
+ */
+const DISPLAY = {
+  show: "block",
+  hide: "none",
+};
+
+/**
  * Toggle the sidebar state
  * @param sidebar - The sidebar element
  * @param content - The content element
@@ -124,19 +132,11 @@ export const initializeSidebar = (
 };
 
 /**
- * Display states for elements
- */
-const DISPLAY = {
-  show: "block",
-  hide: "none",
-};
-
-/**
  * Update the sidebar toggle icons based on state
  * @param openIcon - The open icon element
  * @param closeIcon - The close icon element
- * @param layoutToggle - The optional layout toggle button
  * @param state - The current sidebar state
+ * @param layoutToggle - The optional layout toggle button
  */
 export const updateSidebarIcons = (
   openIcon: HTMLElement | null,

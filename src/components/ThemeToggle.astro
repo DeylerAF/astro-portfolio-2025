@@ -30,8 +30,12 @@ import { Sun, Moon, Monitor } from "lucide-astro";
 </div>
 
 <script>
-  // Define available theme types
-  type ThemeType = "light" | "dark" | "system";
+  import {
+    getThemePreference,
+    applyTheme,
+    setupThemeListener,
+    type ThemeType,
+  } from "../lib/utils/theme";
 
   // Set the theme according to user preference
   const themeToggles: Record<ThemeType, HTMLElement | null> = {
@@ -40,83 +44,43 @@ import { Sun, Moon, Monitor } from "lucide-astro";
     system: document.getElementById("theme-toggle-system"),
   };
 
-  // Function to get the current theme
-  function getCurrentTheme(): ThemeType {
-    // Check localStorage first
-    if (localStorage.getItem("theme") === "light") {
-      return "light";
-    }
-    if (localStorage.getItem("theme") === "dark") {
-      return "dark";
-    }
-    // If no theme is set or set to system, return system
-    return "system";
-  }
-
-  // Function to set the theme
-  function setTheme(theme: ThemeType): void {
-    // Remove all theme classes
-    document.documentElement.classList.remove("light", "dark");
-
-    // If system theme
-    if (theme === "system") {
-      localStorage.removeItem("theme");
-
-      // Apply theme based on system preference
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.add("light");
-      }
-    } else {
-      // For explicit themes
-      localStorage.setItem("theme", theme);
-      document.documentElement.classList.add(theme);
-    } // Update buttons active state
+  // Update buttons active state
+  function updateButtonState(theme: ThemeType): void {
     (Object.keys(themeToggles) as ThemeType[]).forEach((key) => {
       if (themeToggles[key]) {
         if (key === theme) {
-          themeToggles[key].classList.add(
-            "text-blue-600",
-            "dark:text-blue-400",
-          );
+          themeToggles[key]!.classList.add("text-[var(--accent-color)]");
         } else {
-          themeToggles[key].classList.remove(
-            "text-blue-600",
-            "dark:text-blue-400",
-          );
+          themeToggles[key]!.classList.remove("text-[var(--accent-color)]");
         }
       }
     });
   }
 
-  // Initialize theme
-  const initTheme = () => {
-    const currentTheme = getCurrentTheme();
-    setTheme(currentTheme);
-  };
-
   // Set up event listeners for theme toggle buttons
   document.addEventListener("DOMContentLoaded", () => {
-    // Initialize
-    initTheme();
+    const currentTheme = getThemePreference();
+    updateButtonState(currentTheme);
 
     // Light theme button
-    themeToggles.light?.addEventListener("click", () => setTheme("light"));
+    themeToggles.light?.addEventListener("click", () => {
+      applyTheme("light");
+      updateButtonState("light");
+    });
 
     // Dark theme button
-    themeToggles.dark?.addEventListener("click", () => setTheme("dark"));
+    themeToggles.dark?.addEventListener("click", () => {
+      applyTheme("dark");
+      updateButtonState("dark");
+    });
 
     // System theme button
-    themeToggles.system?.addEventListener("click", () => setTheme("system"));
+    themeToggles.system?.addEventListener("click", () => {
+      applyTheme("system");
+      updateButtonState("system");
+    });
 
-    // Listen for system preference changes
-    window
-      .matchMedia("(prefers-color-scheme: dark)")
-      .addEventListener("change", (e) => {
-        if (getCurrentTheme() === "system") {
-          setTheme("system");
-        }
-      });
+    // Setup listener for system preference changes
+    setupThemeListener();
   });
 </script>

@@ -12,6 +12,30 @@ export interface SidebarState {
 }
 
 /**
+ * CSS class mapping for different sidebar states
+ */
+const SIDEBAR_CLASSES = {
+  mobile: {
+    open: "translate-x-0",
+    closed: "-translate-x-full",
+  },
+  desktop: {
+    open: {
+      sidebar: "md:w-[16rem]",
+      content: "md:ml-64",
+    },
+    closed: {
+      sidebar: "md:w-16",
+      content: "md:ml-16",
+    },
+  },
+  text: {
+    visible: "block",
+    hidden: "hidden",
+  },
+};
+
+/**
  * Toggle the sidebar state
  * @param sidebar - The sidebar element
  * @param content - The content element
@@ -30,19 +54,19 @@ export const toggleSidebar = (
 
   if (isMobileView) {
     // On mobile, control visibility with translate classes
-    sidebar.classList.toggle("-translate-x-full");
-    sidebar.classList.toggle("translate-x-0");
+    sidebar.classList.toggle(SIDEBAR_CLASSES.mobile.closed);
+    sidebar.classList.toggle(SIDEBAR_CLASSES.mobile.open);
   } else {
     // On desktop, control width
-    sidebar.classList.toggle("md:w-16");
-    sidebar.classList.toggle("md:w-[16rem]");
-    content.classList.toggle("md:ml-16");
-    content.classList.toggle("md:ml-64");
+    sidebar.classList.toggle(SIDEBAR_CLASSES.desktop.closed.sidebar);
+    sidebar.classList.toggle(SIDEBAR_CLASSES.desktop.open.sidebar);
+    content.classList.toggle(SIDEBAR_CLASSES.desktop.closed.content);
+    content.classList.toggle(SIDEBAR_CLASSES.desktop.open.content);
 
     // Toggle text visibility
     document.querySelectorAll("#sidebar span").forEach((span) => {
-      span.classList.toggle("hidden");
-      span.classList.toggle("block");
+      span.classList.toggle(SIDEBAR_CLASSES.text.hidden);
+      span.classList.toggle(SIDEBAR_CLASSES.text.visible);
     });
   }
 
@@ -70,33 +94,41 @@ export const initializeSidebar = (
 
   if (isMobileView) {
     // On mobile, initially hidden
-    sidebar.classList.add("-translate-x-full");
-    sidebar.classList.remove("translate-x-0");
+    sidebar.classList.add(SIDEBAR_CLASSES.mobile.closed);
+    sidebar.classList.remove(SIDEBAR_CLASSES.mobile.open);
 
     // Show layout toggle button on mobile
     if (layoutToggle) {
-      layoutToggle.classList.remove("hidden");
+      layoutToggle.classList.remove(SIDEBAR_CLASSES.text.hidden);
     }
   } else {
     // On desktop, initially expanded
-    sidebar.classList.remove("md:w-16");
-    sidebar.classList.add("md:w-[16rem]");
-    content.classList.remove("md:ml-16");
-    content.classList.add("md:ml-64");
+    sidebar.classList.remove(SIDEBAR_CLASSES.desktop.closed.sidebar);
+    sidebar.classList.add(SIDEBAR_CLASSES.desktop.open.sidebar);
+    content.classList.remove(SIDEBAR_CLASSES.desktop.closed.content);
+    content.classList.add(SIDEBAR_CLASSES.desktop.open.content);
 
     // All texts visible initially on desktop
     document.querySelectorAll("#sidebar span").forEach((span) => {
-      span.classList.remove("hidden");
-      span.classList.add("block");
+      span.classList.remove(SIDEBAR_CLASSES.text.hidden);
+      span.classList.add(SIDEBAR_CLASSES.text.visible);
     });
 
     // Hide layout toggle on desktop
     if (layoutToggle) {
-      layoutToggle.classList.add("hidden");
+      layoutToggle.classList.add(SIDEBAR_CLASSES.text.hidden);
     }
   }
 
   return { isOpen, isMobileView };
+};
+
+/**
+ * Display states for elements
+ */
+const DISPLAY = {
+  show: "block",
+  hide: "none",
 };
 
 /**
@@ -114,21 +146,12 @@ export const updateSidebarIcons = (
 ): void => {
   if (!openIcon || !closeIcon) return;
 
-  if (state.isOpen) {
-    openIcon.style.display = "none";
-    closeIcon.style.display = "block";
+  // Set icon visibility based on sidebar state
+  openIcon.style.display = state.isOpen ? DISPLAY.hide : DISPLAY.show;
+  closeIcon.style.display = state.isOpen ? DISPLAY.show : DISPLAY.hide;
 
-    // Hide layout toggle when sidebar is open on mobile
-    if (layoutToggle && state.isMobileView) {
-      layoutToggle.style.display = "none";
-    }
-  } else {
-    openIcon.style.display = "block";
-    closeIcon.style.display = "none";
-
-    // Show layout toggle when sidebar is closed on mobile
-    if (layoutToggle && state.isMobileView) {
-      layoutToggle.style.display = "block";
-    }
+  // Only handle layout toggle in mobile view
+  if (layoutToggle && state.isMobileView) {
+    layoutToggle.style.display = state.isOpen ? DISPLAY.hide : DISPLAY.show;
   }
 };

@@ -63,17 +63,22 @@ const { isOpen = true } = Astro.props;
           }
         }
       }
-    }
-
-    // Función para inicializar el sidebar
+    } // Función para inicializar el sidebar
     function initializeSidebar() {
       if (!sidebar || !content) return; // Verificar que los elementos existan
+
+      const layoutToggle = document.getElementById("layout-sidebar-toggle");
 
       if (isMobileView()) {
         // En móvil, inicialmente oculto
         sidebar.classList.add("-translate-x-full");
         sidebar.classList.remove("translate-x-0");
         isSidebarOpen = false;
+
+        // Mostrar el botón del layout solo en móvil
+        if (layoutToggle) {
+          layoutToggle.classList.remove("hidden");
+        }
       } else {
         // En desktop, sidebar expandido inicialmente
         sidebar.classList.remove("md:w-16");
@@ -87,6 +92,11 @@ const { isOpen = true } = Astro.props;
           span.classList.add("block");
         });
         isSidebarOpen = true;
+
+        // Ocultar el botón del layout en desktop
+        if (layoutToggle) {
+          layoutToggle.classList.add("hidden");
+        }
       }
 
       // Configurar el icono correcto

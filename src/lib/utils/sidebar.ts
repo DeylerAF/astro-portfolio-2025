@@ -19,10 +19,12 @@ export interface SidebarState {
  * @returns The new sidebar state
  */
 export const toggleSidebar = (
-  sidebar: HTMLElement,
-  content: HTMLElement,
+  sidebar: HTMLElement | null,
+  content: HTMLElement | null,
   isCurrentlyOpen: boolean,
 ): boolean => {
+  if (!sidebar || !content) return isCurrentlyOpen;
+
   const isMobileView = isMobile();
   const newIsOpen = !isCurrentlyOpen;
 
@@ -55,12 +57,16 @@ export const toggleSidebar = (
  * @returns The initial sidebar state
  */
 export const initializeSidebar = (
-  sidebar: HTMLElement,
-  content: HTMLElement,
-  layoutToggle?: HTMLElement,
+  sidebar: HTMLElement | null,
+  content: HTMLElement | null,
+  layoutToggle?: HTMLElement | null,
 ): SidebarState => {
   const isMobileView = isMobile();
-  let isOpen = !isMobileView; // Default: closed on mobile, open on desktop
+  const isOpen = !isMobileView; // Default: closed on mobile, open on desktop
+
+  if (!sidebar || !content) {
+    return { isOpen, isMobileView };
+  }
 
   if (isMobileView) {
     // On mobile, initially hidden
@@ -101,11 +107,13 @@ export const initializeSidebar = (
  * @param state - The current sidebar state
  */
 export const updateSidebarIcons = (
-  openIcon: HTMLElement,
-  closeIcon: HTMLElement,
+  openIcon: HTMLElement | null,
+  closeIcon: HTMLElement | null,
   state: SidebarState,
-  layoutToggle?: HTMLElement,
+  layoutToggle?: HTMLElement | null,
 ): void => {
+  if (!openIcon || !closeIcon) return;
+
   if (state.isOpen) {
     openIcon.style.display = "none";
     closeIcon.style.display = "block";

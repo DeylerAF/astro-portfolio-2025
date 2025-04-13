@@ -9,6 +9,9 @@ import SidebarToggle from "./SidebarToggle.astro";
 
 // Inicializamos el valor de isOpen desde las props, sin intentar detectar dispositivo del lado del servidor
 const { isOpen = false } = Astro.props;
+
+// Clase dinámica para ocultar el texto cuando el sidebar está cerrado
+const textVisibilityClass = isOpen ? "block" : "hidden";
 ---
 
 <div
@@ -29,7 +32,7 @@ const { isOpen = false } = Astro.props;
           class="flex items-center py-2 px-4 transition-colors text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--accent-color)] md:justify-center"
         >
           <Home class="w-5 h-5" />
-          <span class="ml-3 md:block">Home</span>
+          <span class={`ml-3 ${textVisibilityClass}`}>Home</span>
         </a>
       </li>
       <li class="mb-2">
@@ -38,7 +41,7 @@ const { isOpen = false } = Astro.props;
           class="flex items-center py-2 px-4 transition-colors text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--accent-color)] md:justify-center"
         >
           <FolderKanban class="w-5 h-5" />
-          <span class="ml-3 md:block">Projects</span>
+          <span class={`ml-3 ${textVisibilityClass}`}>Projects</span>
         </a>
       </li>
       <!-- Add more navigation links as needed -->

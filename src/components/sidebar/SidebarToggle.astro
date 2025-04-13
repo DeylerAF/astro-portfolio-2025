@@ -10,8 +10,7 @@ const { isOpen = true } = Astro.props;
 ---
 
 <button
-  id="toggle-sidebar"
-  class="p-2 rounded transition-colors hover:bg-[var(--sidebar-hover)]"
+  class="toggle-sidebar p-2 rounded transition-colors hover:bg-[var(--sidebar-hover)]"
   aria-label="Toggle Sidebar"
 >
   <PanelLeftClose
@@ -30,43 +29,93 @@ const { isOpen = true } = Astro.props;
   // Client-side script for toggling sidebar
   document.addEventListener("DOMContentLoaded", () => {
     const sidebar = document.getElementById("sidebar");
-    const toggleBtn = document.getElementById("toggle-sidebar");
+    const toggleBtn = document.getElementsByClassName("toggle-sidebar");
     const content = document.getElementById("content");
 
-    // Iniciar con el sidebar abierto
-    if (content) {
-      content.classList.remove("ml-16");
-      content.classList.add("ml-64");
+    // Definir una función para verificar si estamos en móvil
+    const isMobileView = () => window.innerWidth < 768;
+    let isSidebarOpen = false; // Estado inicial: cerrado
+
+    // La configuración inicial depende del tamaño de la ventana
+    function initializeSidebar() {
+      if (isMobileView()) {
+        // En móvil, inicialmente oculto
+        sidebar.classList.add("-translate-x-full");
+        sidebar.classList.remove("translate-x-0");
+      } else {
+        // En desktop, sidebar colapsado pero visible
+        sidebar.classList.add("md:w-16");
+        sidebar.classList.remove("md:w-[16rem]");
+        content.classList.add("md:ml-16");
+        content.classList.remove("md:ml-64");
+
+        // Todos los textos ocultos inicialmente
+        document.querySelectorAll("#sidebar span").forEach((span) => {
+          span.classList.add("hidden");
+          span.classList.remove("block");
+        });
+      }
+
+      // Configurar el icono correcto
+      updateIcons();
     }
 
-    toggleBtn?.addEventListener("click", () => {
-      // Toggle sidebar width class
-      sidebar?.classList.toggle("w-64");
-      sidebar?.classList.toggle("w-16");
-
-      // Toggle content margin when sidebar expands/collapses
-      content?.classList.toggle("ml-16");
-      content?.classList.toggle("ml-64");
-
-      // Toggle visibility of text in sidebar items
-      const textLabels = document.querySelectorAll("#sidebar span");
-      textLabels.forEach((label) => {
-        label.classList.toggle("hidden");
-        label.classList.toggle("block");
-      });
-
-      // Toggle between open/close icons
+    // Función para actualizar los iconos según el estado
+    function updateIcons() {
       const openIcon = document.getElementById("sidebar-open-icon");
       const closeIcon = document.getElementById("sidebar-close-icon");
 
       if (openIcon && closeIcon) {
-        if (sidebar?.classList.contains("w-64")) {
+        if (isSidebarOpen) {
           openIcon.style.display = "none";
           closeIcon.style.display = "block";
         } else {
           openIcon.style.display = "block";
           closeIcon.style.display = "none";
         }
+      }
+    }
+
+    // Inicializar
+    initializeSidebar();
+
+    // Asignar el event listener a todos los botones de toggle
+    Array.from(toggleBtn).forEach((btn) => {
+      btn.addEventListener("click", () => {
+        isSidebarOpen = !isSidebarOpen; // Invertir estado
+
+        if (isMobileView()) {
+          // En móvil, control de visibilidad
+          sidebar.classList.toggle("-translate-x-full");
+          sidebar.classList.toggle("translate-x-0");
+        } else {
+          // En desktop, control de ancho
+          sidebar.classList.toggle("md:w-16");
+          sidebar.classList.toggle("md:w-[16rem]");
+          content.classList.toggle("md:ml-16");
+          content.classList.toggle("md:ml-64");
+
+          // Toggle textos
+          document.querySelectorAll("#sidebar span").forEach((span) => {
+            span.classList.toggle("hidden");
+            span.classList.toggle("block");
+          });
+        }
+
+        // Actualizar iconos
+        updateIcons();
+      });
+    });
+
+    // Manejar cambios de tamaño de ventana
+    window.addEventListener("resize", () => {
+      // Resetear a estado inicial cuando se cambia entre móvil y desktop
+      const wasMobile = !isMobileView();
+      const isMobileNow = isMobileView();
+
+      if (wasMobile !== isMobileNow) {
+        isSidebarOpen = false;
+        initializeSidebar();
       }
     });
   });

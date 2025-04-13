@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import Sidebar from "../components/sidebar/Sidebar.astro";
+import SidebarToggle from "../components/sidebar/SidebarToggle.astro";
 import ThemeToggle from "../components/ThemeToggle.astro";
 import { PanelLeft, PanelLeftClose } from "lucide-astro";
 import { initializeTheme } from "../lib/utils/theme";
@@ -36,8 +37,11 @@ const { title = "Astro Portfolio" } = Astro.props;
     <Sidebar />
     <div
       id="content"
-      class="ml-16 flex-grow transition-all duration-300 ease-in-out"
+      class="md:ml-16 flex-grow transition-all duration-300 ease-in-out"
     >
+      <div class="fixed top-4 left-4 z-30 md:hidden">
+        <SidebarToggle />
+      </div>
       <div class="fixed top-4 right-4 z-30">
         <ThemeToggle />
       </div>

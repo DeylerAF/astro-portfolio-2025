@@ -1,0 +1,149 @@
+---
+import { Sun, Moon, Monitor } from "lucide-astro";
+---
+
+<div class="theme-toggle">
+  <button
+    id="theme-toggle-light"
+    title="Use light theme"
+    class="theme-toggle-btn"
+    aria-label="Use light theme"
+  >
+    <Sun class="w-5 h-5" />
+  </button>
+  <button
+    id="theme-toggle-dark"
+    title="Use dark theme"
+    class="theme-toggle-btn"
+    aria-label="Use dark theme"
+  >
+    <Moon class="w-5 h-5" />
+  </button>
+  <button
+    id="theme-toggle-system"
+    title="Use system theme"
+    class="theme-toggle-btn"
+    aria-label="Use system theme"
+  >
+    <Monitor class="w-5 h-5" />
+  </button>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .theme-toggle-btn {
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    transition: background-color 0.2s;
+  }
+
+  .theme-toggle-btn:hover {
+    background-color: var(--hover-bg);
+  }
+
+  /* Active state styling */
+  .theme-toggle-btn.active {
+    color: var(--accent-color);
+  }
+
+  html.dark .theme-toggle-btn,
+  html[data-theme="dark"] .theme-toggle-btn {
+    color: #e2e8f0;
+  }
+
+  html.dark .theme-toggle-btn:hover,
+  html[data-theme="dark"] .theme-toggle-btn:hover {
+    background-color: rgb(255 255 255 / 10%);
+  }
+</style>
+
+<script>
+  // Define available theme types
+  type ThemeType = "light" | "dark" | "system";
+
+  // Set the theme according to user preference
+  const themeToggles: Record<ThemeType, HTMLElement | null> = {
+    light: document.getElementById("theme-toggle-light"),
+    dark: document.getElementById("theme-toggle-dark"),
+    system: document.getElementById("theme-toggle-system"),
+  };
+
+  // Function to get the current theme
+  function getCurrentTheme(): ThemeType {
+    // Check localStorage first
+    if (localStorage.getItem("theme") === "light") {
+      return "light";
+    }
+    if (localStorage.getItem("theme") === "dark") {
+      return "dark";
+    }
+    // If no theme is set or set to system, return system
+    return "system";
+  }
+
+  // Function to set the theme
+  function setTheme(theme: ThemeType): void {
+    // Remove all theme classes
+    document.documentElement.classList.remove("light", "dark");
+
+    // If system theme
+    if (theme === "system") {
+      localStorage.removeItem("theme");
+
+      // Apply theme based on system preference
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.add("light");
+      }
+    } else {
+      // For explicit themes
+      localStorage.setItem("theme", theme);
+      document.documentElement.classList.add(theme);
+    } // Update buttons active state
+    (Object.keys(themeToggles) as ThemeType[]).forEach((key) => {
+      if (themeToggles[key]) {
+        if (key === theme) {
+          themeToggles[key].classList.add("active");
+        } else {
+          themeToggles[key].classList.remove("active");
+        }
+      }
+    });
+  }
+
+  // Initialize theme
+  const initTheme = () => {
+    const currentTheme = getCurrentTheme();
+    setTheme(currentTheme);
+  };
+
+  // Set up event listeners for theme toggle buttons
+  document.addEventListener("DOMContentLoaded", () => {
+    // Initialize
+    initTheme();
+
+    // Light theme button
+    themeToggles.light?.addEventListener("click", () => setTheme("light"));
+
+    // Dark theme button
+    themeToggles.dark?.addEventListener("click", () => setTheme("dark"));
+
+    // System theme button
+    themeToggles.system?.addEventListener("click", () => setTheme("system"));
+
+    // Listen for system preference changes
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", (e) => {
+        if (getCurrentTheme() === "system") {
+          setTheme("system");
+        }
+      });
+  });
+</script>

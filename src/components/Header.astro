@@ -8,40 +8,50 @@ import SidebarToggle from "./sidebar/SidebarToggle.astro";
   class="fixed top-0 right-0 left-0 md:left-16 h-16 z-30 transition-all duration-300 ease-in-out border-b border-[var(--border-color)] flex items-center justify-between px-4"
 >
   <div class="flex items-center gap-3">
-    <!-- SidebarToggle solo visible en mobile -->
+    <!-- Sidebar toggle only visible on mobile -->
     <div class="min-w-[40px] md:hidden">
       <SidebarToggle isOpen={false} />
     </div>
-    <h1 class="text-lg font-semibold">Mi Portfolio</h1>
+    <h1 class="text-lg font-semibold">My Portfolio</h1>
   </div>
   <div class="flex items-center gap-2">
-    <!-- Slot para contenido adicional a la derecha -->
+    <!-- Slot for additional content on the right -->
     <slot name="right" />
     <ThemeToggle />
   </div>
 </header>
 
 <script>
-  // Script para sincronizar el header con el estado del sidebar
+  // Script to synchronize the header position with sidebar state
   document.addEventListener("DOMContentLoaded", () => {
     const header = document.getElementById("main-header");
     const content = document.getElementById("content");
 
-    // Verificar que los elementos existen antes de continuar
     if (!header || !content) return;
 
-    // Función para actualizar las clases del header según el estado de content
+    // Header position classes
+    const HEADER_POSITION = {
+      sidebarExpanded: "md:left-64",
+      sidebarCollapsed: "md:left-16",
+    };
+
+    // Update header position based on content class
     const updateHeaderPosition = () => {
-      if (content.classList.contains("md:ml-64")) {
-        header.classList.remove("md:left-16");
-        header.classList.add("md:left-64");
+      const isSidebarExpanded = content.classList.contains("md:ml-64");
+
+      if (isSidebarExpanded) {
+        header.classList.remove(HEADER_POSITION.sidebarCollapsed);
+        header.classList.add(HEADER_POSITION.sidebarExpanded);
       } else {
-        header.classList.remove("md:left-64");
-        header.classList.add("md:left-16");
+        header.classList.remove(HEADER_POSITION.sidebarExpanded);
+        header.classList.add(HEADER_POSITION.sidebarCollapsed);
       }
     };
 
-    // Función para observar cambios en las clases del contenido
+    // Initialize with current state
+    updateHeaderPosition();
+
+    // Observe changes to content classes
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.attributeName === "class") {
@@ -50,10 +60,7 @@ import SidebarToggle from "./sidebar/SidebarToggle.astro";
       });
     });
 
-    // Inicializar con el estado actual
-    updateHeaderPosition();
-
-    // Comenzar a observar cambios en el elemento content
+    // Start observing content element
     observer.observe(content, { attributes: true });
   });
 </script>

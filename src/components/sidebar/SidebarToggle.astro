@@ -1,10 +1,9 @@
 ---
-// Props for the SidebarToggle component
+import { PanelLeft, PanelLeftClose } from "lucide-astro";
+
 interface Props {
   isOpen?: boolean;
 }
-
-import { PanelLeft, PanelLeftClose } from "lucide-astro";
 
 const { isOpen = true } = Astro.props;
 ---
@@ -26,7 +25,6 @@ const { isOpen = true } = Astro.props;
 </button>
 
 <script>
-  // Import utility functions
   import {
     initializeSidebar,
     toggleSidebar,
@@ -35,58 +33,67 @@ const { isOpen = true } = Astro.props;
   } from "../../lib/utils/sidebar";
 
   document.addEventListener("DOMContentLoaded", () => {
-    const sidebar = document.getElementById("sidebar");
-    const toggleBtn = document.getElementsByClassName("toggle-sidebar");
-    const content = document.getElementById("content");
-    const layoutToggle = document.getElementById("layout-sidebar-toggle");
-    const overlay = document.getElementById("sidebar-overlay");
+    // Get all required elements
+    const elements = {
+      sidebar: document.getElementById("sidebar"),
+      content: document.getElementById("content"),
+      toggleButtons: document.getElementsByClassName("toggle-sidebar"),
+      layoutToggle: document.getElementById("layout-sidebar-toggle"),
+      overlay: document.getElementById("sidebar-overlay"),
+      openIcon: document.getElementById("sidebar-open-icon"),
+      closeIcon: document.getElementById("sidebar-close-icon"),
+    };
 
-    if (!sidebar || !content) return;
+    const {
+      sidebar,
+      content,
+      toggleButtons,
+      layoutToggle,
+      overlay,
+      openIcon,
+      closeIcon,
+    } = elements;
 
-    const openIcon = document.getElementById("sidebar-open-icon");
-    const closeIcon = document.getElementById("sidebar-close-icon");
+    // Exit if required elements are missing
+    if (!sidebar || !content || !openIcon || !closeIcon) return;
 
-    if (!openIcon || !closeIcon) return;
-
-    // Initialize sidebar and state
+    // Initialize sidebar state
     let state: SidebarState = initializeSidebar(sidebar, content, layoutToggle);
 
-    // Initial icon update
+    // Set initial icon visibility
     updateSidebarIcons(openIcon, closeIcon, state, layoutToggle);
 
-    // Function to close the sidebar on mobile
-    const closeSidebar = () => {
+    // Handler for toggling sidebar
+    const handleToggleSidebar = () => {
+      if (!sidebar || !content) return;
+
+      state.isOpen = toggleSidebar(sidebar, content, state.isOpen);
+      updateSidebarIcons(openIcon, closeIcon, state, layoutToggle);
+    };
+
+    // Handler for closing sidebar on mobile
+    const closeSidebarOnMobile = () => {
       if (state.isOpen && state.isMobileView) {
-        state.isOpen = toggleSidebar(sidebar, content, state.isOpen);
-        updateSidebarIcons(openIcon, closeIcon, state, layoutToggle);
+        handleToggleSidebar();
       }
     };
 
-    // Add click handlers to all sidebar toggle buttons
-    Array.from(toggleBtn).forEach((btn) => {
-      btn.addEventListener("click", () => {
-        if (!sidebar || !content) return;
-
-        // Toggle sidebar and get new state
-        state.isOpen = toggleSidebar(sidebar, content, state.isOpen);
-
-        // Update icons based on new state
-        updateSidebarIcons(openIcon, closeIcon, state, layoutToggle);
-      });
+    // Add click handler to toggle buttons
+    Array.from(toggleButtons).forEach((btn) => {
+      btn.addEventListener("click", handleToggleSidebar);
     });
 
-    // Add click handler to overlay to close sidebar when clicking outside
+    // Add click handler to overlay
     if (overlay) {
-      overlay.addEventListener("click", closeSidebar);
+      overlay.addEventListener("click", closeSidebarOnMobile);
     }
 
-    // Handle window resize
+    // Handle viewport changes
     window.addEventListener("resize", () => {
-      const previousState = { ...state };
       const isMobileViewNow = window.innerWidth < 768;
 
-      // Only reinitialize if viewport type changed (mobile/desktop switch)
-      if (previousState.isMobileView !== isMobileViewNow) {
+      // Only reinitialize if viewport type changed
+      if (state.isMobileView !== isMobileViewNow) {
         state = initializeSidebar(sidebar, content, layoutToggle);
         updateSidebarIcons(openIcon, closeIcon, state, layoutToggle);
       }

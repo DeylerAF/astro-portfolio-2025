@@ -12,7 +12,7 @@ export interface SidebarState {
 }
 
 /**
- * CSS class mapping for different sidebar states
+ * CSS class mapping for sidebar states
  */
 const SIDEBAR_CLASSES = {
   mobile: {
@@ -20,27 +20,62 @@ const SIDEBAR_CLASSES = {
     closed: "-translate-x-full",
   },
   desktop: {
-    open: {
-      sidebar: "md:w-[16rem]",
-      content: "md:ml-64",
+    sidebar: {
+      open: "md:w-[16rem]",
+      closed: "md:w-16",
     },
-    closed: {
-      sidebar: "md:w-16",
-      content: "md:ml-16",
+    content: {
+      open: "md:ml-64",
+      closed: "md:ml-16",
     },
   },
-  text: {
-    visible: "block",
-    hidden: "hidden",
-  },
+  text: "hidden", // Class to hide/show text elements
+  overlay: "hidden", // Class to hide/show overlay
 };
 
 /**
- * Display states for elements
+ * Apply classes to elements based on sidebar state
+ * @param elements - The DOM elements
+ * @param isMobile - Whether it's mobile view
+ * @param isOpen - Whether sidebar is open
  */
-const DISPLAY = {
-  show: "block",
-  hide: "none",
+const applySidebarClasses = (
+  elements: {
+    sidebar: HTMLElement | null;
+    content: HTMLElement | null;
+    overlay: HTMLElement | null;
+    spans: NodeListOf<HTMLElement> | null;
+  },
+  isMobile: boolean,
+  isOpen: boolean,
+): void => {
+  const { sidebar, content, overlay, spans } = elements;
+
+  if (!sidebar || !content) return;
+
+  if (isMobile) {
+    // Mobile view logic
+    sidebar.classList.toggle(SIDEBAR_CLASSES.mobile.closed, !isOpen);
+    sidebar.classList.toggle(SIDEBAR_CLASSES.mobile.open, isOpen);
+
+    // Toggle overlay
+    if (overlay) {
+      overlay.classList.toggle(SIDEBAR_CLASSES.overlay, !isOpen);
+    }
+  } else {
+    // Desktop view logic
+    sidebar.classList.toggle(SIDEBAR_CLASSES.desktop.sidebar.closed, !isOpen);
+    sidebar.classList.toggle(SIDEBAR_CLASSES.desktop.sidebar.open, isOpen);
+    content.classList.toggle(SIDEBAR_CLASSES.desktop.content.closed, !isOpen);
+    content.classList.toggle(SIDEBAR_CLASSES.desktop.content.open, isOpen);
+
+    // Toggle text visibility in desktop mode
+    if (spans) {
+      spans.forEach((span) => {
+        span.classList.toggle(SIDEBAR_CLASSES.text, !isOpen);
+      });
+    }
+  }
 };
 
 /**
@@ -55,38 +90,16 @@ export const toggleSidebar = (
   content: HTMLElement | null,
   isCurrentlyOpen: boolean,
 ): boolean => {
-  if (!sidebar || !content) return isCurrentlyOpen;
-
   const isMobileView = isMobile();
   const newIsOpen = !isCurrentlyOpen;
   const overlay = document.getElementById("sidebar-overlay");
+  const spans = document.querySelectorAll<HTMLElement>("#sidebar span");
 
-  if (isMobileView) {
-    // On mobile, control visibility with translate classes
-    sidebar.classList.toggle(SIDEBAR_CLASSES.mobile.closed);
-    sidebar.classList.toggle(SIDEBAR_CLASSES.mobile.open);
-
-    // Toggle overlay visibility
-    if (overlay) {
-      if (newIsOpen) {
-        overlay.classList.remove("hidden");
-      } else {
-        overlay.classList.add("hidden");
-      }
-    }
-  } else {
-    // On desktop, control width
-    sidebar.classList.toggle(SIDEBAR_CLASSES.desktop.closed.sidebar);
-    sidebar.classList.toggle(SIDEBAR_CLASSES.desktop.open.sidebar);
-    content.classList.toggle(SIDEBAR_CLASSES.desktop.closed.content);
-    content.classList.toggle(SIDEBAR_CLASSES.desktop.open.content);
-
-    // Toggle text visibility
-    document.querySelectorAll("#sidebar span").forEach((span) => {
-      span.classList.toggle(SIDEBAR_CLASSES.text.hidden);
-      span.classList.toggle(SIDEBAR_CLASSES.text.visible);
-    });
-  }
+  applySidebarClasses(
+    { sidebar, content, overlay, spans },
+    isMobileView,
+    newIsOpen,
+  );
 
   return newIsOpen;
 };
@@ -110,32 +123,32 @@ export const initializeSidebar = (
     return { isOpen, isMobileView };
   }
 
-  if (isMobileView) {
-    // On mobile, initially hidden
-    sidebar.classList.add(SIDEBAR_CLASSES.mobile.closed);
-    sidebar.classList.remove(SIDEBAR_CLASSES.mobile.open);
+  // Reset all classes first
+  sidebar.classList.remove(
+    SIDEBAR_CLASSES.mobile.open,
+    SIDEBAR_CLASSES.mobile.closed,
+    SIDEBAR_CLASSES.desktop.sidebar.open,
+    SIDEBAR_CLASSES.desktop.sidebar.closed,
+  );
 
-    // Show layout toggle button on mobile
-    if (layoutToggle) {
-      layoutToggle.classList.remove(SIDEBAR_CLASSES.text.hidden);
-    }
-  } else {
-    // On desktop, initially expanded
-    sidebar.classList.remove(SIDEBAR_CLASSES.desktop.closed.sidebar);
-    sidebar.classList.add(SIDEBAR_CLASSES.desktop.open.sidebar);
-    content.classList.remove(SIDEBAR_CLASSES.desktop.closed.content);
-    content.classList.add(SIDEBAR_CLASSES.desktop.open.content);
+  content.classList.remove(
+    SIDEBAR_CLASSES.desktop.content.open,
+    SIDEBAR_CLASSES.desktop.content.closed,
+  );
 
-    // All texts visible initially on desktop
-    document.querySelectorAll("#sidebar span").forEach((span) => {
-      span.classList.remove(SIDEBAR_CLASSES.text.hidden);
-      span.classList.add(SIDEBAR_CLASSES.text.visible);
-    });
+  const overlay = document.getElementById("sidebar-overlay");
+  const spans = document.querySelectorAll<HTMLElement>("#sidebar span");
 
-    // Hide layout toggle on desktop
-    if (layoutToggle) {
-      layoutToggle.classList.add(SIDEBAR_CLASSES.text.hidden);
-    }
+  // Apply proper classes based on state
+  applySidebarClasses(
+    { sidebar, content, overlay, spans },
+    isMobileView,
+    isOpen,
+  );
+
+  // Layout toggle visibility
+  if (layoutToggle) {
+    layoutToggle.classList.toggle(SIDEBAR_CLASSES.text, !isMobileView);
   }
 
   return { isOpen, isMobileView };
@@ -157,11 +170,11 @@ export const updateSidebarIcons = (
   if (!openIcon || !closeIcon) return;
 
   // Set icon visibility based on sidebar state
-  openIcon.style.display = state.isOpen ? DISPLAY.hide : DISPLAY.show;
-  closeIcon.style.display = state.isOpen ? DISPLAY.show : DISPLAY.hide;
+  openIcon.style.display = state.isOpen ? "none" : "block";
+  closeIcon.style.display = state.isOpen ? "block" : "none";
 
   // Only handle layout toggle in mobile view
   if (layoutToggle && state.isMobileView) {
-    layoutToggle.style.display = state.isOpen ? DISPLAY.hide : DISPLAY.show;
+    layoutToggle.style.display = state.isOpen ? "none" : "block";
   }
 };

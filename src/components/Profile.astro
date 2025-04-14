@@ -1,7 +1,7 @@
 ---
-import { getPageById } from "../lib/services/notion";
+import { getPageById, getBlockChildren } from "../lib/services/notion";
 
-// Define simple interface for our profile data
+// Define interfaces for our profile data types
 interface ProfileData {
   name: string;
   title: string;
@@ -9,8 +9,15 @@ interface ProfileData {
   avatarUrl: string;
 }
 
+interface NotionBlock {
+  type: string;
+  id: string;
+  content: string | Array<{ text: string; bold?: boolean; italic?: boolean }>;
+}
+
 // Initialize state variables
 let profileData: ProfileData | null = null;
+let introBlocks: NotionBlock[] = [];
 let isLoading = true;
 let hasError = false;
 let errorMessage = "";
@@ -82,6 +89,60 @@ const extractProfileData = (page: any): ProfileData | null => {
   }
 };
 
+/**
+ * Process block content from Notion API
+ * @param block - Notion block object
+ * @returns Processed block with content
+ */
+const processBlockContent = (block: any): NotionBlock | null => {
+  try {
+    if (!block || !block.type) return null;
+
+    const blockType = block.type;
+
+    // Skip section headings and callouts
+    if (blockType === "callout" || blockType === "column_list") {
+      return null;
+    }
+
+    let content:
+      | string
+      | Array<{ text: string; bold?: boolean; italic?: boolean }> = "";
+
+    // Process different block types
+    if (blockType === "paragraph") {
+      if (block.paragraph?.rich_text?.length > 0) {
+        content = block.paragraph.rich_text.map((textItem: any) => ({
+          text: textItem.plain_text,
+          bold: textItem.annotations?.bold || false,
+          italic: textItem.annotations?.italic || false,
+        }));
+      }
+    } else if (
+      blockType === "heading_1" ||
+      blockType === "heading_2" ||
+      blockType === "heading_3"
+    ) {
+      if (block[blockType]?.rich_text?.length > 0) {
+        content = block[blockType].rich_text.map((textItem: any) => ({
+          text: textItem.plain_text,
+          bold: textItem.annotations?.bold || false,
+          italic: textItem.annotations?.italic || false,
+        }));
+      }
+    }
+
+    return {
+      id: block.id,
+      type: blockType,
+      content,
+    };
+  } catch (error) {
+    console.error("Error processing block:", error);
+    return null;
+  }
+};
+
 try {
   // Ensure we have the required environment variables
   if (!import.meta.env.PUBLIC_NOTION_TOKEN) {
@@ -96,18 +157,44 @@ try {
   const pageId = formatPageId(import.meta.env.PUBLIC_NOTION_PAGE_ID);
   console.log("Fetching Notion page with ID:", pageId);
 
-  // Fetch only the page data (no content blocks)
+  // Fetch the page data
   const page = await getPageById(pageId);
 
   if (page) {
-    // Extract only the essential profile data
+    // Extract the essential profile data
     profileData = extractProfileData(page);
 
     if (!profileData) {
       throw new Error("Failed to extract profile data from Notion page");
     }
 
+    // Fetch the page blocks
+    const blocksResponse = await getBlockChildren(pageId);
+
+    if (blocksResponse && blocksResponse.results) {
+      // Process blocks to extract intro content before sections
+      for (const block of blocksResponse.results) {
+        // Check if block is a full BlockObjectResponse (not partial)
+        if ("type" in block) {
+          // Stop processing when we hit the first callout (section heading)
+          if (block.type === "callout") {
+            break;
+          }
+
+          const processedBlock = processBlockContent(block);
+          if (
+            processedBlock &&
+            (processedBlock.type === "paragraph" ||
+              processedBlock.type.startsWith("heading_"))
+          ) {
+            introBlocks.push(processedBlock);
+          }
+        }
+      }
+    }
+
     console.log("Successfully loaded profile data from Notion");
+    console.log(`Loaded ${introBlocks.length} intro blocks`);
   } else {
     hasError = true;
     errorMessage = "Could not fetch page from Notion API";
@@ -156,8 +243,80 @@ try {
           </div>
         </div>
 
-        <div class="profile-description">
-          <p>{profileData.description}</p>
+        {/* Display intro blocks from Notion */}
+        <div class="profile-intro">
+          {introBlocks.map((block) => {
+            if (block.type === "paragraph") {
+              return (
+                <p class="profile-paragraph">
+                  {Array.isArray(block.content)
+                    ? block.content.map((text, i) => (
+                        <span
+                          class:list={{
+                            bold: text.bold,
+                            italic: text.italic,
+                          }}
+                        >
+                          {text.text}
+                        </span>
+                      ))
+                    : block.content}
+                </p>
+              );
+            } else if (block.type === "heading_1") {
+              return (
+                <h1 class="profile-heading-1">
+                  {Array.isArray(block.content)
+                    ? block.content.map((text, i) => (
+                        <span
+                          class:list={{
+                            bold: text.bold,
+                            italic: text.italic,
+                          }}
+                        >
+                          {text.text}
+                        </span>
+                      ))
+                    : block.content}
+                </h1>
+              );
+            } else if (block.type === "heading_2") {
+              return (
+                <h2 class="profile-heading-2">
+                  {Array.isArray(block.content)
+                    ? block.content.map((text, i) => (
+                        <span
+                          class:list={{
+                            bold: text.bold,
+                            italic: text.italic,
+                          }}
+                        >
+                          {text.text}
+                        </span>
+                      ))
+                    : block.content}
+                </h2>
+              );
+            } else if (block.type === "heading_3") {
+              return (
+                <h3 class="profile-heading-3">
+                  {Array.isArray(block.content)
+                    ? block.content.map((text, i) => (
+                        <span
+                          class:list={{
+                            bold: text.bold,
+                            italic: text.italic,
+                          }}
+                        >
+                          {text.text}
+                        </span>
+                      ))
+                    : block.content}
+                </h3>
+              );
+            }
+            return null;
+          })}
         </div>
       </>
     )

@@ -69,3 +69,19 @@ export const setupThemeListener = (): void => {
       }
     });
 };
+
+// Add a utility function to update button states
+export const updateButtonState = (
+  theme: ThemeType,
+  themeToggles: Record<ThemeType, HTMLElement | null>,
+): void => {
+  (Object.keys(themeToggles) as ThemeType[]).forEach((key) => {
+    if (themeToggles[key]) {
+      if (key === theme) {
+        themeToggles[key]!.classList.add("text-[var(--accent-color)]");
+      } else {
+        themeToggles[key]!.classList.remove("text-[var(--accent-color)]");
+      }
+    }
+  });
+};

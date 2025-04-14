@@ -34,50 +34,28 @@ import { Sun, Moon, Monitor } from "lucide-astro";
     getThemePreference,
     applyTheme,
     setupThemeListener,
+    updateButtonState,
     type ThemeType,
   } from "../lib/utils/theme";
 
-  // Set the theme according to user preference
-  const themeToggles: Record<ThemeType, HTMLElement | null> = {
-    light: document.getElementById("theme-toggle-light"),
-    dark: document.getElementById("theme-toggle-dark"),
-    system: document.getElementById("theme-toggle-system"),
-  };
-
-  // Update buttons active state
-  function updateButtonState(theme: ThemeType): void {
-    (Object.keys(themeToggles) as ThemeType[]).forEach((key) => {
-      if (themeToggles[key]) {
-        if (key === theme) {
-          themeToggles[key]!.classList.add("text-[var(--accent-color)]");
-        } else {
-          themeToggles[key]!.classList.remove("text-[var(--accent-color)]");
-        }
-      }
-    });
-  }
-
-  // Set up event listeners for theme toggle buttons
   document.addEventListener("DOMContentLoaded", () => {
+    const themeToggles: Record<ThemeType, HTMLElement | null> = {
+      light: document.getElementById("theme-toggle-light"),
+      dark: document.getElementById("theme-toggle-dark"),
+      system: document.getElementById("theme-toggle-system"),
+    };
+
     const currentTheme = getThemePreference();
-    updateButtonState(currentTheme);
+    updateButtonState(currentTheme, themeToggles);
 
-    // Light theme button
-    themeToggles.light?.addEventListener("click", () => {
-      applyTheme("light");
-      updateButtonState("light");
-    });
-
-    // Dark theme button
-    themeToggles.dark?.addEventListener("click", () => {
-      applyTheme("dark");
-      updateButtonState("dark");
-    });
-
-    // System theme button
-    themeToggles.system?.addEventListener("click", () => {
-      applyTheme("system");
-      updateButtonState("system");
+    // Add event listeners for theme toggle buttons
+    Object.entries(themeToggles).forEach(([theme, button]) => {
+      if (button) {
+        button.addEventListener("click", () => {
+          applyTheme(theme as ThemeType);
+          updateButtonState(theme as ThemeType, themeToggles);
+        });
+      }
     });
 
     // Setup listener for system preference changes

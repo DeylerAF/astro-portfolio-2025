@@ -15,10 +15,83 @@ import type {
   NotionFilesProperty,
 } from "../types/notion";
 
-// Initialize the Notion client with your API token
-const notion = new Client({
-  auth: import.meta.env.PUBLIC_NOTION_TOKEN,
-});
+// ===== Notion Client Module =====
+
+/**
+ * Singleton Notion client to centralize API access
+ */
+class NotionClient {
+  private static instance: NotionClient;
+  private client: Client;
+
+  private constructor() {
+    this.client = new Client({
+      auth: import.meta.env.PUBLIC_NOTION_TOKEN,
+    });
+  }
+
+  static getInstance(): NotionClient {
+    if (!NotionClient.instance) {
+      NotionClient.instance = new NotionClient();
+    }
+    return NotionClient.instance;
+  }
+
+  getClient(): Client {
+    return this.client;
+  }
+}
+
+// Get the Notion client instance
+const notionClient = NotionClient.getInstance().getClient();
+
+// ===== Type Guards =====
+
+/**
+ * Type guard to check if a block is a BlockObjectResponse
+ */
+function isBlockObjectResponse(block: unknown): block is BlockObjectResponse {
+  return typeof block === "object" && block !== null && "type" in block;
+}
+
+/**
+ * Type guard to check if a block has children
+ */
+function hasChildren(block: BlockObjectResponse): boolean {
+  return "has_children" in block && block.has_children === true;
+}
+
+/**
+ * Type guard to check if a string is an image URL
+ */
+function isImageUrl(url: string): boolean {
+  const imageExtensions = [".png", ".jpg", ".jpeg", ".gif", ".webp"];
+  const imageDomains = ["images.unsplash.com", "secure.notion-static.com"];
+
+  return (
+    imageExtensions.some((ext) => url.endsWith(ext)) ||
+    imageDomains.some((domain) => url.includes(domain))
+  );
+}
+
+// ===== Error Handling =====
+
+/**
+ * Standardized error handler for Notion API calls
+ * @param operation - Description of the operation that failed
+ * @param error - The error that occurred
+ * @param defaultValue - The default value to return on error
+ */
+function handleNotionError<T>(
+  operation: string,
+  error: unknown,
+  defaultValue: T,
+): T {
+  console.error(`Error ${operation}:`, error);
+  return defaultValue;
+}
+
+// ===== Project API =====
 
 /**
  * Fetches all projects from the Notion database
@@ -26,21 +99,13 @@ const notion = new Client({
  */
 export async function getProjects() {
   try {
-    const response = await notion.databases.query({
+    const response = await notionClient.databases.query({
       database_id: import.meta.env.PUBLIC_NOTION_DATABASE_ID,
-      // You can add filters here if needed
-      // For example:
-      // filter: {
-      //   property: 'Status',
-      //   status: { equals: 'Published' }
-      // },
-      // sorts: [{ property: 'Date', direction: 'descending' }],
     });
 
     return response.results;
   } catch (error) {
-    console.error("Error fetching projects from Notion:", error);
-    return [];
+    return handleNotionError("fetching projects from Notion", error, []);
   }
 }
 
@@ -53,16 +118,17 @@ export async function getProjectById(
   pageId: string,
 ): Promise<PageObjectResponse | null> {
   try {
-    const response = await notion.pages.retrieve({
+    const response = await notionClient.pages.retrieve({
       page_id: pageId,
     });
 
     return response as PageObjectResponse;
   } catch (error) {
-    console.error(`Error fetching project with ID ${pageId}:`, error);
-    return null;
+    return handleNotionError(`fetching project with ID ${pageId}`, error, null);
   }
 }
+
+// ===== Block API =====
 
 /**
  * Fetches all block children of a specific block or page
@@ -77,7 +143,7 @@ export async function getBlockChildren(
   pageSize: number = 100,
 ): Promise<ListBlockChildrenResponse> {
   try {
-    const response = await notion.blocks.children.list({
+    const response = await notionClient.blocks.children.list({
       block_id: blockId,
       start_cursor: startCursor,
       page_size: pageSize,
@@ -85,15 +151,14 @@ export async function getBlockChildren(
 
     return response;
   } catch (error) {
-    console.error(`Error fetching block children for ${blockId}:`, error);
-    return {
+    return handleNotionError(`fetching block children for ${blockId}`, error, {
       object: "list",
       type: "block",
       block: {},
       results: [],
       has_more: false,
       next_cursor: null,
-    };
+    });
   }
 }
 
@@ -112,23 +177,31 @@ export async function getAllBlocksRecursively(
   // Fetch all top-level blocks
   while (hasMore) {
     const response = await getBlockChildren(blockId, startCursor);
-    // Type assertion to ensure we're dealing with BlockObjectResponse objects
-    const blockResults = response.results.filter(
-      (block): block is BlockObjectResponse => "type" in block,
-    );
+    // Filter blocks to ensure they're BlockObjectResponse objects
+    const blockResults = response.results.filter(isBlockObjectResponse);
     blocks.push(...blockResults);
 
     hasMore = response.has_more;
     startCursor = response.next_cursor || undefined;
   }
 
-  // Recursively fetch children for blocks that can have children
+  // Process blocks with children recursively
+  const blocksWithChildren = await processBlocksWithChildren(blocks);
+  return blocksWithChildren;
+}
+
+/**
+ * Process blocks to fetch their children recursively
+ */
+async function processBlocksWithChildren(
+  blocks: BlockObjectResponse[],
+): Promise<BlockObjectResponse[]> {
   const blocksWithChildren: BlockObjectResponse[] = [];
+
   for (const block of blocks) {
     blocksWithChildren.push(block);
 
-    // Check if the block has children
-    if ("has_children" in block && block.has_children) {
+    if (hasChildren(block)) {
       const childBlocks = await getAllBlocksRecursively(block.id);
       blocksWithChildren.push(...childBlocks);
     }
@@ -136,6 +209,8 @@ export async function getAllBlocksRecursively(
 
   return blocksWithChildren;
 }
+
+// ===== Image Processing =====
 
 /**
  * Extracts all image blocks from an array of Notion blocks
@@ -145,19 +220,45 @@ export async function getAllBlocksRecursively(
 export function extractImagesFromBlocks(
   blocks: BlockObjectResponse[],
 ): string[] {
+  return blocks
+    .filter((block) => block.type === "image")
+    .map((block) => {
+      const imageBlock = block.image;
+      return imageBlock.type === "external"
+        ? imageBlock.external.url
+        : imageBlock.type === "file"
+          ? imageBlock.file.url
+          : "";
+    })
+    .filter((url) => url !== "");
+}
+
+/**
+ * Extracts cover image URL from a Notion page if it exists
+ */
+function extractCoverImage(page: PageObjectResponse): string | null {
+  if (!("cover" in page) || !page.cover) return null;
+
+  return page.cover.type === "external"
+    ? page.cover.external.url
+    : page.cover.type === "file"
+      ? page.cover.file.url
+      : null;
+}
+
+/**
+ * Extracts image URLs from property values
+ */
+function extractImagesFromProperties(
+  properties: Record<string, unknown>,
+): string[] {
   const imageUrls: string[] = [];
 
-  blocks.forEach((block) => {
-    // Check for image block type
-    if (block.type === "image") {
-      const imageBlock = block.image;
-
-      // Handle different image sources (external, file)
-      if (imageBlock.type === "external") {
-        imageUrls.push(imageBlock.external.url);
-      } else if (imageBlock.type === "file") {
-        imageUrls.push(imageBlock.file.url);
-      }
+  Object.values(properties).forEach((value) => {
+    if (Array.isArray(value)) {
+      value
+        .filter((item) => typeof item === "string" && isImageUrl(item))
+        .forEach((url) => imageUrls.push(url as string));
     }
   });
 
@@ -180,38 +281,18 @@ export async function getImagesFromPage(pageId: string): Promise<{
     const propertyImages: string[] = [];
 
     if (page) {
-      // Extract images from properties (e.g., cover image, files properties with images)
+      // Extract images from properties
       const parsedProperties = parseNotionProperties(page.properties);
 
-      // Get cover image if exists
-      if ("cover" in page && page.cover) {
-        if (page.cover.type === "external") {
-          propertyImages.push(page.cover.external.url);
-        } else if (page.cover.type === "file") {
-          propertyImages.push(page.cover.file.url);
-        }
+      // Add cover image if it exists
+      const coverImage = extractCoverImage(page);
+      if (coverImage) {
+        propertyImages.push(coverImage);
       }
 
-      // Get images from file properties
-      Object.values(parsedProperties).forEach((value) => {
-        if (Array.isArray(value)) {
-          value.forEach((item) => {
-            // Check if the item is a URL that looks like an image
-            if (
-              typeof item === "string" &&
-              (item.endsWith(".png") ||
-                item.endsWith(".jpg") ||
-                item.endsWith(".jpeg") ||
-                item.endsWith(".gif") ||
-                item.endsWith(".webp") ||
-                item.includes("images.unsplash.com") ||
-                item.includes("secure.notion-static.com"))
-            ) {
-              propertyImages.push(item);
-            }
-          });
-        }
-      });
+      // Add images from properties
+      const propertyImageUrls = extractImagesFromProperties(parsedProperties);
+      propertyImages.push(...propertyImageUrls);
     }
 
     // Get all blocks recursively
@@ -226,9 +307,67 @@ export async function getImagesFromPage(pageId: string): Promise<{
       allImages: [...propertyImages, ...blockImages],
     };
   } catch (error) {
-    console.error(`Error fetching images from page ${pageId}:`, error);
-    return { propertyImages: [], blockImages: [], allImages: [] };
+    return handleNotionError(`fetching images from page ${pageId}`, error, {
+      propertyImages: [],
+      blockImages: [],
+      allImages: [],
+    });
   }
+}
+
+// ===== Property Processing =====
+
+/**
+ * Process a Notion title property
+ */
+function processTitleProperty(property: NotionTitleProperty): string {
+  return property.title[0]?.plain_text || "";
+}
+
+/**
+ * Process a Notion rich text property
+ */
+function processRichTextProperty(property: NotionRichTextProperty): string {
+  return property.rich_text[0]?.plain_text || "";
+}
+
+/**
+ * Process a Notion URL property
+ */
+function processUrlProperty(property: NotionUrlProperty): string {
+  return property.url || "";
+}
+
+/**
+ * Process a Notion date property
+ */
+function processDateProperty(property: NotionDateProperty): string | null {
+  return property.date?.start || null;
+}
+
+/**
+ * Process a Notion multi-select property
+ */
+function processMultiSelectProperty(
+  property: NotionMultiSelectProperty,
+): string[] {
+  return property.multi_select.map((item) => item.name);
+}
+
+/**
+ * Process a Notion select property
+ */
+function processSelectProperty(property: NotionSelectProperty): string {
+  return property.select?.name || "";
+}
+
+/**
+ * Process a Notion files property
+ */
+function processFilesProperty(property: NotionFilesProperty): string[] {
+  return property.files
+    .map((file) => file.external?.url || file.file?.url || "")
+    .filter((url) => url !== "");
 }
 
 /**
@@ -238,7 +377,7 @@ export async function getImagesFromPage(pageId: string): Promise<{
  */
 export function parseNotionProperties(
   properties: Record<string, NotionProperty>,
-) {
+): Record<string, unknown> {
   const result: Record<string, unknown> = {};
 
   Object.keys(properties).forEach((key) => {
@@ -246,31 +385,29 @@ export function parseNotionProperties(
 
     switch (property.type) {
       case "title":
-        result[key] =
-          (property as NotionTitleProperty).title[0]?.plain_text || "";
+        result[key] = processTitleProperty(property as NotionTitleProperty);
         break;
       case "rich_text":
-        result[key] =
-          (property as NotionRichTextProperty).rich_text[0]?.plain_text || "";
+        result[key] = processRichTextProperty(
+          property as NotionRichTextProperty,
+        );
         break;
       case "url":
-        result[key] = (property as NotionUrlProperty).url || "";
+        result[key] = processUrlProperty(property as NotionUrlProperty);
         break;
       case "date":
-        result[key] = (property as NotionDateProperty).date?.start || null;
+        result[key] = processDateProperty(property as NotionDateProperty);
         break;
       case "multi_select":
-        result[key] = (property as NotionMultiSelectProperty).multi_select.map(
-          (item) => item.name,
+        result[key] = processMultiSelectProperty(
+          property as NotionMultiSelectProperty,
         );
         break;
       case "select":
-        result[key] = (property as NotionSelectProperty).select?.name || "";
+        result[key] = processSelectProperty(property as NotionSelectProperty);
         break;
       case "files":
-        result[key] = (property as NotionFilesProperty).files.map(
-          (file) => file.external?.url || file.file?.url || "",
-        );
+        result[key] = processFilesProperty(property as NotionFilesProperty);
         break;
       default:
         result[key] = property[property.type] || null;

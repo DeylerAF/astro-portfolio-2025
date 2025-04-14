@@ -20,26 +20,52 @@ const { title = "Astro Portfolio" } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
 
-    <!-- Minimal theme initialization script to prevent flash -->
+    <!-- Theme initialization script with system preference detection -->
     <script is:inline define:vars={{ THEME_STORAGE_KEY, THEME_CLASSES }}>
-      // Get theme preference from localStorage
-      const theme = localStorage.getItem(THEME_STORAGE_KEY);
-      const systemPrefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
+      (function initializeTheme() {
+        try {
+          // Safe access to browser APIs
+          const browserAPI = {
+            getThemePreference: () => {
+              return localStorage.getItem(THEME_STORAGE_KEY) || "system";
+            },
+            systemPrefersDark: () => {
+              return window.matchMedia("(prefers-color-scheme: dark)").matches;
+            },
+            updateThemeClass: (isDark) => {
+              const html = document.documentElement;
+              const lightClass = THEME_CLASSES.light;
+              const darkClass = THEME_CLASSES.dark;
 
-      // Remove any existing theme classes
-      document.documentElement.classList.remove(
-        THEME_CLASSES.light,
-        THEME_CLASSES.dark
-      );
+              // First remove both classes, then add the appropriate one
+              html.classList.remove(lightClass, darkClass);
+              html.classList.add(isDark ? darkClass : lightClass);
+            },
+          };
 
-      // Apply the appropriate theme class
-      if (theme === "dark" || (theme !== "light" && systemPrefersDark)) {
-        document.documentElement.classList.add(THEME_CLASSES.dark);
-      } else {
-        document.documentElement.classList.add(THEME_CLASSES.light);
-      }
+          // Get saved theme or use system preference
+          const savedTheme = browserAPI.getThemePreference();
+          const isDarkMode =
+            savedTheme === "dark" ||
+            (savedTheme !== "light" && browserAPI.systemPrefersDark());
+
+          // Apply the theme
+          browserAPI.updateThemeClass(isDarkMode);
+
+          // Add listener for system preference changes if using system setting
+          if (savedTheme !== "light" && savedTheme !== "dark") {
+            window
+              .matchMedia("(prefers-color-scheme: dark)")
+              .addEventListener("change", (e) => {
+                browserAPI.updateThemeClass(e.matches);
+              });
+          }
+        } catch (error) {
+          // Fallback to light theme in case of errors
+          console.error("Theme initialization error:", error);
+          document.documentElement.classList.add(THEME_CLASSES.light);
+        }
+      })();
     </script>
   </head>
   <body class="flex">

@@ -5,12 +5,12 @@
 export type ThemeType = "light" | "dark" | "system";
 
 // Constants to avoid magic strings
-const THEME_STORAGE_KEY = "theme";
-const THEME_CLASSES = {
+export const THEME_STORAGE_KEY = "theme";
+export const THEME_CLASSES = {
   light: "light",
   dark: "dark",
 };
-const THEME_ACCENT_CLASS = "text-[var(--accent-color)]";
+export const THEME_ACCENT_CLASS = "text-[var(--accent-color)]";
 
 /**
  * Gets the user's theme preference from local storage or system
@@ -65,36 +65,6 @@ export const applyTheme = (theme: ThemeType): void => {
  */
 export const initializeTheme = (): void => {
   applyTheme(getThemePreference());
-};
-
-/**
- * Returns a self-contained script for inline HTML head use
- * Uses the same logic as the main utilities but in a self-executing function
- */
-export const getInlineThemeScript = (): string => {
-  return `
-    (function() {
-      const THEME_STORAGE_KEY = "theme";
-      
-      const getThemePreference = () => {
-        if (typeof localStorage === "undefined") return "system";
-        const theme = localStorage.getItem(THEME_STORAGE_KEY);
-        return (theme === "light" || theme === "dark") ? theme : "system";
-      };
-      
-      const systemPrefersDark = () => {
-        return window.matchMedia("(prefers-color-scheme: dark)").matches;
-      };
-      
-      const resolveTheme = (theme) => {
-        return theme === "system" ? (systemPrefersDark() ? "dark" : "light") : theme;
-      };
-      
-      const theme = getThemePreference();
-      document.documentElement.classList.remove("light", "dark");
-      document.documentElement.classList.add(resolveTheme(theme));
-    })();
-  `;
 };
 
 /**

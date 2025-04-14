@@ -1,22 +1,29 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import Hero from "../components/Hero.astro";
 ---
 
-<Layout title="Portfolio Home">
-  <main class="mx-auto px-6 py-6 max-w-7xl">
-    <h1 class="text-4xl font-bold mb-4">Welcome to My Portfolio</h1>
-    <p class="text-lg mb-6">
-      This is a modern portfolio site built with Astro and Tailwind CSS, using
-      Notion as a CMS.
-    </p>
+<Layout title="Deyler Alvarez | Portfolio">
+  <main class="mx-auto px-6 py-12 max-w-7xl">
+    <section class="py-10">
+      <Hero />
+    </section>
 
-    <div class="mt-8">
-      <a
-        href="/products"
-        class="inline-block bg-[var(--accent-color)] hover:bg-[var(--accent-tertiary)] text-white px-4 py-2 rounded font-medium transition-colors"
-      >
-        View Products
-      </a>
-    </div>
+    <section class="py-10">
+      <h2 class="text-3xl font-bold mb-8 text-[var(--text-color)]">
+        My Projects
+      </h2>
+      <p class="mb-6 text-lg">
+        Check out some of my work from my Notion database:
+      </p>
+      <div class="mt-6">
+        <a
+          href="/products"
+          class="inline-block bg-[var(--accent-color)] hover:bg-[var(--accent-tertiary)] text-white px-5 py-3 rounded font-medium transition-colors"
+        >
+          View All Projects
+        </a>
+      </div>
+    </section>
   </main>
 </Layout>

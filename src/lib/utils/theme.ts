@@ -146,3 +146,57 @@ export const updateButtonState = (
     element.classList[isActive ? "add" : "remove"](THEME_ACCENT_CLASS);
   });
 };
+
+/**
+ * Generates an inline script for theme initialization
+ * Can be used directly in the head of an HTML document
+ * @returns The script content as a string
+ */
+export const generateInitializationScript = (): string => {
+  return `
+(function initializeTheme() {
+  try {
+    // Safe access to browser APIs
+    const browserAPI = {
+      getThemePreference: () => {
+        return localStorage.getItem("${THEME_STORAGE_KEY}") || "system";
+      },
+      systemPrefersDark: () => {
+        return window.matchMedia("(prefers-color-scheme: dark)").matches;
+      },
+      updateThemeClass: (isDark) => {
+        const html = document.documentElement;
+        const lightClass = "${THEME_CLASSES.light}";
+        const darkClass = "${THEME_CLASSES.dark}";
+
+        // First remove both classes, then add the appropriate one
+        html.classList.remove(lightClass, darkClass);
+        html.classList.add(isDark ? darkClass : lightClass);
+      },
+    };
+
+    // Get saved theme or use system preference
+    const savedTheme = browserAPI.getThemePreference();
+    const isDarkMode =
+      savedTheme === "dark" ||
+      (savedTheme !== "light" && browserAPI.systemPrefersDark());
+
+    // Apply the theme
+    browserAPI.updateThemeClass(isDarkMode);
+
+    // Add listener for system preference changes if using system setting
+    if (savedTheme !== "light" && savedTheme !== "dark") {
+      window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .addEventListener("change", (e) => {
+          browserAPI.updateThemeClass(e.matches);
+        });
+    }
+  } catch (error) {
+    // Fallback to light theme in case of errors
+    console.error("Theme initialization error:", error);
+    document.documentElement.classList.add("${THEME_CLASSES.light}");
+  }
+})();
+  `.trim();
+};

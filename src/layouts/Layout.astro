@@ -2,13 +2,14 @@
 import "../styles/global.css";
 import Sidebar from "../components/sidebar/Sidebar.astro";
 import Header from "../components/Header.astro";
-import { THEME_STORAGE_KEY, THEME_CLASSES } from "../lib/utils/theme";
+import { generateInitializationScript } from "../lib/utils/theme";
 
 interface Props {
   title?: string;
 }
 
 const { title = "Astro Portfolio" } = Astro.props;
+const themeInitScript = generateInitializationScript();
 ---
 
 <!doctype html>
@@ -19,54 +20,8 @@ const { title = "Astro Portfolio" } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
-
     <!-- Theme initialization script with system preference detection -->
-    <script is:inline define:vars={{ THEME_STORAGE_KEY, THEME_CLASSES }}>
-      (function initializeTheme() {
-        try {
-          // Safe access to browser APIs
-          const browserAPI = {
-            getThemePreference: () => {
-              return localStorage.getItem(THEME_STORAGE_KEY) || "system";
-            },
-            systemPrefersDark: () => {
-              return window.matchMedia("(prefers-color-scheme: dark)").matches;
-            },
-            updateThemeClass: (isDark) => {
-              const html = document.documentElement;
-              const lightClass = THEME_CLASSES.light;
-              const darkClass = THEME_CLASSES.dark;
-
-              // First remove both classes, then add the appropriate one
-              html.classList.remove(lightClass, darkClass);
-              html.classList.add(isDark ? darkClass : lightClass);
-            },
-          };
-
-          // Get saved theme or use system preference
-          const savedTheme = browserAPI.getThemePreference();
-          const isDarkMode =
-            savedTheme === "dark" ||
-            (savedTheme !== "light" && browserAPI.systemPrefersDark());
-
-          // Apply the theme
-          browserAPI.updateThemeClass(isDarkMode);
-
-          // Add listener for system preference changes if using system setting
-          if (savedTheme !== "light" && savedTheme !== "dark") {
-            window
-              .matchMedia("(prefers-color-scheme: dark)")
-              .addEventListener("change", (e) => {
-                browserAPI.updateThemeClass(e.matches);
-              });
-          }
-        } catch (error) {
-          // Fallback to light theme in case of errors
-          console.error("Theme initialization error:", error);
-          document.documentElement.classList.add(THEME_CLASSES.light);
-        }
-      })();
-    </script>
+    <script is:inline set:html={themeInitScript} />
   </head>
   <body class="flex">
     <!-- Backdrop overlay for mobile when sidebar is open -->

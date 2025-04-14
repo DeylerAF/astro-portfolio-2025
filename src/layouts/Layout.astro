@@ -2,17 +2,7 @@
 import "../styles/global.css";
 import Sidebar from "../components/sidebar/Sidebar.astro";
 import Header from "../components/Header.astro";
-import {
-  THEME_STORAGE_KEY,
-  THEME_CLASSES,
-  THEME_ACCENT_CLASS,
-  getThemePreference,
-  resolveTheme,
-} from "../lib/utils/theme";
-
-// Pre-compute some values for the inline script
-const preferenceFunction = getThemePreference.toString();
-const resolveFunction = resolveTheme.toString();
+import { THEME_STORAGE_KEY, THEME_CLASSES } from "../lib/utils/theme";
 
 interface Props {
   title?: string;
@@ -31,24 +21,12 @@ const { title = "Astro Portfolio" } = Astro.props;
     <title>{title}</title>
 
     <!-- Minimal theme initialization script to prevent flash -->
-    <script
-      is:inline
-      define:vars={{
-        THEME_STORAGE_KEY,
-        THEME_CLASSES,
-        THEME_ACCENT_CLASS,
-        preferenceFunction,
-        resolveFunction,
-      }}
-    >
-      // Recreate necessary functions from their string representations
-      const systemPrefersDark = () =>
-        window.matchMedia("(prefers-color-scheme: dark)").matches;
-      const getThemePreference = new Function("return " + preferenceFunction)();
-      const resolveTheme = new Function("return " + resolveFunction)();
-
-      // Get theme preference using the imported function
-      const preference = getThemePreference();
+    <script is:inline define:vars={{ THEME_STORAGE_KEY, THEME_CLASSES }}>
+      // Get theme preference from localStorage
+      const theme = localStorage.getItem(THEME_STORAGE_KEY);
+      const systemPrefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
 
       // Remove any existing theme classes
       document.documentElement.classList.remove(
@@ -56,9 +34,12 @@ const { title = "Astro Portfolio" } = Astro.props;
         THEME_CLASSES.dark
       );
 
-      // Resolve and apply the appropriate theme class
-      const themeToApply = resolveTheme(preference);
-      document.documentElement.classList.add(themeToApply);
+      // Apply the appropriate theme class
+      if (theme === "dark" || (theme !== "light" && systemPrefersDark)) {
+        document.documentElement.classList.add(THEME_CLASSES.dark);
+      } else {
+        document.documentElement.classList.add(THEME_CLASSES.light);
+      }
     </script>
   </head>
   <body class="flex">

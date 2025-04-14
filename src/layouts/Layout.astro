@@ -2,7 +2,7 @@
 import "../styles/global.css";
 import Sidebar from "../components/sidebar/Sidebar.astro";
 import SidebarToggle from "../components/sidebar/SidebarToggle.astro";
-import ThemeToggle from "../components/ThemeToggle.astro";
+import Header from "../components/Header.astro";
 import { PanelLeft, PanelLeftClose } from "lucide-astro";
 import { initializeTheme } from "../lib/utils/theme";
 
@@ -50,10 +50,16 @@ const { title = "Astro Portfolio" } = Astro.props;
       <div id="layout-sidebar-toggle" class="fixed top-4 left-4 z-30 hidden">
         <SidebarToggle />
       </div>
-      <div class="fixed top-4 right-4 z-30">
-        <ThemeToggle />
+
+      <!-- Nuevo Header con ThemeToggle incorporado -->
+      <Header>
+        <SidebarToggle slot="left" isOpen={false} />
+      </Header>
+
+      <!-- Contenido principal con margen superior para el header -->
+      <div class="mt-16 p-4">
+        <slot />
       </div>
-      <slot />
     </div>
   </body>
 </html>

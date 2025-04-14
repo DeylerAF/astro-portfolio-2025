@@ -1,0 +1,54 @@
+---
+import ThemeToggle from "./ThemeToggle.astro";
+---
+
+<header
+  id="main-header"
+  class="fixed top-0 right-0 left-0 md:left-16 h-16 z-30 transition-all duration-300 ease-in-out border-b border-[var(--border-color)] flex items-center justify-between px-4"
+>
+  <div class="flex items-center gap-3">
+    <!-- Slot para contenido adicional a la izquierda -->
+    <slot name="left" />
+    <h1 class="text-lg font-semibold">Mi Portfolio</h1>
+  </div>
+  <div class="flex items-center gap-2">
+    <!-- Slot para contenido adicional a la derecha -->
+    <slot name="right" />
+    <ThemeToggle />
+  </div>
+</header>
+
+<script>
+  // Script para sincronizar el header con el estado del sidebar
+  document.addEventListener("DOMContentLoaded", () => {
+    const header = document.getElementById("main-header");
+    const content = document.getElementById("content");
+
+    // Función para observar cambios en las clases del contenido
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === "class") {
+          // Actualizar la posición izquierda del header cuando cambia la clase del contenido
+          if (content.classList.contains("md:ml-64")) {
+            header.classList.remove("md:left-16");
+            header.classList.add("md:left-64");
+          } else {
+            header.classList.remove("md:left-64");
+            header.classList.add("md:left-16");
+          }
+        }
+      });
+    });
+
+    if (content) {
+      // Inicializar con el estado actual
+      if (content.classList.contains("md:ml-64")) {
+        header.classList.remove("md:left-16");
+        header.classList.add("md:left-64");
+      }
+
+      // Comenzar a observar cambios en el elemento content
+      observer.observe(content, { attributes: true });
+    }
+  });
+</script>

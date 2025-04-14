@@ -57,6 +57,19 @@ function isBlockObjectResponse(block: unknown): block is BlockObjectResponse {
 }
 
 /**
+ * Type guard to check if a response is a PageObjectResponse
+ */
+function isPageObjectResponse(
+  response: unknown,
+): response is PageObjectResponse {
+  return (
+    typeof response === "object" &&
+    response !== null &&
+    "properties" in response
+  );
+}
+
+/**
  * Type guard to check if a block has children
  */
 function hasChildren(block: BlockObjectResponse): boolean {
@@ -259,8 +272,11 @@ function extractImagesFromProperties(
   Object.values(properties).forEach((value) => {
     if (Array.isArray(value)) {
       value
-        .filter((item) => typeof item === "string" && isImageUrl(item))
-        .forEach((url) => imageUrls.push(url as string));
+        .filter(
+          (item: unknown) =>
+            typeof item === "string" && isImageUrl(item as string),
+        )
+        .forEach((url: string) => imageUrls.push(url as string));
     }
   });
 
@@ -368,8 +384,11 @@ function processSelectProperty(property: NotionSelectProperty): string {
  */
 function processFilesProperty(property: NotionFilesProperty): string[] {
   return property.files
-    .map((file) => file.external?.url || file.file?.url || "")
-    .filter((url) => url !== "");
+    .map(
+      (file: { external?: { url: string }; file?: { url: string } }) =>
+        file.external?.url || file.file?.url || "",
+    )
+    .filter((url: string) => url !== "");
 }
 
 /**
@@ -435,11 +454,17 @@ export async function getPage(): Promise<PageObjectResponse | null> {
       return null;
     }
 
+    console.log("Fetching page with ID:", pageId);
+
     const response = await notionClient.pages.retrieve({
       page_id: pageId,
     });
 
-    return response as PageObjectResponse;
+    if (!isPageObjectResponse(response)) {
+      throw new Error("Invalid response from Notion API");
+    }
+
+    return response;
   } catch (error) {
     return handleNotionError("fetching page from Notion", error, null);
   }

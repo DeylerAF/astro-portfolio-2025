@@ -24,31 +24,33 @@ import ThemeToggle from "./ThemeToggle.astro";
     const header = document.getElementById("main-header");
     const content = document.getElementById("content");
 
+    // Verificar que los elementos existen antes de continuar
+    if (!header || !content) return;
+
+    // Función para actualizar las clases del header según el estado de content
+    const updateHeaderPosition = () => {
+      if (content.classList.contains("md:ml-64")) {
+        header.classList.remove("md:left-16");
+        header.classList.add("md:left-64");
+      } else {
+        header.classList.remove("md:left-64");
+        header.classList.add("md:left-16");
+      }
+    };
+
     // Función para observar cambios en las clases del contenido
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.attributeName === "class") {
-          // Actualizar la posición izquierda del header cuando cambia la clase del contenido
-          if (content.classList.contains("md:ml-64")) {
-            header.classList.remove("md:left-16");
-            header.classList.add("md:left-64");
-          } else {
-            header.classList.remove("md:left-64");
-            header.classList.add("md:left-16");
-          }
+          updateHeaderPosition();
         }
       });
     });
 
-    if (content) {
-      // Inicializar con el estado actual
-      if (content.classList.contains("md:ml-64")) {
-        header.classList.remove("md:left-16");
-        header.classList.add("md:left-64");
-      }
+    // Inicializar con el estado actual
+    updateHeaderPosition();
 
-      // Comenzar a observar cambios en el elemento content
-      observer.observe(content, { attributes: true });
-    }
+    // Comenzar a observar cambios en el elemento content
+    observer.observe(content, { attributes: true });
   });
 </script>

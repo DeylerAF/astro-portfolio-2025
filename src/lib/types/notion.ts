@@ -54,3 +54,59 @@ export type NotionProperty =
   | NotionSelectProperty
   | NotionFilesProperty
   | NotionPropertyValue;
+
+/**
+ * Interface for rich text annotation properties
+ */
+export interface RichTextAnnotations {
+  bold: boolean;
+  italic: boolean;
+  strikethrough: boolean;
+  underline: boolean;
+  code: boolean;
+  color: string;
+}
+
+/**
+ * Interface for processed rich text items
+ */
+export interface RichTextItem {
+  text: string;
+  href: string | null;
+  annotations: RichTextAnnotations;
+  type: string;
+}
+
+/**
+ * Union type for various block content structures
+ */
+export type BlockContent =
+  | RichTextItem[]
+  | string
+  | null
+  | { text: RichTextItem[] | string; checked?: boolean }
+  | { text: RichTextItem[] | string; language?: string }
+  | {
+      text: RichTextItem[] | string;
+      icon?: {
+        type: string;
+        emoji?: string;
+        file?: { url: string };
+        external?: { url: string };
+      } | null;
+    }
+  | { url: string; caption?: RichTextItem[] | string }
+  | { title: string }
+  | { message: string };
+
+/**
+ * Interface for a processed Notion block ready for rendering
+ */
+export interface ProcessedBlock {
+  id: string;
+  type: string;
+  content: BlockContent;
+  children?: ProcessedBlock[];
+  hasChildren: boolean;
+  level?: number;
+}

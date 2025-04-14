@@ -13,6 +13,8 @@ import type {
   NotionMultiSelectProperty,
   NotionSelectProperty,
   NotionFilesProperty,
+  ProcessedBlock,
+  RichTextItem,
 } from "../types/notion";
 
 // ===== Notion Client Module =====
@@ -415,4 +417,296 @@ export function parseNotionProperties(
   });
 
   return result;
+}
+
+// ===== Page Content API =====
+
+/**
+ * Fetches a specific page by ID using the environment variable
+ * @returns Page data or null if not found
+ */
+export async function getPage(): Promise<PageObjectResponse | null> {
+  try {
+    const pageId = import.meta.env.PUBLIC_NOTION_PAGE_ID;
+    if (!pageId) {
+      console.error(
+        "PUBLIC_NOTION_PAGE_ID is not defined in environment variables",
+      );
+      return null;
+    }
+
+    const response = await notionClient.pages.retrieve({
+      page_id: pageId,
+    });
+
+    return response as PageObjectResponse;
+  } catch (error) {
+    return handleNotionError("fetching page from Notion", error, null);
+  }
+}
+
+/**
+ * Fetches a page by its explicit ID
+ * @param pageId - The Notion page ID
+ * @returns Page data or null if not found
+ */
+export async function getPageById(
+  pageId: string,
+): Promise<PageObjectResponse | null> {
+  try {
+    const response = await notionClient.pages.retrieve({
+      page_id: pageId,
+    });
+
+    return response as PageObjectResponse;
+  } catch (error) {
+    return handleNotionError(`fetching page with ID ${pageId}`, error, null);
+  }
+}
+
+/**
+ * Gets page content with processed blocks ready for rendering
+ * @param pageId - Optional page ID (falls back to env variable if not provided)
+ * @returns Object containing page metadata and content blocks
+ */
+export async function getPageContent(pageId?: string): Promise<{
+  page: PageObjectResponse | null;
+  blocks: BlockObjectResponse[];
+  processedContent: ProcessedBlock[];
+}> {
+  try {
+    const targetPageId = pageId || import.meta.env.PUBLIC_NOTION_PAGE_ID;
+
+    if (!targetPageId) {
+      console.error(
+        "No page ID provided and PUBLIC_NOTION_PAGE_ID is not defined",
+      );
+      return { page: null, blocks: [], processedContent: [] };
+    }
+
+    // Get the page metadata
+    const page = await getPageById(targetPageId);
+
+    if (!page) {
+      return { page: null, blocks: [], processedContent: [] };
+    }
+
+    // Get all blocks from the page
+    const blocks = await getAllBlocksRecursively(targetPageId);
+
+    // Process blocks for rendering
+    const processedContent = processBlocksForRendering(blocks);
+
+    return {
+      page,
+      blocks,
+      processedContent,
+    };
+  } catch (error) {
+    return handleNotionError(`fetching page content for ${pageId}`, error, {
+      page: null,
+      blocks: [],
+      processedContent: [],
+    });
+  }
+}
+
+// ===== Block Processing for Rendering =====
+
+/**
+ * Process blocks for rendering in a hierarchical structure
+ */
+function processBlocksForRendering(
+  blocks: BlockObjectResponse[],
+  parentId?: string,
+  level: number = 0,
+): ProcessedBlock[] {
+  const processedBlocks: ProcessedBlock[] = [];
+  const directChildren = blocks.filter((block) => {
+    // If we're processing top-level blocks, we only want blocks without a parent
+    // Otherwise, we want blocks that are direct children of the specified parent
+    if (!parentId) {
+      return (
+        !block.parent ||
+        block.parent.type === "page_id" ||
+        block.parent.type === "workspace"
+      );
+    }
+    return (
+      block.parent &&
+      block.parent.type === "block_id" &&
+      block.parent.block_id === parentId
+    );
+  });
+
+  directChildren.forEach((block) => {
+    const processedBlock = processBlockContent(block, level);
+
+    // Process children recursively if this block has children
+    if (block.has_children) {
+      const childBlocks = blocks.filter(
+        (childBlock) =>
+          childBlock.parent &&
+          childBlock.parent.type === "block_id" &&
+          childBlock.parent.block_id === block.id,
+      );
+
+      if (childBlocks.length > 0) {
+        processedBlock.children = processBlocksForRendering(
+          blocks,
+          block.id,
+          level + 1,
+        );
+      }
+    }
+
+    processedBlocks.push(processedBlock);
+  });
+
+  return processedBlocks;
+}
+
+/**
+ * Process an individual block's content based on its type
+ */
+function processBlockContent(
+  block: BlockObjectResponse,
+  level: number = 0,
+): ProcessedBlock {
+  const baseProcessedBlock: ProcessedBlock = {
+    id: block.id,
+    type: block.type,
+    content: null,
+    hasChildren: block.has_children,
+    level,
+  };
+
+  switch (block.type) {
+    case "paragraph":
+      baseProcessedBlock.content = processRichTextArray(
+        block.paragraph.rich_text,
+      );
+      break;
+    case "heading_1":
+      baseProcessedBlock.content = processRichTextArray(
+        block.heading_1.rich_text,
+      );
+      break;
+    case "heading_2":
+      baseProcessedBlock.content = processRichTextArray(
+        block.heading_2.rich_text,
+      );
+      break;
+    case "heading_3":
+      baseProcessedBlock.content = processRichTextArray(
+        block.heading_3.rich_text,
+      );
+      break;
+    case "bulleted_list_item":
+      baseProcessedBlock.content = processRichTextArray(
+        block.bulleted_list_item.rich_text,
+      );
+      break;
+    case "numbered_list_item":
+      baseProcessedBlock.content = processRichTextArray(
+        block.numbered_list_item.rich_text,
+      );
+      break;
+    case "to_do":
+      baseProcessedBlock.content = {
+        text: processRichTextArray(block.to_do.rich_text),
+        checked: block.to_do.checked,
+      };
+      break;
+    case "toggle":
+      baseProcessedBlock.content = processRichTextArray(block.toggle.rich_text);
+      break;
+    case "code":
+      baseProcessedBlock.content = {
+        text: processRichTextArray(block.code.rich_text),
+        language: block.code.language,
+      };
+      break;
+    case "quote":
+      baseProcessedBlock.content = processRichTextArray(block.quote.rich_text);
+      break;
+    case "callout":
+      baseProcessedBlock.content = {
+        text: processRichTextArray(block.callout.rich_text),
+        icon: block.callout.icon,
+      };
+      break;
+    case "divider":
+      baseProcessedBlock.content = null;
+      break;
+    case "image":
+      baseProcessedBlock.content = {
+        url:
+          block.image.type === "external"
+            ? block.image.external.url
+            : block.image.file.url,
+        caption: block.image.caption
+          ? processRichTextArray(block.image.caption)
+          : "",
+      };
+      break;
+    case "bookmark":
+      baseProcessedBlock.content = {
+        url: block.bookmark.url,
+        caption: block.bookmark.caption
+          ? processRichTextArray(block.bookmark.caption)
+          : "",
+      };
+      break;
+    case "child_page":
+      baseProcessedBlock.content = {
+        title: block.child_page.title,
+      };
+      break;
+    case "child_database":
+      baseProcessedBlock.content = {
+        title: block.child_database.title,
+      };
+      break;
+    default:
+      if (block.type === "unsupported") {
+        baseProcessedBlock.content = { message: "Unsupported block type" };
+      } else {
+        baseProcessedBlock.content = {
+          message: `Unknown block type: ${block.type}`,
+        };
+      }
+  }
+
+  return baseProcessedBlock;
+}
+
+/**
+ * Process an array of rich text objects
+ */
+function processRichTextArray(
+  richTexts: {
+    plain_text: string;
+    href?: string | null;
+    annotations: {
+      bold: boolean;
+      italic: boolean;
+      strikethrough: boolean;
+      underline: boolean;
+      code: boolean;
+      color: string;
+    };
+    type: string;
+  }[],
+): RichTextItem[] | string {
+  if (!richTexts || !Array.isArray(richTexts) || richTexts.length === 0) {
+    return "";
+  }
+
+  return richTexts.map((richText) => ({
+    text: richText.plain_text,
+    href: richText.href || null,
+    annotations: richText.annotations,
+    type: richText.type,
+  })) as RichTextItem[];
 }

@@ -120,7 +120,11 @@ export const initializeSidebar = (
 ): SidebarState => {
   const viewportWidth = getViewportWidth();
   const isMobileView = viewportWidth < breakpoints.md;
-  const isOpen = !isMobileView; // Default: closed on mobile, open on desktop
+  const isTabletView =
+    viewportWidth >= breakpoints.md && viewportWidth < breakpoints.lg;
+
+  // Default: closed on mobile and tablet, open on desktop
+  const isOpen = !(isMobileView || isTabletView);
 
   if (!sidebar || !content) {
     return { isOpen, isMobileView };

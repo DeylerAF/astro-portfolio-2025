@@ -1,32 +1,57 @@
 ---
-import { Sun, Moon, Monitor } from "lucide-astro";
+import { Sun, Moon, Monitor, ChevronDown } from "lucide-astro";
 ---
 
-<div class="flex gap-2 p-2">
+<div class="theme-toggle-container relative">
   <button
-    id="theme-toggle-light"
-    title="Use light theme"
-    class="p-2 rounded-md transition-colors hover:bg-[var(--hover-bg)] text-[var(--text-color)]"
-    aria-label="Use light theme"
+    id="theme-toggle-button"
+    title="Toggle theme options"
+    class="p-2 rounded-md transition-colors hover:bg-[var(--hover-bg)] text-[var(--text-color)] flex items-center gap-1"
+    aria-label="Toggle theme options"
+    aria-haspopup="true"
+    aria-expanded="false"
   >
-    <Sun class="w-5 h-5" />
+    <span id="current-theme-icon">
+      <!-- The active theme icon will be placed here by script -->
+      <Sun class="w-5 h-5 theme-icon" id="light-icon" />
+      <Moon class="w-5 h-5 theme-icon hidden" id="dark-icon" />
+      <Monitor class="w-5 h-5 theme-icon hidden" id="system-icon" />
+    </span>
+    <ChevronDown class="w-4 h-4 transition-transform" id="dropdown-chevron" />
   </button>
-  <button
-    id="theme-toggle-dark"
-    title="Use dark theme"
-    class="p-2 rounded-md transition-colors hover:bg-[var(--hover-bg)] text-[var(--text-color)]"
-    aria-label="Use dark theme"
+
+  <div
+    id="theme-dropdown"
+    class="absolute top-full right-0 mt-1 p-1 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-md shadow-md hidden z-50"
   >
-    <Moon class="w-5 h-5" />
-  </button>
-  <button
-    id="theme-toggle-system"
-    title="Use system theme"
-    class="p-2 rounded-md transition-colors hover:bg-[var(--hover-bg)] text-[var(--text-color)]"
-    aria-label="Use system theme"
-  >
-    <Monitor class="w-5 h-5" />
-  </button>
+    <button
+      id="theme-toggle-light"
+      title="Use light theme"
+      class="flex items-center gap-2 w-full p-2 rounded-md transition-colors hover:bg-[var(--hover-bg)] text-[var(--text-color)]"
+      aria-label="Use light theme"
+    >
+      <Sun class="w-5 h-5" />
+      <span class="text-sm">Light</span>
+    </button>
+    <button
+      id="theme-toggle-dark"
+      title="Use dark theme"
+      class="flex items-center gap-2 w-full p-2 rounded-md transition-colors hover:bg-[var(--hover-bg)] text-[var(--text-color)]"
+      aria-label="Use dark theme"
+    >
+      <Moon class="w-5 h-5" />
+      <span class="text-sm">Dark</span>
+    </button>
+    <button
+      id="theme-toggle-system"
+      title="Use system theme"
+      class="flex items-center gap-2 w-full p-2 rounded-md transition-colors hover:bg-[var(--hover-bg)] text-[var(--text-color)]"
+      aria-label="Use system theme"
+    >
+      <Monitor class="w-5 h-5" />
+      <span class="text-sm">System</span>
+    </button>
+  </div>
 </div>
 
 <script>
@@ -39,26 +64,97 @@ import { Sun, Moon, Monitor } from "lucide-astro";
   } from "../lib/utils/theme";
 
   document.addEventListener("DOMContentLoaded", () => {
+    const themeDropdown = document.getElementById("theme-dropdown");
+    const themeToggleButton = document.getElementById("theme-toggle-button");
+    const dropdownChevron = document.getElementById("dropdown-chevron");
+    const themeIcons = {
+      light: document.getElementById("light-icon"),
+      dark: document.getElementById("dark-icon"),
+      system: document.getElementById("system-icon"),
+    };
+
     const themeToggles: Record<ThemeType, HTMLElement | null> = {
       light: document.getElementById("theme-toggle-light"),
       dark: document.getElementById("theme-toggle-dark"),
       system: document.getElementById("theme-toggle-system"),
     };
 
+    // Function to update the visible icon in the main button
+    const updateMainButtonIcon = (theme: ThemeType) => {
+      // Hide all icons first
+      Object.values(themeIcons).forEach((icon) => {
+        if (icon) icon.classList.add("hidden");
+      });
+
+      // Show the active theme icon
+      if (themeIcons[theme]) {
+        themeIcons[theme]!.classList.remove("hidden");
+      }
+    };
+
+    // Enhanced button state update to include main button icon
+    const enhancedUpdateButtonState = (theme: ThemeType) => {
+      updateButtonState(theme, themeToggles);
+      updateMainButtonIcon(theme);
+    };
+
     const currentTheme = getThemePreference();
-    updateButtonState(currentTheme, themeToggles);
+    enhancedUpdateButtonState(currentTheme);
+
+    // Toggle dropdown visibility
+    const toggleDropdown = () => {
+      const isVisible = !themeDropdown?.classList.contains("hidden");
+      if (isVisible) {
+        themeDropdown?.classList.add("hidden");
+        dropdownChevron?.classList.remove("rotate-180");
+        themeToggleButton?.setAttribute("aria-expanded", "false");
+      } else {
+        themeDropdown?.classList.remove("hidden");
+        dropdownChevron?.classList.add("rotate-180");
+        themeToggleButton?.setAttribute("aria-expanded", "true");
+      }
+    };
+
+    // Close dropdown if clicked outside
+    const closeDropdownOnClickOutside = (e: MouseEvent) => {
+      if (
+        themeDropdown &&
+        !themeDropdown.classList.contains("hidden") &&
+        e.target instanceof Node &&
+        !themeToggleButton?.contains(e.target) &&
+        !themeDropdown.contains(e.target)
+      ) {
+        themeDropdown.classList.add("hidden");
+        dropdownChevron?.classList.remove("rotate-180");
+        themeToggleButton?.setAttribute("aria-expanded", "false");
+      }
+    };
+
+    // Toggle dropdown when main button is clicked
+    themeToggleButton?.addEventListener("click", toggleDropdown);
+
+    // Add click outside listener
+    document.addEventListener("click", closeDropdownOnClickOutside);
 
     // Add event listeners for theme toggle buttons
     Object.entries(themeToggles).forEach(([theme, button]) => {
       if (button) {
         button.addEventListener("click", () => {
           applyTheme(theme as ThemeType);
-          updateButtonState(theme as ThemeType, themeToggles);
+          enhancedUpdateButtonState(theme as ThemeType);
+          toggleDropdown(); // Close dropdown after selection
         });
       }
     });
 
     // Setup listener for system preference changes
     setupThemeListener();
+
+    // Keyboard navigation support
+    themeToggleButton?.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !themeDropdown?.classList.contains("hidden")) {
+        toggleDropdown();
+      }
+    });
   });
 </script>

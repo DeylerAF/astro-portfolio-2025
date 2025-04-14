@@ -1,7 +1,7 @@
 /**
  * Sidebar utility functions for managing sidebar state
  */
-import { isMobile } from "./responsive";
+import { getViewportWidth, breakpoints } from "./responsive";
 
 /**
  * Type definition for sidebar state
@@ -29,8 +29,9 @@ const SIDEBAR_CLASSES = {
       closed: "md:ml-16",
     },
   },
-  text: "hidden", // Class to hide/show text elements
+  text: "md:hidden", // Class to hide/show text elements
   overlay: "hidden", // Class to hide/show overlay
+  activeIcon: "text-[var(--accent-color)]", // Class for active link icon
 };
 
 /**
@@ -90,7 +91,8 @@ export const toggleSidebar = (
   content: HTMLElement | null,
   isCurrentlyOpen: boolean,
 ): boolean => {
-  const isMobileView = isMobile();
+  const viewportWidth = getViewportWidth();
+  const isMobileView = viewportWidth < breakpoints.md;
   const newIsOpen = !isCurrentlyOpen;
   const overlay = document.getElementById("sidebar-overlay");
   const spans = document.querySelectorAll<HTMLElement>("#sidebar span");
@@ -116,7 +118,8 @@ export const initializeSidebar = (
   content: HTMLElement | null,
   layoutToggle?: HTMLElement | null,
 ): SidebarState => {
-  const isMobileView = isMobile();
+  const viewportWidth = getViewportWidth();
+  const isMobileView = viewportWidth < breakpoints.md;
   const isOpen = !isMobileView; // Default: closed on mobile, open on desktop
 
   if (!sidebar || !content) {
@@ -151,7 +154,25 @@ export const initializeSidebar = (
     layoutToggle.classList.toggle(SIDEBAR_CLASSES.text, !isMobileView);
   }
 
+  // Add appropriate ARIA attributes
+  updateSidebarAccessibility(sidebar, isOpen);
+
   return { isOpen, isMobileView };
+};
+
+/**
+ * Update ARIA attributes for better accessibility
+ * @param sidebar The sidebar element
+ * @param isOpen Whether the sidebar is open
+ */
+const updateSidebarAccessibility = (
+  sidebar: HTMLElement | null,
+  isOpen: boolean,
+): void => {
+  if (!sidebar) return;
+
+  // Set appropriate ARIA attributes
+  sidebar.setAttribute("aria-hidden", isOpen ? "false" : "true");
 };
 
 /**
@@ -177,4 +198,34 @@ export const updateSidebarIcons = (
   if (layoutToggle && state.isMobileView) {
     layoutToggle.style.display = state.isOpen ? "none" : "block";
   }
+};
+
+/**
+ * Handle clicks outside the sidebar to close it on mobile
+ * @param event - The click event
+ * @param state - The current sidebar state
+ * @param sidebar - The sidebar element
+ * @param content - The content element
+ * @returns The updated sidebar state
+ */
+export const handleOutsideClick = (
+  event: MouseEvent,
+  state: SidebarState,
+  sidebar: HTMLElement | null,
+  content: HTMLElement | null,
+): SidebarState => {
+  // Only proceed if on mobile and sidebar is open
+  if (!state.isMobileView || !state.isOpen || !sidebar) {
+    return state;
+  }
+
+  // Check if click is outside sidebar
+  const target = event.target as Node;
+  if (sidebar.contains(target)) {
+    return state;
+  }
+
+  // Toggle sidebar closed
+  const newIsOpen = toggleSidebar(sidebar, content, true);
+  return { ...state, isOpen: newIsOpen };
 };

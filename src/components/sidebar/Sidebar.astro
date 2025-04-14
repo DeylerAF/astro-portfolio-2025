@@ -2,7 +2,8 @@
 import { Home, FolderKanban } from "lucide-astro";
 import SidebarToggle from "./SidebarToggle.astro";
 
-// The sidebar state is handled client-side through utility functions
+// Get current path to determine active link
+const { pathname } = Astro.url;
 ---
 
 <div
@@ -11,31 +12,53 @@ import SidebarToggle from "./SidebarToggle.astro";
   -translate-x-full md:translate-x-0
   w-[16rem]"
 >
-  <div class="flex justify-end p-3">
+  <div class="flex justify-between items-center p-3">
     <SidebarToggle />
   </div>
 
   <div class="mt-4">
-    <ul>
-      <li class="mb-2">
-        <a
-          href="/"
-          class="flex items-center py-2 px-4 transition-colors text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--accent-color)] md:justify-center"
-        >
-          <Home class="w-5 h-5" />
-          <span class="ml-3">Home</span>
-        </a>
-      </li>
-      <li class="mb-2">
-        <a
-          href="/projects"
-          class="flex items-center py-2 px-4 transition-colors text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--accent-color)] md:justify-center"
-        >
-          <FolderKanban class="w-5 h-5" />
-          <span class="ml-3">Projects</span>
-        </a>
-      </li>
-      <!-- Add more navigation links as needed -->
-    </ul>
+    <nav aria-label="Main Navigation">
+      <ul>
+        <li class="mb-2">
+          <a
+            href="/"
+            class={`flex items-center py-2 px-4 transition-colors hover:bg-[var(--sidebar-hover)] hover:text-[var(--accent-color)] relative
+            ${pathname === "/" ? "text-[var(--accent-color)] font-medium" : "text-[var(--sidebar-text)]"}`}
+            aria-current={pathname === "/" ? "page" : undefined}
+          >
+            <Home class="w-5 h-5" />
+            <span class="ml-3">Home</span>
+            {
+              pathname === "/" && (
+                <span
+                  class="absolute left-0 top-0 bottom-0 w-1 bg-[var(--accent-color)]"
+                  aria-hidden="true"
+                />
+              )
+            }
+          </a>
+        </li>
+        <li class="mb-2">
+          <a
+            href="/projects"
+            class={`flex items-center py-2 px-4 transition-colors hover:bg-[var(--sidebar-hover)] hover:text-[var(--accent-color)] relative
+            ${pathname === "/projects" ? "text-[var(--accent-color)] font-medium" : "text-[var(--sidebar-text)]"}`}
+            aria-current={pathname === "/projects" ? "page" : undefined}
+          >
+            <FolderKanban class="w-5 h-5" />
+            <span class="ml-3">Projects</span>
+            {
+              pathname === "/projects" && (
+                <span
+                  class="absolute left-0 top-0 bottom-0 w-1 bg-[var(--accent-color)]"
+                  aria-hidden="true"
+                />
+              )
+            }
+          </a>
+        </li>
+        <!-- Add more navigation links as needed -->
+      </ul>
+    </nav>
   </div>
 </div>

@@ -9,18 +9,22 @@ const { isOpen = true } = Astro.props;
 ---
 
 <button
-  class="toggle-sidebar p-2 rounded transition-colors hover:bg-[var(--sidebar-hover)]"
+  class="toggle-sidebar p-2 rounded-md transition-colors hover:bg-[var(--sidebar-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] focus:ring-opacity-50"
   aria-label="Toggle Sidebar"
+  aria-expanded={isOpen ? "true" : "false"}
+  aria-controls="sidebar"
 >
   <PanelLeftClose
     id="sidebar-close-icon"
     class="w-5 h-5"
     style={isOpen ? "" : "display: none;"}
+    aria-hidden="true"
   />
   <PanelLeft
     id="sidebar-open-icon"
     class="w-5 h-5"
     style={isOpen ? "display: none;" : ""}
+    aria-hidden="true"
   />
 </button>
 
@@ -31,13 +35,14 @@ const { isOpen = true } = Astro.props;
     updateSidebarIcons,
     type SidebarState,
   } from "../../lib/utils/sidebar";
+  import { getViewportWidth, breakpoints } from "../../lib/utils/responsive";
 
   document.addEventListener("DOMContentLoaded", () => {
     // Get all required elements
     const elements = {
       sidebar: document.getElementById("sidebar"),
       content: document.getElementById("content"),
-      toggleButtons: document.getElementsByClassName("toggle-sidebar"),
+      toggleButtons: document.querySelectorAll<HTMLElement>(".toggle-sidebar"),
       layoutToggle: document.getElementById("layout-sidebar-toggle"),
       overlay: document.getElementById("sidebar-overlay"),
       openIcon: document.getElementById("sidebar-open-icon"),
@@ -60,8 +65,9 @@ const { isOpen = true } = Astro.props;
     // Initialize sidebar state
     let state: SidebarState = initializeSidebar(sidebar, content, layoutToggle);
 
-    // Set initial icon visibility
+    // Set initial icon visibility and ARIA attributes
     updateSidebarIcons(openIcon, closeIcon, state, layoutToggle);
+    updateAriaAttributes();
 
     // Handler for toggling sidebar
     const handleToggleSidebar = () => {
@@ -69,6 +75,7 @@ const { isOpen = true } = Astro.props;
 
       state.isOpen = toggleSidebar(sidebar, content, state.isOpen);
       updateSidebarIcons(openIcon, closeIcon, state, layoutToggle);
+      updateAriaAttributes();
     };
 
     // Handler for closing sidebar on mobile
@@ -78,8 +85,15 @@ const { isOpen = true } = Astro.props;
       }
     };
 
+    // Function to update ARIA attributes
+    function updateAriaAttributes() {
+      toggleButtons.forEach((btn) => {
+        btn.setAttribute("aria-expanded", state.isOpen ? "true" : "false");
+      });
+    }
+
     // Add click handler to toggle buttons
-    Array.from(toggleButtons).forEach((btn) => {
+    toggleButtons.forEach((btn) => {
       btn.addEventListener("click", handleToggleSidebar);
     });
 
@@ -90,12 +104,21 @@ const { isOpen = true } = Astro.props;
 
     // Handle viewport changes
     window.addEventListener("resize", () => {
-      const isMobileViewNow = window.innerWidth < 768;
+      const viewportWidth = getViewportWidth();
+      const isMobileViewNow = viewportWidth < breakpoints.md;
 
       // Only reinitialize if viewport type changed
       if (state.isMobileView !== isMobileViewNow) {
         state = initializeSidebar(sidebar, content, layoutToggle);
         updateSidebarIcons(openIcon, closeIcon, state, layoutToggle);
+        updateAriaAttributes();
+      }
+    });
+
+    // Add keyboard support
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && state.isOpen && state.isMobileView) {
+        handleToggleSidebar();
       }
     });
   });

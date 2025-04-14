@@ -1,16 +1,15 @@
 ---
 import "../styles/global.css";
 import Sidebar from "../components/sidebar/Sidebar.astro";
-import SidebarToggle from "../components/sidebar/SidebarToggle.astro";
 import Header from "../components/Header.astro";
-import { PanelLeft, PanelLeftClose } from "lucide-astro";
-import { initializeTheme } from "../lib/utils/theme";
+import { getInlineThemeScript } from "../lib/utils/theme";
 
 interface Props {
   title?: string;
 }
 
 const { title = "Astro Portfolio" } = Astro.props;
+const themeScript = getInlineThemeScript();
 ---
 
 <!doctype html>
@@ -23,12 +22,7 @@ const { title = "Astro Portfolio" } = Astro.props;
     <title>{title}</title>
 
     <!-- Minimal theme initialization script to prevent flash -->
-    <script is:inline>
-      // Use the imported initializeTheme function from theme utils
-      {
-        initializeTheme();
-      }
-    </script>
+    <script is:inline set:html={themeScript} />
   </head>
   <body class="flex">
     <!-- Backdrop overlay for mobile when sidebar is open -->

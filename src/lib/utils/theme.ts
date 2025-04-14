@@ -51,10 +51,39 @@ export const applyTheme = (theme: ThemeType): void => {
  */
 export const initializeTheme = (): void => {
   const themeValue = getThemePreference();
-  const isDark =
-    themeValue === "dark" || (themeValue === "system" && systemPrefersDark());
+  applyTheme(themeValue);
+};
 
-  document.documentElement.classList.add(isDark ? "dark" : "light");
+/**
+ * Returns a self-contained script as a string for inline use in HTML head
+ * This avoids duplication of logic by generating the minimal script needed
+ */
+export const getInlineThemeScript = (): string => {
+  return `
+    (function() {
+      // Get theme from localStorage or default to system
+      const getTheme = () => {
+        if (typeof localStorage === "undefined") return "system";
+        const saved = localStorage.getItem("theme");
+        return (saved === "light" || saved === "dark") ? saved : "system";
+      };
+      
+      // Check if system prefers dark mode
+      const systemPrefersDark = () => {
+        return window.matchMedia("(prefers-color-scheme: dark)").matches;
+      };
+      
+      // Get theme and apply appropriate class
+      const theme = getTheme();
+      document.documentElement.classList.remove("light", "dark");
+      
+      if (theme === "system") {
+        document.documentElement.classList.add(systemPrefersDark() ? "dark" : "light");
+      } else {
+        document.documentElement.classList.add(theme);
+      }
+    })();
+  `;
 };
 
 /**

@@ -25,8 +25,6 @@ const themeInitScript = generateInitializationScript();
     <script is:inline set:html={themeInitScript} />
   </head>
   <body class="flex min-h-screen bg-[var(--body-bg)] text-[var(--text-color)]">
-    <!-- Header component -->
-    <Header />
     <!-- Backdrop overlay for mobile when sidebar is open -->
     <div
       id="sidebar-overlay"
@@ -38,10 +36,12 @@ const themeInitScript = generateInitializationScript();
     <Sidebar />
     <div
       id="content"
-      class="md:ml-16 flex-grow transition-all duration-300 ease-in-out max-w-full overflow-x-hidden"
+      class="md:ml-16 flex-grow transition-all duration-300 ease-in-out max-w-full overflow-x-hidden flex flex-col"
     >
-      <!-- Main content with margin top for the header -->
-      <main class="mt-16 p-4 md:p-6 container mx-auto max-w-6xl">
+      <!-- Header component -->
+      <Header />
+      <!-- Main content without margin top since header is now in content flow -->
+      <main class="p-4 md:p-6 container mx-auto max-w-6xl">
         <slot />
       </main>
       <!-- Footer -->

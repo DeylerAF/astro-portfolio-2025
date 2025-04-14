@@ -91,13 +91,13 @@ function handleNotionError<T>(
   return defaultValue;
 }
 
-// ===== Project API =====
+// ===== Product API =====
 
 /**
- * Fetches all projects from the Notion database
- * @returns Array of projects from Notion
+ * Fetches all products from the Notion database
+ * @returns Array of products from Notion
  */
-export async function getProjects() {
+export async function getProducts() {
   try {
     const response = await notionClient.databases.query({
       database_id: import.meta.env.PUBLIC_NOTION_DATABASE_ID,
@@ -105,16 +105,16 @@ export async function getProjects() {
 
     return response.results;
   } catch (error) {
-    return handleNotionError("fetching projects from Notion", error, []);
+    return handleNotionError("fetching products from Notion", error, []);
   }
 }
 
 /**
- * Fetches a single project by its ID
- * @param pageId - The Notion page ID of the project
- * @returns Project data or null if not found
+ * Fetches a single product by its ID
+ * @param pageId - The Notion page ID of the product
+ * @returns Product data or null if not found
  */
-export async function getProjectById(
+export async function getProductById(
   pageId: string,
 ): Promise<PageObjectResponse | null> {
   try {
@@ -124,7 +124,7 @@ export async function getProjectById(
 
     return response as PageObjectResponse;
   } catch (error) {
-    return handleNotionError(`fetching project with ID ${pageId}`, error, null);
+    return handleNotionError(`fetching product with ID ${pageId}`, error, null);
   }
 }
 
@@ -277,7 +277,7 @@ export async function getImagesFromPage(pageId: string): Promise<{
 }> {
   try {
     // Get the page to extract property images
-    const page = await getProjectById(pageId);
+    const page = await getProductById(pageId);
     const propertyImages: string[] = [];
 
     if (page) {

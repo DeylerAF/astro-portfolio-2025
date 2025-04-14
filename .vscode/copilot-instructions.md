@@ -45,7 +45,7 @@ This is a modern portfolio website built with Astro and Tailwind CSS, using Noti
 
 - Notion API client in `src/lib/services/notion.ts`
 - Type definitions in `src/lib/types/notion.ts`
-- Projects are fetched from a Notion database
+- Products are fetched from a Notion database
 
 ### Responsive Design
 
@@ -72,7 +72,7 @@ This is a modern portfolio website built with Astro and Tailwind CSS, using Noti
 ## Environment Variables
 
 - `PUBLIC_NOTION_TOKEN`: Notion API token
-- `PUBLIC_NOTION_DATABASE_ID`: Notion database ID for projects
+- `PUBLIC_NOTION_DATABASE_ID`: Notion database ID for products
 
 ## Common Tasks
 

@@ -1,17 +1,17 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import {
-  getProjects,
+  getProducts,
   parseNotionProperties,
   getImagesFromPage,
 } from "../lib/services/notion";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 
-// Fetch projects from Notion
-const notionProjects = await getProjects();
+// Fetch products from Notion
+const notionProducts = await getProducts();
 
-// Define the project type to avoid TypeScript errors
-interface Project {
+// Define the product type to avoid TypeScript errors
+interface Product {
   id: string;
   Name?: string;
   Description?: string;
@@ -24,81 +24,81 @@ interface Project {
 }
 
 // Parse the properties for easier use in the template and fetch additional images
-const projects = await Promise.all(
-  notionProjects.map(async (project) => {
-    const pageObject = project as PageObjectResponse;
-    const parsedProject = {
-      id: project.id,
+const products = await Promise.all(
+  notionProducts.map(async (product) => {
+    const pageObject = product as PageObjectResponse;
+    const parsedProduct = {
+      id: product.id,
       ...parseNotionProperties(pageObject.properties || {}),
-    } as Project;
+    } as Product;
 
-    // Fetch all images from the project page
-    const images = await getImagesFromPage(project.id);
+    // Fetch all images from the product page
+    const images = await getImagesFromPage(product.id);
 
-    // Add content images and all images to the project
-    parsedProject.ContentImages = images.blockImages;
-    parsedProject.AllImages = images.allImages;
+    // Add content images and all images to the product
+    parsedProduct.ContentImages = images.blockImages;
+    parsedProduct.AllImages = images.allImages;
 
-    return parsedProject;
-  }),
+    return parsedProduct;
+  })
 );
 ---
 
-<Layout title="Portfolio Projects">
+<Layout title="Portfolio Products">
   <main class="mx-auto px-6 py-6 max-w-7xl">
-    <h1 class="text-4xl font-bold mb-4">My Projects</h1>
+    <h1 class="text-4xl font-bold mb-4">My Products</h1>
     <p class="text-lg">
-      These projects are pulled directly from my Notion database
+      These products are pulled directly from my Notion database
     </p>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
       {
-        projects.length === 0 ? (
+        products.length === 0 ? (
           <p class="text-[var(--sidebar-text)]">
-            No projects found. Make sure your Notion credentials are correct and
+            No products found. Make sure your Notion credentials are correct and
             your database has content.
           </p>
         ) : (
-          projects.map((project) => (
+          products.map((product) => (
             <article class="rounded-lg overflow-hidden bg-[var(--card-bg)] shadow-[0_4px_6px_var(--card-shadow)] hover:shadow-[0_10px_15px_var(--card-shadow)] hover:-translate-y-1 transition-all duration-200">
-              {/* Display project image from property or content */}
-              {(project.Image && project.Image[0]) ||
-              (project.AllImages && project.AllImages[0]) ? (
+              {/* Display product image from property or content */}
+              {(product.Image && product.Image[0]) ||
+              (product.AllImages && product.AllImages[0]) ? (
                 <img
                   src={
-                    (project.Image && project.Image[0]) ||
-                    (project.AllImages && project.AllImages[0])
+                    (product.Image && product.Image[0]) ||
+                    (product.AllImages && product.AllImages[0])
                   }
-                  alt={`Project: ${project.Name}`}
+                  alt={`Product: ${product.Name}`}
                   class="w-full h-44 object-cover"
                   loading="lazy"
                 />
               ) : null}
               <div class="p-6">
                 <h2 class="text-2xl font-semibold mb-3 text-[var(--text-color)]">
-                  {project.Name}
+                  {product.Name}
                 </h2>
-                {project.Description && (
+                {product.Description && (
                   <p class="text-[var(--text-color)] opacity-80">
-                    {project.Description}
+                    {product.Description}
                   </p>
                 )}
-                {project.Tags && (
+                {product.Tags && (
                   <ul class="flex flex-wrap gap-2 my-4">
-                    {project.Tags.map((tag: string) => (
+                    {product.Tags.map((tag: string) => (
                       <li class="bg-[var(--hover-bg)] text-[var(--sidebar-text)] px-2 py-1 rounded text-sm">
                         {tag}
                       </li>
                     ))}
                   </ul>
                 )}
-                {project.URL && (
+                {product.URL && (
                   <a
-                    href={project.URL}
+                    href={product.URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     class="inline-block bg-[var(--accent-color)] hover:bg-[var(--accent-tertiary)] text-white px-4 py-2 rounded font-medium mt-4 transition-colors"
                   >
-                    View Project
+                    View Product
                   </a>
                 )}
               </div>

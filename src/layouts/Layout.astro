@@ -40,10 +40,10 @@ const themeInitScript = generateInitializationScript();
     >
       <!-- Header component -->
       <Header />
-      <!-- Main content without margin top since header is now in content flow -->
-      <main class="p-4 md:p-6 container mx-auto max-w-6xl">
+      <!-- Content container that will receive the page content -->
+      <div class="p-4 md:p-6 container mx-auto max-w-6xl">
         <slot />
-      </main>
+      </div>
       <!-- Footer -->
       <footer class="mt-auto py-4 text-center text-sm opacity-75">
         &copy; {new Date().getFullYear()} My Portfolio. Built with Astro.

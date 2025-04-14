@@ -1,6 +1,10 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { getProjects, parseNotionProperties } from "../lib/services/notion";
+import {
+  getProjects,
+  parseNotionProperties,
+  getImagesFromPage,
+} from "../lib/services/notion";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 
 // Fetch projects from Notion
@@ -13,18 +17,31 @@ interface Project {
   Description?: string;
   Tags?: string[];
   Image?: string[];
+  ContentImages?: string[];
+  AllImages?: string[];
   URL?: string;
   [key: string]: unknown;
 }
 
-// Parse the properties for easier use in the template
-const projects = notionProjects.map((project) => {
-  const pageObject = project as PageObjectResponse;
-  return {
-    id: project.id,
-    ...parseNotionProperties(pageObject.properties || {}),
-  } as Project;
-});
+// Parse the properties for easier use in the template and fetch additional images
+const projects = await Promise.all(
+  notionProjects.map(async (project) => {
+    const pageObject = project as PageObjectResponse;
+    const parsedProject = {
+      id: project.id,
+      ...parseNotionProperties(pageObject.properties || {}),
+    } as Project;
+
+    // Fetch all images from the project page
+    const images = await getImagesFromPage(project.id);
+
+    // Add content images and all images to the project
+    parsedProject.ContentImages = images.blockImages;
+    parsedProject.AllImages = images.allImages;
+
+    return parsedProject;
+  }),
+);
 ---
 
 <Layout title="Portfolio Projects">
@@ -43,15 +60,20 @@ const projects = notionProjects.map((project) => {
         ) : (
           projects.map((project) => (
             <article class="rounded-lg overflow-hidden bg-[var(--card-bg)] shadow-[0_4px_6px_var(--card-shadow)] hover:shadow-[0_10px_15px_var(--card-shadow)] hover:-translate-y-1 transition-all duration-200">
-              {project.Image && project.Image[0] && (
+              {/* Display project image from property or content */}
+              {(project.Image && project.Image[0]) ||
+              (project.AllImages && project.AllImages[0]) ? (
                 <img
-                  src={project.Image[0]}
+                  src={
+                    (project.Image && project.Image[0]) ||
+                    (project.AllImages && project.AllImages[0])
+                  }
                   alt={`Project: ${project.Name}`}
                   class="w-full h-44 object-cover"
+                  loading="lazy"
                 />
-              )}
+              ) : null}
               <div class="p-6">
-                {" "}
                 <h2 class="text-2xl font-semibold mb-3 text-[var(--text-color)]">
                   {project.Name}
                 </h2>
@@ -62,7 +84,6 @@ const projects = notionProjects.map((project) => {
                 )}
                 {project.Tags && (
                   <ul class="flex flex-wrap gap-2 my-4">
-                    {" "}
                     {project.Tags.map((tag: string) => (
                       <li class="bg-[var(--hover-bg)] text-[var(--sidebar-text)] px-2 py-1 rounded text-sm">
                         {tag}

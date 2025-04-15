@@ -41,48 +41,30 @@ try {
 }
 ---
 
-<div class="profile-container">
+<div class="max-w-2xl mx-auto p-8 font-sans">
   {
     hasError || !profileData ? (
-      <div class="profile-error">
-        <h2>Could not load profile data</h2>
-        <p>{errorMessage}</p>
-        <p>Check your Notion connection settings or try again later.</p>
-        <button class="retry-button" onclick="window.location.reload()">
+      <div class="text-center p-8 bg-red-50 rounded-lg text-red-600">
+        <h2 class="text-2xl font-bold mb-2">Could not load profile data</h2>
+        <p class="mb-1">{errorMessage}</p>
+        <p class="mb-4">Check your Notion connection settings or try again later.</p>
+        <button class="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition" onclick="window.location.reload()">
           Retry
         </button>
       </div>
     ) : (
       <>
-        <div class="profile-header">
-          {profileData.avatarUrl && profileData.avatarUrl.startsWith("http") ? (
-            <img
-              src={profileData.avatarUrl}
-              alt={profileData.name}
-              class="profile-avatar"
-            />
-          ) : profileData.avatarUrl ? (
-            <div class="profile-avatar-emoji">{profileData.avatarUrl}</div>
-          ) : (
-            <div class="profile-avatar-emoji">👤</div>
-          )}
-          <div class="profile-title">
-            <h1>{profileData.name}</h1>
-            <h2>{profileData.title}</h2>
-          </div>
-        </div>
-
         {/* Display intro blocks from Notion */}
-        <div class="profile-intro">
+        <div class="flex flex-col gap-4">
           {introBlocks.map((block) => {
             if (block.type === "paragraph") {
               return (
-                <p class="profile-paragraph">
+                <p class="text-lg text-gray-800 dark:text-gray-300 leading-relaxed">
                   {Array.isArray(block.content)
                     ? (block.content as RichTextItem[]).map((text, i) => (
                         <span
                           class:list={{
-                            bold: text.annotations?.bold,
+                            "font-bold": text.annotations?.bold,
                             italic: text.annotations?.italic,
                           }}
                         >
@@ -94,12 +76,12 @@ try {
               );
             } else if (block.type === "heading_1") {
               return (
-                <h1 class="profile-heading-1">
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white mt-6 mb-2">
                   {Array.isArray(block.content)
                     ? (block.content as RichTextItem[]).map((text, i) => (
                         <span
                           class:list={{
-                            bold: text.annotations?.bold,
+                            "font-bold": text.annotations?.bold,
                             italic: text.annotations?.italic,
                           }}
                         >
@@ -111,12 +93,12 @@ try {
               );
             } else if (block.type === "heading_2") {
               return (
-                <h2 class="profile-heading-2">
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mt-4 mb-1">
                   {Array.isArray(block.content)
                     ? (block.content as RichTextItem[]).map((text, i) => (
                         <span
                           class:list={{
-                            bold: text.annotations?.bold,
+                            "font-bold": text.annotations?.bold,
                             italic: text.annotations?.italic,
                           }}
                         >
@@ -128,12 +110,12 @@ try {
               );
             } else if (block.type === "heading_3") {
               return (
-                <h3 class="profile-heading-3">
+                <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mt-2 mb-1">
                   {Array.isArray(block.content)
                     ? (block.content as RichTextItem[]).map((text, i) => (
                         <span
                           class:list={{
-                            bold: text.annotations?.bold,
+                            "font-bold": text.annotations?.bold,
                             italic: text.annotations?.italic,
                           }}
                         >
@@ -150,18 +132,14 @@ try {
               "url" in block.content
             ) {
               return (
-                <figure class="profile-image-container">
+                <figure class="my-6 w-full">
                   <img
                     src={block.content.url as string}
-                    alt={
-                      block.content.caption
-                        ? String(block.content.caption)
-                        : "Profile image"
-                    }
-                    class="profile-image"
+                    alt={block.content.caption ? String(block.content.caption) : "Profile image"}
+                    class="max-w-full h-auto rounded-lg mx-auto shadow"
                   />
                   {block.content.caption && (
-                    <figcaption class="profile-image-caption">
+                    <figcaption class="text-center mt-2 text-sm text-gray-500 italic">
                       {String(block.content.caption)}
                     </figcaption>
                   )}
@@ -175,113 +153,3 @@ try {
     )
   }
 </div>
-
-<style>
-  .profile-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem;
-    font-family:
-      system-ui,
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      sans-serif;
-  }
-
-  .profile-header {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .profile-avatar {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-
-  .profile-avatar-emoji {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background-color: #f0f0f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-  }
-
-  .profile-title h1 {
-    margin: 0;
-    font-size: 1.8rem;
-    color: var(--text-color, #333);
-  }
-
-  .profile-title h2 {
-    margin: 0.5rem 0 0;
-    font-size: 1.2rem;
-    font-weight: 400;
-    color: var(--secondary-text-color, #666);
-  }
-
-  .profile-description {
-    margin-bottom: 2rem;
-    line-height: 1.6;
-  }
-
-  .profile-error {
-    text-align: center;
-    padding: 2rem;
-    background-color: #fff5f5;
-    border-radius: 8px;
-    color: #e53e3e;
-  }
-
-  .retry-button {
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    background-color: #e53e3e;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-
-  .retry-button:hover {
-    background-color: #c53030;
-  }
-
-  /* Estilos para imágenes */
-  .profile-image-container {
-    margin: 1.5rem 0;
-    width: 100%;
-  }
-
-  .profile-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    display: block;
-    margin: 0 auto;
-  }
-
-  .profile-image-caption {
-    text-align: center;
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
-    color: var(--secondary-text-color, #666);
-    font-style: italic;
-  }
-
-  /* Responsive adjustments */
-  @media (width <= 600px) {
-    .profile-header {
-      flex-direction: column;
-      text-align: center;
-    }
-  }
-</style>

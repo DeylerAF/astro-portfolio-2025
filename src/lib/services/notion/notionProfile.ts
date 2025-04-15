@@ -32,7 +32,12 @@ export async function getProfileDataAndIntroBlocks(pageId: string): Promise<{
     // Extract name, title, description
     const name =
       (properties.title as string) || (properties.Name as string) || "";
-    const title = (properties.Title as string) || "";
+    // Improved title extraction: check for 'Title', 'title', then 'Name'
+    const title =
+      (properties.Title as string) ||
+      (properties.title as string) ||
+      (properties.Name as string) ||
+      "";
     const description = (properties.Description as string) || "";
     // Extract avatar/profile image (icon or cover)
     let avatarUrl = "";

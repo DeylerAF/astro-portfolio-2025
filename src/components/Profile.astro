@@ -45,35 +45,45 @@ try {
 <div class="max-w-xl">
   <div class="flex items-end gap-4 mb-4">
     {/* Render the first Notion image block as the avatar if available */}
-    {(() => {
-      // Find the first image block in introBlocks
-      const imageBlockIndex = introBlocks.findIndex(
-        (block) => block.type === "image" && block.content && typeof block.content === "object" && "url" in block.content
-      );
-      if (
-        imageBlockIndex !== -1 &&
-        introBlocks[imageBlockIndex].content &&
-        typeof introBlocks[imageBlockIndex].content === "object" &&
-        "url" in introBlocks[imageBlockIndex].content
-      ) {
-        return (
-          <img
-            src={introBlocks[imageBlockIndex].content.url as string}
-            alt={profileData?.name ? `${profileData.name} profile photo` : "Profile photo"}
-            class="size-20 rounded-full object-cover drop-shadow-[0px_0px_5px_rgba(0,0,0,0.5)] dark:drop-shadow-[0px_0px_5px_rgba(255,255,255,0.2)]"
-            width={80}
-            height={80}
-            loading="eager"
-          />
+    {
+      (() => {
+        // Find the first image block in introBlocks
+        const imageBlockIndex = introBlocks.findIndex(
+          (block) =>
+            block.type === "image" &&
+            block.content &&
+            typeof block.content === "object" &&
+            "url" in block.content
         );
-      }
-      // Fallback to initials if no image is present
-      return (
-        <div class="size-20 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-3xl font-bold text-gray-500">
-          {profileData?.name?.[0]?.toUpperCase() ?? "P"}
-        </div>
-      );
-    })()}
+        if (
+          imageBlockIndex !== -1 &&
+          introBlocks[imageBlockIndex].content &&
+          typeof introBlocks[imageBlockIndex].content === "object" &&
+          "url" in introBlocks[imageBlockIndex].content
+        ) {
+          return (
+            <img
+              src={introBlocks[imageBlockIndex].content.url as string}
+              alt={
+                profileData?.name
+                  ? `${profileData.name} profile photo`
+                  : "Profile photo"
+              }
+              class="size-20 rounded-full object-cover drop-shadow-[0px_0px_5px_rgba(0,0,0,0.5)] dark:drop-shadow-[0px_0px_5px_rgba(255,255,255,0.2)]"
+              width={80}
+              height={80}
+              loading="eager"
+            />
+          );
+        }
+        // Fallback to initials if no image is present
+        return (
+          <div class="size-20 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-3xl font-bold text-gray-500">
+            {profileData?.name?.[0]?.toUpperCase() ?? "P"}
+          </div>
+        );
+      })()
+    }
     <a
       href="#"
       class="flex items-center transition md:justify-center md:hover:scale-105"
@@ -83,57 +93,67 @@ try {
       <Badge>Open to work</Badge>
     </a>
   </div>
-  {/* Render Notion heading_2 as the main h1 if available, otherwise fallback to name */}
-  {(() => {
-    const headingBlock = introBlocks.find((block) => block.type === "heading_2");
-    if (headingBlock && Array.isArray(headingBlock.content)) {
+  {
+    /* Render Notion heading_2 as the main h1 if available, otherwise fallback to name */
+  }
+  {
+    (() => {
+      const headingBlock = introBlocks.find(
+        (block) => block.type === "heading_2"
+      );
+      if (headingBlock && Array.isArray(headingBlock.content)) {
+        return (
+          <h1 class="text-4xl font-bold tracking-tight text-gray-800 sm:text-5xl dark:text-white">
+            {(headingBlock.content as RichTextItem[]).map((text) => (
+              <span
+                class:list={{
+                  "font-bold": text.annotations?.bold,
+                  italic: text.annotations?.italic,
+                }}
+              >
+                {text.text}
+              </span>
+            ))}
+          </h1>
+        );
+      }
+      // Fallback to profileData name if no heading_2 block
       return (
         <h1 class="text-4xl font-bold tracking-tight text-gray-800 sm:text-5xl dark:text-white">
-          {(headingBlock.content as RichTextItem[]).map((text, i) => (
-            <span
-              class:list={{
-                "font-bold": text.annotations?.bold,
-                italic: text.annotations?.italic,
-              }}
-              key={i}
-            >
-              {text.text}
-            </span>
-          ))}
+          {profileData?.name ? (
+            <>
+              Hi, I'm{" "}
+              <strong class="text-lime-600 dark:text-lime-400">
+                {profileData.name}
+              </strong>
+            </>
+          ) : (
+            <>
+              Hi, I'm{" "}
+              <strong class="text-lime-600 dark:text-lime-400">
+                Your Name
+              </strong>
+            </>
+          )}
         </h1>
       );
-    }
-    // Fallback to profileData name if no heading_2 block
-    return (
-      <h1 class="text-4xl font-bold tracking-tight text-gray-800 sm:text-5xl dark:text-white">
-        {profileData?.name ? (
-          <>
-            Hi, I'm{" "}
-            <strong class="text-lime-600 dark:text-lime-400">
-              {profileData.name}
-            </strong>
-          </>
-        ) : (
-          <>
-            Hi, I'm{" "}
-            <strong class="text-lime-600 dark:text-lime-400">Your Name</strong>
-          </>
-        )}
-      </h1>
-    );
-  })()}
+    })()
+  }
   {/* Render all blocks except the first image block (used as avatar) */}
-  <div class="flex flex-col gap-4 mt-6 text-xl text-gray-800 dark:text-gray-300">
+  <div
+    class="flex flex-col gap-4 mt-6 text-xl text-gray-800 dark:text-gray-300"
+  >
     {
       (() => {
         const imageBlockIndex = introBlocks.findIndex(
-          (block) => block.type === "image" && block.content && typeof block.content === "object" && "url" in block.content
+          (block) =>
+            block.type === "image" &&
+            block.content &&
+            typeof block.content === "object" &&
+            "url" in block.content
         );
         return introBlocks.map((block, idx) => {
-          if (
-            block.type === "image" &&
-            idx === imageBlockIndex
-          ) {
+          if (block.type === "image" && idx === imageBlockIndex) {
             return null; // Skip the first image block (used as avatar)
           }
           if (block.type === "paragraph") {
@@ -200,7 +220,11 @@ try {
               <figure class="my-6 w-full">
                 <img
                   src={block.content.url as string}
-                  alt={block.content.caption ? String(block.content.caption) : "Profile image"}
+                  alt={
+                    block.content.caption
+                      ? String(block.content.caption)
+                      : "Profile image"
+                  }
                   class="max-w-full h-auto rounded-lg mx-auto shadow"
                 />
                 {block.content.caption && (

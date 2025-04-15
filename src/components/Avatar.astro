@@ -1,0 +1,43 @@
+---
+import { getProfileDataAndIntroBlocks } from "../lib/services/notion/notionProfile";
+
+// Get the Notion page ID from environment variable
+const pageId = import.meta.env.PUBLIC_NOTION_PAGE_ID;
+
+let imageUrl: string | undefined = undefined;
+let alt: string = "Profile image";
+let isError = false;
+
+try {
+  const { profileData, images } = await getProfileDataAndIntroBlocks(pageId);
+  if (images && images.length > 0) {
+    imageUrl = images[0];
+  }
+  if (profileData?.name) {
+    alt = profileData.name + " profile photo";
+  }
+} catch (error) {
+  isError = true;
+}
+---
+
+{
+  isError ? (
+    <div class="w-10 h-10 rounded-sm bg-red-200 dark:bg-red-700 flex items-center justify-center text-red-400 text-xs">
+      Error
+    </div>
+  ) : imageUrl ? (
+    <img
+      class="w-10 h-10 rounded-sm object-cover"
+      src={imageUrl}
+      alt={alt}
+      width={40}
+      height={40}
+      loading="eager"
+    />
+  ) : (
+    <div class="w-10 h-10 rounded-sm bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400 text-xs">
+      N/A
+    </div>
+  )
+}

@@ -2,6 +2,7 @@
 import { getProfileDataAndIntroBlocks } from "../lib/services/notion/notionProfile";
 import type { RichTextItem } from "../lib/types/notion";
 import Badge from "./Badge.astro";
+import Avatar from "./Avatar.astro";
 
 // Fetch profile data, intro blocks, and all images from Notion service
 const pageId = import.meta.env.PUBLIC_NOTION_PAGE_ID;
@@ -11,22 +12,7 @@ const { profileData, introBlocks, images } =
 
 <div class="max-w-2xl mx-auto">
   <div class="flex items-end gap-4 mb-4">
-    {
-      images[0] ? (
-        <img
-          src={images[0]}
-          alt={
-            profileData?.name
-              ? profileData.name + " profile photo"
-              : "Profile image"
-          }
-          class="size-20 rounded-full object-cover drop-shadow-[0px_0px_5px_rgba(0,0,0,0.5)] dark:drop-shadow-[0px_0px_5px_rgba(255,255,255,0.2)] border-2 border-[var(--accent-color)]"
-          width={80}
-          height={80}
-          loading="eager"
-        />
-      ) : null
-    }
+    <Avatar />
     <a
       href="#"
       class="flex items-center transition md:justify-center md:hover:scale-105"

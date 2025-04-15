@@ -1,10 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import {
-  getProducts,
-  parseNotionProperties,
-  getImagesFromPage,
-} from "../lib/services/notion";
+import { getProducts } from "../lib/services/notion/notionProducts";
+import { parseNotionProperties } from "../lib/services/notion/notionProperties";
+import { getImagesFromPage } from "../lib/services/notion/notionImages";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 
 // Fetch products from Notion
@@ -40,7 +38,7 @@ const products = await Promise.all(
     parsedProduct.AllImages = images.allImages;
 
     return parsedProduct;
-  }),
+  })
 );
 ---
 

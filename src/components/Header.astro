@@ -3,64 +3,56 @@ import ThemeToggle from "./ThemeToggle.astro";
 import SidebarToggle from "./sidebar/SidebarToggle.astro";
 ---
 
-<header
-  id="main-header"
-  class="sticky top-0 z-30 transition-all duration-300 ease-in-out border-b border-[var(--border-color)] flex items-center justify-between px-4 h-16 min-h-[4rem] bg-[var(--header-bg)] backdrop-blur-sm bg-opacity-90 w-full"
+<!-- Flowbite-style responsive navbar with backdrop blur -->
+<nav
+  class="bg-[var(--header-bg)] bg-opacity-90 border-b border-[var(--border-color)] sticky top-0 z-30 w-full backdrop-blur-sm"
 >
-  <div class="flex items-center gap-3">
-    <!-- Sidebar toggle only visible on mobile -->
-    <div class="md:hidden">
-      <SidebarToggle isOpen={false} />
+  <div class="flex flex-wrap items-center justify-between mx-auto p-3">
+    <!-- Left: Brand and mobile sidebar toggle -->
+    <div class="flex items-center gap-3">
+      <!-- Sidebar toggle only visible on mobile -->
+      <div class="md:hidden">
+        <SidebarToggle isOpen={false} />
+      </div>
+      <a href="/" class="flex items-center gap-2">
+        <span
+          class="self-center text-xl font-semibold whitespace-nowrap text-[var(--text-color)] dark:text-white"
+          >My Portfolio</span
+        >
+      </a>
     </div>
-    <h1 class="text-lg font-semibold">My Portfolio</h1>
+    <!-- Center: Navigation links (add more as needed) -->
+    <!-- <div class="hidden w-full md:block md:w-auto">
+      <ul
+        class="flex flex-col md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium"
+      >
+        <li>
+          <a
+            href="/"
+            class="block py-2 pl-3 pr-4 rounded md:bg-transparent md:p-0 text-[var(--text-color)] hover:text-[var(--accent-color)] focus:text-[var(--accent-color)] transition-colors"
+            >Home</a
+          >
+        </li>
+        <li>
+          <a
+            href="/products"
+            class="block py-2 pl-3 pr-4 rounded md:bg-transparent md:p-0 text-[var(--text-color)] hover:text-[var(--accent-color)] focus:text-[var(--accent-color)] transition-colors"
+            >Projects</a
+          >
+        </li>
+      </ul>
+    </div> -->
+    <!-- Right: Theme toggle and slot -->
+    <div class="flex items-center gap-2">
+      <slot name="right" />
+      <ThemeToggle />
+    </div>
   </div>
-  <div class="flex items-center gap-2">
-    <!-- Slot for additional content on the right -->
-    <slot name="right" />
-    <ThemeToggle />
-  </div>
-</header>
+</nav>
 
+<!-- Optionally, add a script for mobile nav toggle if you add a collapsible menu -->
+<!--
 <script>
-  // Script to synchronize the header position with sidebar state
-  document.addEventListener("DOMContentLoaded", () => {
-    const header = document.getElementById("main-header");
-    const content = document.getElementById("content");
-
-    if (!header || !content) return;
-
-    // Header position classes
-    const HEADER_POSITION = {
-      sidebarExpanded: "md:left-64",
-      sidebarCollapsed: "md:left-16",
-    };
-
-    // Update header position based on content class
-    const updateHeaderPosition = () => {
-      const isSidebarExpanded = content.classList.contains("md:ml-64");
-
-      if (isSidebarExpanded) {
-        header.classList.remove(HEADER_POSITION.sidebarCollapsed);
-        header.classList.add(HEADER_POSITION.sidebarExpanded);
-      } else {
-        header.classList.remove(HEADER_POSITION.sidebarExpanded);
-        header.classList.add(HEADER_POSITION.sidebarCollapsed);
-      }
-    };
-
-    // Initialize with current state
-    updateHeaderPosition();
-
-    // Observe changes to content classes
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === "class") {
-          updateHeaderPosition();
-        }
-      });
-    });
-
-    // Start observing content element
-    observer.observe(content, { attributes: true });
-  });
+// ...existing code for header/sidebar sync if needed...
 </script>
+-->

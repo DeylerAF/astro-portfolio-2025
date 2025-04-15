@@ -9,11 +9,8 @@ const { profileData, introBlocks, images } =
   await getProfileDataAndIntroBlocks(pageId);
 ---
 
-<div class="max-w-xl">
+<div class="max-w-2xl mx-auto">
   <div class="flex items-end gap-4 mb-4">
-    {
-      /* Render the first image from the Notion page (property or block image) as the avatar if available */
-    }
     {
       images[0] ? (
         <img
@@ -23,7 +20,7 @@ const { profileData, introBlocks, images } =
               ? profileData.name + " profile photo"
               : "Profile image"
           }
-          class="size-20 rounded-full object-cover drop-shadow-[0px_0px_5px_rgba(0,0,0,0.5)] dark:drop-shadow-[0px_0px_5px_rgba(255,255,255,0.2)]"
+          class="size-20 rounded-full object-cover drop-shadow-[0px_0px_5px_rgba(0,0,0,0.5)] dark:drop-shadow-[0px_0px_5px_rgba(255,255,255,0.2)] border-2 border-[var(--accent-color)]"
           width={80}
           height={80}
           loading="eager"
@@ -47,13 +44,13 @@ const { profileData, introBlocks, images } =
       );
       if (headingBlock && Array.isArray(headingBlock.content)) {
         return (
-          <h1 class="text-4xl font-bold tracking-tight text-gray-800 sm:text-5xl dark:text-white">
+          <h1 class="text-4xl font-bold tracking-tight text-[var(--text-color)] sm:text-5xl dark:text-white mb-4">
             {(headingBlock.content as RichTextItem[]).map((text) => (
               <span
                 class:list={{
                   "font-bold": text.annotations?.bold,
                   italic: text.annotations?.italic,
-                  "text-lime-600 dark:text-lime-400": text.annotations?.bold,
+                  "text-[var(--accent-color)]": text.annotations?.bold,
                 }}
               >
                 {text.text}
@@ -84,7 +81,7 @@ const { profileData, introBlocks, images } =
     /* Render all blocks except heading_2 and the first image block (if it matches images[0]) */
   }
   <div
-    class="flex flex-col gap-4 mt-6 text-xl text-gray-800 dark:text-gray-300"
+    class="flex flex-col gap-4 mt-6 text-xl text-[var(--text-color)] dark:text-gray-300"
   >
     {
       introBlocks.map((block) => {
@@ -100,17 +97,15 @@ const { profileData, introBlocks, images } =
           return null;
         }
         if (block.type === "paragraph") {
-          // Ensure block.content is not null and is an array before mapping
           if (Array.isArray(block.content)) {
             return (
-              <p class="[&>strong]:text-lime-600 dark:[&>strong]:text-lime-400 [&>strong]:font-semibold">
+              <p class="[&>strong]:text-[var(--accent-color)] [&>strong]:font-semibold">
                 {(block.content as RichTextItem[]).map((text) => (
                   <span
                     class:list={{
                       "font-bold": text.annotations?.bold,
                       italic: text.annotations?.italic,
-                      "text-lime-600 dark:text-lime-400":
-                        text.annotations?.bold,
+                      "text-[var(--accent-color)]": text.annotations?.bold,
                     }}
                   >
                     {text.text}
@@ -120,7 +115,7 @@ const { profileData, introBlocks, images } =
             );
           } else if (typeof block.content === "string") {
             return (
-              <p class="[&>strong]:text-lime-600 dark:[&>strong]:text-lime-400 [&>strong]:font-semibold">
+              <p class="[&>strong]:text-[var(--accent-color)] [&>strong]:font-semibold">
                 {block.content}
               </p>
             );
@@ -128,15 +123,14 @@ const { profileData, introBlocks, images } =
           return null;
         } else if (block.type === "heading_1") {
           return (
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mt-6 mb-2">
+            <h1 class="text-2xl font-bold text-[var(--text-color)] dark:text-white mt-6 mb-2">
               {Array.isArray(block.content)
                 ? (block.content as RichTextItem[]).map((text) => (
                     <span
                       class:list={{
                         "font-bold": text.annotations?.bold,
                         italic: text.annotations?.italic,
-                        "text-lime-600 dark:text-lime-400":
-                          text.annotations?.bold,
+                        "text-[var(--accent-color)]": text.annotations?.bold,
                       }}
                     >
                       {text.text}
@@ -147,15 +141,14 @@ const { profileData, introBlocks, images } =
           );
         } else if (block.type === "heading_3") {
           return (
-            <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mt-2 mb-1">
+            <h3 class="text-lg font-medium text-[var(--sidebar-text)] dark:text-gray-300 mt-2 mb-1">
               {Array.isArray(block.content)
                 ? (block.content as RichTextItem[]).map((text) => (
                     <span
                       class:list={{
                         "font-bold": text.annotations?.bold,
                         italic: text.annotations?.italic,
-                        "text-lime-600 dark:text-lime-400":
-                          text.annotations?.bold,
+                        "text-[var(--accent-color)]": text.annotations?.bold,
                       }}
                     >
                       {text.text}

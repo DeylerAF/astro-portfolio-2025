@@ -6,59 +6,57 @@ import SidebarToggle from "./SidebarToggle.astro";
 const { pathname } = Astro.url;
 ---
 
-<div
+<aside
   id="sidebar"
-  class="fixed top-0 left-0 h-full shadow-md transition-all duration-300 ease-in-out z-40 overflow-y-auto overflow-x-hidden bg-[var(--sidebar-bg)] text-[var(--sidebar-text)]
-  -translate-x-full md:translate-x-0
-  w-[16rem]"
+  class="fixed top-0 left-0 h-full shadow-md transition-all duration-300 ease-in-out z-40 overflow-y-auto overflow-x-hidden bg-[var(--sidebar-bg)] text-[var(--sidebar-text)] -translate-x-full md:translate-x-0 w-[16rem] border-r border-[var(--border-color)]"
+  aria-label="Sidebar navigation"
 >
-  <div class="flex justify-between items-center p-3">
+  <div
+    class="flex justify-between items-center p-3 border-b border-[var(--border-color)]"
+  >
     <SidebarToggle />
   </div>
-
-  <div class="mt-4">
-    <nav aria-label="Main Navigation">
-      <ul>
-        <li class="mb-2">
-          <a
-            href="/"
-            class={`flex items-center py-2 px-4 transition-colors hover:bg-[var(--sidebar-hover)] hover:text-[var(--accent-color)] relative
-            ${pathname === "/" ? "text-[var(--accent-color)] font-medium" : "text-[var(--sidebar-text)]"}`}
-            aria-current={pathname === "/" ? "page" : undefined}
-          >
-            <Home class="w-5 h-5" />
-            <span class="ml-3">Home</span>
-            {
-              pathname === "/" && (
-                <span
-                  class="absolute left-0 top-0 bottom-0 w-1 bg-[var(--accent-color)]"
-                  aria-hidden="true"
-                />
-              )
-            }
-          </a>
-        </li>
-        <li class="mb-2">
-          <a
-            href="/products"
-            class={`flex items-center py-2 px-4 transition-colors hover:bg-[var(--sidebar-hover)] hover:text-[var(--accent-color)] relative
-            ${pathname === "/products" ? "text-[var(--accent-color)] font-medium" : "text-[var(--sidebar-text)]"}`}
-            aria-current={pathname === "/products" ? "page" : undefined}
-          >
-            <FolderKanban class="w-5 h-5" />
-            <span class="ml-3">Products</span>
-            {
-              pathname === "/products" && (
-                <span
-                  class="absolute left-0 top-0 bottom-0 w-1 bg-[var(--accent-color)]"
-                  aria-hidden="true"
-                />
-              )
-            }
-          </a>
-        </li>
-        <!-- Add more navigation links as needed -->
-      </ul>
-    </nav>
-  </div>
-</div>
+  <nav class="mt-4" aria-label="Main Navigation">
+    <ul class="space-y-1">
+      <li>
+        <a
+          href="/"
+          class={`flex items-center py-2 px-4 rounded-lg transition-colors relative font-medium
+            ${pathname === "/" ? "text-[var(--accent-color)] bg-[var(--sidebar-hover)]" : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--accent-color)]"}`}
+          aria-current={pathname === "/" ? "page" : undefined}
+        >
+          <Home class="w-5 h-5" />
+          <span class="ml-3">Home</span>
+          {
+            pathname === "/" && (
+              <span
+                class="absolute left-0 top-0 bottom-0 w-1 bg-[var(--accent-color)] rounded-r"
+                aria-hidden="true"
+              />
+            )
+          }
+        </a>
+      </li>
+      <li>
+        <a
+          href="/products"
+          class={`flex items-center py-2 px-4 rounded-lg transition-colors relative font-medium
+            ${pathname === "/products" ? "text-[var(--accent-color)] bg-[var(--sidebar-hover)]" : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--accent-color)]"}`}
+          aria-current={pathname === "/products" ? "page" : undefined}
+        >
+          <FolderKanban class="w-5 h-5" />
+          <span class="ml-3">Products</span>
+          {
+            pathname === "/products" && (
+              <span
+                class="absolute left-0 top-0 bottom-0 w-1 bg-[var(--accent-color)] rounded-r"
+                aria-hidden="true"
+              />
+            )
+          }
+        </a>
+      </li>
+      <!-- Add more navigation links as needed -->
+    </ul>
+  </nav>
+</aside>

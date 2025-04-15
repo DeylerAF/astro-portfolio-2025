@@ -29,14 +29,11 @@ const products = await Promise.all(
       id: product.id,
       ...parseNotionProperties(pageObject.properties || {}),
     } as Product;
-
     // Fetch all images from the product page
     const images = await getImagesFromPage(product.id);
-
     // Add content images and all images to the product
     parsedProduct.ContentImages = images.blockImages;
     parsedProduct.AllImages = images.allImages;
-
     return parsedProduct;
   })
 );
@@ -44,8 +41,10 @@ const products = await Promise.all(
 
 <Layout title="Products">
   <main class="mx-auto px-6 py-6 max-w-7xl">
-    <h1 class="text-4xl font-bold mb-4">My Products</h1>
-    <p class="text-lg">
+    <h1 class="text-4xl font-bold mb-4 text-[var(--text-color)]">
+      My Products
+    </h1>
+    <p class="text-lg text-[var(--sidebar-text)]">
       These products are pulled directly from my Notion database
     </p>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">

@@ -1,17 +1,15 @@
 ---
 // Button.astro
-// A reusable button component that accepts url, text, icon, and other button props as props.
+// A reusable button component that accepts text, icon, and other button props as props.
 // Props:
-//   url: string (optional) - If provided, renders an anchor tag; otherwise, renders a button.
 //   text: string - The button text.
 //   icon: Astro component (optional) - Lucide icon component to render inside the button.
 //   iconPosition: 'left' | 'right' (optional, default: 'left') - Position of the icon.
 //   type: 'button' | 'submit' | 'reset' (optional, default: 'button') - Button type.
 //   disabled: boolean (optional) - Disables the button.
-//   ...rest: any - Other props to pass to the button or anchor.
+//   ...rest: any - Other props to pass to the button.
 
 interface ButtonProps {
-  url?: string;
   text: string;
   icon?: any;
   iconPosition?: "left" | "right";
@@ -21,7 +19,6 @@ interface ButtonProps {
 }
 
 const {
-  url,
   text,
   icon: Icon,
   iconPosition = "left",
@@ -29,82 +26,37 @@ const {
   disabled = false,
   ...rest
 } = Astro.props as ButtonProps;
-
-function getButtonClass(baseClass: string, userClass?: string): string {
-  return [
-    baseClass,
-    "px-5",
-    "py-3",
-    "text-base",
-    "font-medium",
-    "text-center",
-    "inline-flex",
-    "items-center",
-    "text-white",
-    "bg-blue-700",
-    "rounded-lg",
-    "hover:bg-blue-800",
-    "focus:ring-4",
-    "focus:outline-none",
-    "focus:ring-blue-300",
-    "dark:bg-blue-600",
-    "dark:hover:bg-blue-700",
-    "dark:focus:ring-blue-800",
-    userClass,
-  ]
-    .filter(Boolean)
-    .join(" ");
-}
-
-// Validate type prop for <button>
-const validTypes = ["button", "submit", "reset"];
-const buttonType = validTypes.includes(type) ? type : "button";
 ---
 
-{
-  url ? (
-    <span class="relative inline-block overflow-hidden rounded-lg p-[1px] box-border">
-      <span class="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#65A30D_0%,#A3E635_50%,#65A30D_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,#365314_0%,#86CC16_50%,#365314_100%)]" />
-      <a
-        href={url}
-        aria-disabled={disabled ? "true" : undefined}
-        tabindex={disabled ? -1 : undefined}
-        {...rest}
-        class="relative z-10 rounded-lg focus:outline-none bg-transparent align-middle"
-      >
-        <div class="relative z-20 inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-black dark:text-white bg-white/80 dark:bg-black/40 rounded-lg transition-colors duration-200">
-          {iconPosition === "left" && Icon && (
-            <Icon class="w-4 h-4 me-2" aria-hidden="true" />
-          )}
-          <span class="relative z-30">{text}</span>
-          {iconPosition === "right" && Icon && (
-            <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
-          )}
-        </div>
-      </a>
-    </span>
-  ) : (
-    <span class="relative inline-block overflow-hidden rounded-lg p-[1px] box-border">
-      <span class="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#65A30D_0%,#A3E635_50%,#65A30D_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,#365314_0%,#86CC16_50%,#365314_100%)]" />
-      <button
-        type={buttonType}
-        disabled={disabled}
-        {...rest}
-        class="relative z-10 rounded-lg focus:outline-none bg-transparent align-middle"
-      >
-        <div class="relative z-20 inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-black dark:text-white bg-white/80 dark:bg-black/40 rounded-lg transition-colors duration-200">
-          {iconPosition === "left" && Icon && (
-            <Icon class="w-4 h-4 me-2" aria-hidden="true" />
-          )}
-          <span class="relative z-30">{text}</span>
-          {iconPosition === "right" && Icon && (
-            <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
-          )}
-        </div>
-      </button>
-    </span>
-  )
-}
+<span
+  class="relative inline-block overflow-hidden rounded-lg box-border align-middle"
+>
+  <span
+    class="absolute inset-[-1000%] pointer-events-none animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#65A30D_0%,#A3E635_50%,#65A30D_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,#365314_0%,#86CC16_50%,#365314_100%)] rounded-lg"
+  ></span>
+  <button
+    type={type}
+    disabled={disabled}
+    class="relative z-10 rounded-lg focus:outline-none bg-transparent p-0 m-0 border-none"
+    {...rest}
+  >
+    <div
+      class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium text-center text-black dark:text-white bg-white/80 dark:bg-black/40 rounded-lg transition-colors duration-200"
+    >
+      {
+        iconPosition === "left" && Icon && (
+          <Icon class="w-4 h-4 me-2" aria-hidden="true" />
+        )
+      }
+      <span class="relative z-30">{text}</span>
+      {
+        iconPosition === "right" && Icon && (
+          <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
+        )
+      }
+    </div>
+  </button>
+</span>
 
 <style>
   .button {

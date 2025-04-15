@@ -7,82 +7,50 @@ import type {
 } from "../lib/types/notion";
 import Badge from "./Badge.astro";
 
-// Initialize state variables
-let profileData: ProfileData | null = null;
-let introBlocks: ProcessedBlock[] = [];
-let isLoading = true;
-let hasError = false;
-let errorMessage = "";
+// Fetch profile data and intro blocks from Notion service
+const pageId = import.meta.env.PUBLIC_NOTION_PAGE_ID;
+const { profileData, introBlocks } = await getProfileDataAndIntroBlocks(pageId);
 
-try {
-  // Fetch profile data and intro blocks from Notion service
-  const pageId = import.meta.env.PUBLIC_NOTION_PAGE_ID;
-  if (!import.meta.env.PUBLIC_NOTION_TOKEN) {
-    throw new Error("Missing PUBLIC_NOTION_TOKEN environment variable");
-  }
-  if (!pageId) {
-    throw new Error("Missing PUBLIC_NOTION_PAGE_ID environment variable");
-  }
-  const result = await getProfileDataAndIntroBlocks(pageId);
-  profileData = result.profileData;
-  introBlocks = result.introBlocks;
-  if (!profileData) {
-    hasError = true;
-    errorMessage = "Could not fetch page from Notion API";
-  }
-} catch (error) {
-  hasError = true;
-  errorMessage =
-    error instanceof Error
-      ? error.message
-      : "Unknown error fetching Notion data";
-  console.error("Error fetching Notion data:", error);
-} finally {
-  isLoading = false;
+// Helper type guard for image block content
+function isImageContent(
+  content: unknown
+): content is { url: string; caption?: string } {
+  return (
+    typeof content === "object" &&
+    content !== null &&
+    "url" in content &&
+    typeof (content as any).url === "string"
+  );
 }
+
+// Find the first image block to use as the profile image
+const firstImageIdx = introBlocks.findIndex(
+  (block) => block.type === "image" && isImageContent(block.content)
+);
+const profileImageBlock =
+  firstImageIdx !== -1 ? introBlocks[firstImageIdx] : null;
 ---
 
 <div class="max-w-xl">
   <div class="flex items-end gap-4 mb-4">
     {/* Render the first Notion image block as the avatar if available */}
     {
-      (() => {
-        // Find the first image block in introBlocks
-        const imageBlockIndex = introBlocks.findIndex(
-          (block) =>
-            block.type === "image" &&
-            block.content &&
-            typeof block.content === "object" &&
-            "url" in block.content
-        );
-        if (
-          imageBlockIndex !== -1 &&
-          introBlocks[imageBlockIndex].content &&
-          typeof introBlocks[imageBlockIndex].content === "object" &&
-          "url" in introBlocks[imageBlockIndex].content
-        ) {
-          return (
-            <img
-              src={introBlocks[imageBlockIndex].content.url as string}
-              alt={
-                profileData?.name
-                  ? `${profileData.name} profile photo`
-                  : "Profile photo"
-              }
-              class="size-20 rounded-full object-cover drop-shadow-[0px_0px_5px_rgba(0,0,0,0.5)] dark:drop-shadow-[0px_0px_5px_rgba(255,255,255,0.2)]"
-              width={80}
-              height={80}
-              loading="eager"
-            />
-          );
-        }
-        // Fallback to initials if no image is present
-        return (
-          <div class="size-20 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-3xl font-bold text-gray-500">
-            {profileData?.name?.[0]?.toUpperCase() ?? "P"}
-          </div>
-        );
-      })()
+      profileImageBlock && isImageContent(profileImageBlock.content) && (
+        <img
+          src={profileImageBlock.content.url}
+          alt={
+            profileImageBlock.content.caption
+              ? String(profileImageBlock.content.caption)
+              : profileData?.name
+                ? profileData.name + " profile photo"
+                : "Profile image"
+          }
+          class="size-20 rounded-full object-cover drop-shadow-[0px_0px_5px_rgba(0,0,0,0.5)] dark:drop-shadow-[0px_0px_5px_rgba(255,255,255,0.2)]"
+          width={80}
+          height={80}
+          loading="eager"
+        />
+      )
     }
     <a
       href="#"
@@ -93,9 +61,7 @@ try {
       <Badge>Open to work</Badge>
     </a>
   </div>
-  {
-    /* Render Notion heading_2 as the main h1 if available, otherwise fallback to name */
-  }
+  {/* Render Notion heading_2 as the main h1 if available */}
   {
     (() => {
       const headingBlock = introBlocks.find(
@@ -108,7 +74,7 @@ try {
               <span
                 class:list={{
                   "font-bold": text.annotations?.bold,
-                  "italic": text.annotations?.italic,
+                  italic: text.annotations?.italic,
                   "text-lime-600 dark:text-lime-400": text.annotations?.bold,
                 }}
               >
@@ -118,130 +84,97 @@ try {
           </h1>
         );
       }
-      // Fallback to profileData name if no heading_2 block
-      return (
-        <h1 class="text-4xl font-bold tracking-tight text-gray-800 sm:text-5xl dark:text-white">
-          {profileData?.name ? (
-            <>
-              Hi, I'm{" "}
-              <strong class="text-lime-600 dark:text-lime-400">
-                {profileData.name}
-              </strong>
-            </>
-          ) : (
-            <>
-              Hi, I'm{" "}
-              <strong class="text-lime-600 dark:text-lime-400">
-                Your Name
-              </strong>
-            </>
-          )}
-        </h1>
-      );
+      return null;
     })()
   }
-  {/* Render all blocks except the first image block (used as avatar) */}
+  {
+    /* Render all blocks except heading_2 and the first image block (used as avatar) */
+  }
   <div
     class="flex flex-col gap-4 mt-6 text-xl text-gray-800 dark:text-gray-300"
   >
     {
-      (() => {
-        const imageBlockIndex = introBlocks.findIndex(
-          (block) =>
-            block.type === "image" &&
-            block.content &&
-            typeof block.content === "object" &&
-            "url" in block.content
-        );
-        return introBlocks.map((block, idx) => {
-          if (block.type === "image" && idx === imageBlockIndex) {
-            return null; // Skip the first image block (used as avatar)
-          }
-          if (block.type === "paragraph") {
-            return (
-              <p class="[&>strong]:text-lime-600 dark:[&>strong]:text-lime-400 [&>strong]:font-semibold">
-                {Array.isArray(block.content)
-                  ? (block.content as RichTextItem[]).map((text, i) => (
-                      <span
-                        class:list={{
-                          "font-bold": text.annotations?.bold,
-                          "italic": text.annotations?.italic,
-                          "text-lime-600 dark:text-lime-400": text.annotations?.bold,
-                        }}
-                      >
-                        {text.text}
-                      </span>
-                    ))
-                  : block.content}
-              </p>
-            );
-          } else if (block.type === "heading_1") {
-            return (
-              <h1 class="text-2xl font-bold text-gray-900 dark:text-white mt-6 mb-2">
-                {Array.isArray(block.content)
-                  ? (block.content as RichTextItem[]).map((text, i) => (
-                      <span
-                        class:list={{
-                          "font-bold": text.annotations?.bold,
-                          "italic": text.annotations?.italic,
-                          "text-lime-600 dark:text-lime-400": text.annotations?.bold,
-                        }}
-                      >
-                        {text.text}
-                      </span>
-                    ))
-                  : block.content}
-              </h1>
-            );
-          } else if (block.type === "heading_2") {
-            return null; // Skip heading_2, already rendered as main h1
-          } else if (block.type === "heading_3") {
-            return (
-              <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mt-2 mb-1">
-                {Array.isArray(block.content)
-                  ? (block.content as RichTextItem[]).map((text, i) => (
-                      <span
-                        class:list={{
-                          "font-bold": text.annotations?.bold,
-                          "italic": text.annotations?.italic,
-                          "text-lime-600 dark:text-lime-400": text.annotations?.bold,
-                        }}
-                      >
-                        {text.text}
-                      </span>
-                    ))
-                  : block.content}
-              </h3>
-            );
-          } else if (
-            block.type === "image" &&
-            typeof block.content === "object" &&
-            block.content &&
-            "url" in block.content
-          ) {
-            // Render any additional image blocks as normal
-            return (
-              <figure class="my-6 w-full">
-                <img
-                  src={block.content.url as string}
-                  alt={
-                    block.content.caption
-                      ? String(block.content.caption)
-                      : "Profile image"
-                  }
-                  class="max-w-full h-auto rounded-lg mx-auto shadow"
-                />
-                {block.content.caption && (
-                  <figcaption class="text-center mt-2 text-sm text-gray-500 italic">
-                    {String(block.content.caption)}
-                  </figcaption>
-                )}
-              </figure>
-            );
-          }
-          return null;
-        });
-      })()
+      introBlocks.map((block, idx) => {
+        if (block.type === "heading_2" || idx === firstImageIdx) return null;
+        if (block.type === "paragraph") {
+          return (
+            <p class="[&>strong]:text-lime-600 dark:[&>strong]:text-lime-400 [&>strong]:font-semibold">
+              {Array.isArray(block.content)
+                ? (block.content as RichTextItem[]).map((text) => (
+                    <span
+                      class:list={{
+                        "font-bold": text.annotations?.bold,
+                        italic: text.annotations?.italic,
+                        "text-lime-600 dark:text-lime-400":
+                          text.annotations?.bold,
+                      }}
+                    >
+                      {text.text}
+                    </span>
+                  ))
+                : block.content}
+            </p>
+          );
+        } else if (block.type === "heading_1") {
+          return (
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mt-6 mb-2">
+              {Array.isArray(block.content)
+                ? (block.content as RichTextItem[]).map((text) => (
+                    <span
+                      class:list={{
+                        "font-bold": text.annotations?.bold,
+                        italic: text.annotations?.italic,
+                        "text-lime-600 dark:text-lime-400":
+                          text.annotations?.bold,
+                      }}
+                    >
+                      {text.text}
+                    </span>
+                  ))
+                : block.content}
+            </h1>
+          );
+        } else if (block.type === "heading_3") {
+          return (
+            <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mt-2 mb-1">
+              {Array.isArray(block.content)
+                ? (block.content as RichTextItem[]).map((text) => (
+                    <span
+                      class:list={{
+                        "font-bold": text.annotations?.bold,
+                        italic: text.annotations?.italic,
+                        "text-lime-600 dark:text-lime-400":
+                          text.annotations?.bold,
+                      }}
+                    >
+                      {text.text}
+                    </span>
+                  ))
+                : block.content}
+            </h3>
+          );
+        } else if (block.type === "image" && isImageContent(block.content)) {
+          return (
+            <figure class="my-6 w-full">
+              <img
+                src={block.content.url}
+                alt={
+                  block.content.caption
+                    ? String(block.content.caption)
+                    : "Profile image"
+                }
+                class="max-w-full h-auto rounded-lg mx-auto shadow"
+              />
+              {block.content.caption && (
+                <figcaption class="text-center mt-2 text-sm text-gray-500 italic">
+                  {String(block.content.caption)}
+                </figcaption>
+              )}
+            </figure>
+          );
+        }
+        return null;
+      })
     }
   </div>
 </div>

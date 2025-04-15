@@ -541,7 +541,7 @@ export async function getPageContent(pageId?: string): Promise<{
 /**
  * Process blocks for rendering in a hierarchical structure
  */
-function processBlocksForRendering(
+export function processBlocksForRendering(
   blocks: BlockObjectResponse[],
   parentId?: string,
   level: number = 0,

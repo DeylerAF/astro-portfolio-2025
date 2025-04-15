@@ -1,7 +1,17 @@
 ---
-import { getPageById, getBlockChildren } from "../lib/services/notion";
+import {
+  getPageById,
+  getBlockChildren,
+  parseNotionProperties,
+  processBlocksForRendering,
+} from "../lib/services/notion";
+import type {
+  BlockObjectResponse,
+  PageObjectResponse,
+} from "@notionhq/client/build/src/api-endpoints";
+import type { ProcessedBlock, RichTextItem } from "../lib/types/notion";
 
-// Define interfaces for our profile data types
+// Define interface for our profile data
 interface ProfileData {
   name: string;
   title: string;
@@ -9,154 +19,45 @@ interface ProfileData {
   avatarUrl: string;
 }
 
-interface NotionBlock {
-  type: string;
-  id: string;
-  content:
-    | string
-    | Array<{ text: string; bold?: boolean; italic?: boolean }>
-    | { url: string; caption?: string };
-}
-
 // Initialize state variables
 let profileData: ProfileData | null = null;
-let introBlocks: NotionBlock[] = [];
+let introBlocks: ProcessedBlock[] = [];
 let isLoading = true;
 let hasError = false;
 let errorMessage = "";
 
-// Format the page ID to ensure it's in the correct format
-const formatPageId = (id: string): string => {
-  // Check if the ID contains hyphens already
-  if (id.includes("-")) return id;
-
-  // Convert to hyphenated format: 4be8c525e1394a76ab766b0e74e9f3db → 4be8c525-e139-4a76-ab76-6b0e74e9f3db
-  return `${id.slice(0, 8)}-${id.slice(8, 12)}-${id.slice(12, 16)}-${id.slice(16, 20)}-${id.slice(20)}`;
-};
-
-// Extract profile data from Notion page
-const extractProfileData = (page: any): ProfileData | null => {
-  try {
-    // Initialize profile data with empty values
-    const data: ProfileData = {
-      name: "",
-      title: "",
-      description: "",
-      avatarUrl: "",
-    };
-
-    // Extract name from page title if available
-    if (page.properties?.title?.title?.length > 0) {
-      data.name = page.properties.title.title
-        .map((t: any) => t.plain_text)
-        .join("");
-    } else if (page.properties?.Name?.title?.length > 0) {
-      data.name = page.properties.Name.title
-        .map((t: any) => t.plain_text)
-        .join("");
-    }
-
-    // Extract title and description from rich text properties
-    if (page.properties?.Title?.rich_text?.length > 0) {
-      data.title = page.properties.Title.rich_text
-        .map((t: any) => t.plain_text)
-        .join("");
-    }
-
-    if (page.properties?.Description?.rich_text?.length > 0) {
-      data.description = page.properties.Description.rich_text
-        .map((t: any) => t.plain_text)
-        .join("");
-    }
-
-    // Extract avatar/profile image (icon or cover)
-    if (page.icon) {
-      if (page.icon.type === "emoji" && page.icon.emoji) {
-        data.avatarUrl = page.icon.emoji;
-      } else if (page.icon.type === "external" && page.icon.external?.url) {
-        data.avatarUrl = page.icon.external.url;
-      } else if (
-        page.icon.type === "custom_emoji" &&
-        page.icon.custom_emoji?.url
-      ) {
-        data.avatarUrl = page.icon.custom_emoji.url;
-      }
-    } else if (page.cover?.type === "external" && page.cover.external.url) {
-      data.avatarUrl = page.cover.external.url;
-    }
-
-    return data;
-  } catch (err) {
-    console.error("Error extracting profile data:", err);
-    return null;
-  }
-};
-
 /**
- * Process block content from Notion API
- * @param block - Notion block object
- * @returns Processed block with content
+ * Extract profile data from Notion page
  */
-const processBlockContent = (block: any): NotionBlock | null => {
-  try {
-    if (!block || !block.type) return null;
+const extractProfileData = (page: PageObjectResponse): ProfileData => {
+  // Parse the properties using the existing utility
+  const properties = parseNotionProperties(page.properties);
 
-    const blockType = block.type;
+  // Initialize profile data with empty values
+  const data: ProfileData = {
+    name: "",
+    title: "",
+    description: "",
+    avatarUrl: "",
+  };
 
-    // Skip section headings and callouts
-    if (blockType === "callout" || blockType === "column_list") {
-      return null;
+  // Extract name, title and description from parsed properties
+  data.name = (properties.title as string) || (properties.Name as string) || "";
+  data.title = (properties.Title as string) || "";
+  data.description = (properties.Description as string) || "";
+
+  // Extract avatar/profile image (icon or cover)
+  if (page.icon) {
+    if (page.icon.type === "emoji" && page.icon.emoji) {
+      data.avatarUrl = page.icon.emoji;
+    } else if (page.icon.type === "external" && page.icon.external?.url) {
+      data.avatarUrl = page.icon.external.url;
     }
-
-    let content:
-      | string
-      | Array<{ text: string; bold?: boolean; italic?: boolean }>
-      | { url: string; caption?: string } = "";
-
-    // Process different block types
-    if (blockType === "paragraph") {
-      if (block.paragraph?.rich_text?.length > 0) {
-        content = block.paragraph.rich_text.map((textItem: any) => ({
-          text: textItem.plain_text,
-          bold: textItem.annotations?.bold || false,
-          italic: textItem.annotations?.italic || false,
-        }));
-      }
-    } else if (
-      blockType === "heading_1" ||
-      blockType === "heading_2" ||
-      blockType === "heading_3"
-    ) {
-      if (block[blockType]?.rich_text?.length > 0) {
-        content = block[blockType].rich_text.map((textItem: any) => ({
-          text: textItem.plain_text,
-          bold: textItem.annotations?.bold || false,
-          italic: textItem.annotations?.italic || false,
-        }));
-      }
-    } else if (blockType === "image") {
-      // Process image blocks
-      content = {
-        url:
-          block.image.type === "external"
-            ? block.image.external.url
-            : block.image.file.url,
-        caption:
-          block.image.caption && block.image.caption.length > 0
-            ? block.image.caption.map((c: any) => c.plain_text).join("")
-            : "",
-      };
-    }
-
-    return {
-      id: block.id,
-      type: blockType,
-      content,
-    };
-  } catch (error) {
-    console.error("Error processing block:", error);
-    return null;
+  } else if (page.cover?.type === "external" && page.cover.external.url) {
+    data.avatarUrl = page.cover.external.url;
   }
+
+  return data;
 };
 
 try {
@@ -169,8 +70,8 @@ try {
     throw new Error("Missing PUBLIC_NOTION_PAGE_ID environment variable");
   }
 
-  // Use the provided page ID with proper formatting
-  const pageId = formatPageId(import.meta.env.PUBLIC_NOTION_PAGE_ID);
+  // Use the provided page ID
+  const pageId = import.meta.env.PUBLIC_NOTION_PAGE_ID;
   console.log("Fetching Notion page with ID:", pageId);
 
   // Fetch the page data
@@ -180,41 +81,37 @@ try {
     // Extract the essential profile data
     profileData = extractProfileData(page);
 
-    if (!profileData) {
-      throw new Error("Failed to extract profile data from Notion page");
-    }
-
     // Fetch the page blocks
     const blocksResponse = await getBlockChildren(pageId);
 
     if (blocksResponse && blocksResponse.results) {
-      // Process blocks to extract intro content before sections
-      for (const block of blocksResponse.results) {
-        // Check if block is a full BlockObjectResponse (not partial)
-        if ("type" in block) {
-          // Stop processing when we hit the first callout (section heading)
-          if (block.type === "callout") {
-            break;
-          }
+      // Use the existing function to process blocks
+      const allBlocks = blocksResponse.results.filter(
+        (block): block is BlockObjectResponse =>
+          typeof block === "object" && block !== null && "type" in block
+      );
 
-          const processedBlock = processBlockContent(block);
-          if (
-            processedBlock &&
-            (processedBlock.type === "paragraph" ||
-              processedBlock.type.startsWith("heading_") ||
-              processedBlock.type === "image")
-          ) {
-            introBlocks.push(processedBlock);
-          }
+      // Process blocks for rendering
+      const processedBlocks = processBlocksForRendering(allBlocks);
+
+      // Get intro blocks (stop at first callout which is typically a section heading)
+      for (const block of processedBlocks) {
+        if (block.type === "callout") {
+          break;
+        }
+
+        if (
+          block.type === "paragraph" ||
+          block.type.startsWith("heading_") ||
+          block.type === "image"
+        ) {
+          introBlocks.push(block);
         }
       }
     }
 
     console.log("Successfully loaded profile data from Notion");
     console.log(`Loaded ${introBlocks.length} intro blocks`);
-    introBlocks.forEach((block) => {
-      console.log(`Block type: ${block.type}, ID: ${block.id}`);
-    });
   } else {
     hasError = true;
     errorMessage = "Could not fetch page from Notion API";
@@ -270,11 +167,11 @@ try {
               return (
                 <p class="profile-paragraph">
                   {Array.isArray(block.content)
-                    ? block.content.map((text, i) => (
+                    ? (block.content as RichTextItem[]).map((text, i) => (
                         <span
                           class:list={{
-                            bold: text.bold,
-                            italic: text.italic,
+                            bold: text.annotations?.bold,
+                            italic: text.annotations?.italic,
                           }}
                         >
                           {text.text}
@@ -287,11 +184,11 @@ try {
               return (
                 <h1 class="profile-heading-1">
                   {Array.isArray(block.content)
-                    ? block.content.map((text, i) => (
+                    ? (block.content as RichTextItem[]).map((text, i) => (
                         <span
                           class:list={{
-                            bold: text.bold,
-                            italic: text.italic,
+                            bold: text.annotations?.bold,
+                            italic: text.annotations?.italic,
                           }}
                         >
                           {text.text}
@@ -304,11 +201,11 @@ try {
               return (
                 <h2 class="profile-heading-2">
                   {Array.isArray(block.content)
-                    ? block.content.map((text, i) => (
+                    ? (block.content as RichTextItem[]).map((text, i) => (
                         <span
                           class:list={{
-                            bold: text.bold,
-                            italic: text.italic,
+                            bold: text.annotations?.bold,
+                            italic: text.annotations?.italic,
                           }}
                         >
                           {text.text}
@@ -321,11 +218,11 @@ try {
               return (
                 <h3 class="profile-heading-3">
                   {Array.isArray(block.content)
-                    ? block.content.map((text, i) => (
+                    ? (block.content as RichTextItem[]).map((text, i) => (
                         <span
                           class:list={{
-                            bold: text.bold,
-                            italic: text.italic,
+                            bold: text.annotations?.bold,
+                            italic: text.annotations?.italic,
                           }}
                         >
                           {text.text}
@@ -337,18 +234,23 @@ try {
             } else if (
               block.type === "image" &&
               typeof block.content === "object" &&
+              block.content &&
               "url" in block.content
             ) {
               return (
                 <figure class="profile-image-container">
                   <img
-                    src={block.content.url}
-                    alt={block.content.caption || "Profile image"}
+                    src={block.content.url as string}
+                    alt={
+                      block.content.caption
+                        ? String(block.content.caption)
+                        : "Profile image"
+                    }
                     class="profile-image"
                   />
                   {block.content.caption && (
                     <figcaption class="profile-image-caption">
-                      {block.content.caption}
+                      {String(block.content.caption)}
                     </figcaption>
                   )}
                 </figure>

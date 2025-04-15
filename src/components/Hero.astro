@@ -65,8 +65,23 @@ const { profileData, introBlocks, images } =
       return null;
     })()
   }
+  {/* Render all images except the first one (used as avatar) */}
   {
-    /* Render all blocks except heading_2 and the first image block (if it matches firstImage) */
+    images.length > 1 && (
+      <div class="flex flex-col gap-6 mt-6">
+        {images.slice(1).map((imgUrl, idx) => (
+          <img
+            src={imgUrl}
+            alt={`Notion image ${idx + 2}`}
+            class="max-w-full h-auto rounded-lg mx-auto shadow"
+            loading="lazy"
+          />
+        ))}
+      </div>
+    )
+  }
+  {
+    /* Render all blocks except heading_2 and the first image block (if it matches images[0]) */
   }
   <div
     class="flex flex-col gap-4 mt-6 text-xl text-gray-800 dark:text-gray-300"

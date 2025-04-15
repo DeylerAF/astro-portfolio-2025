@@ -26,12 +26,17 @@ const { profileData, introBlocks, images } =
     <!-- Example usage of the Button component with icon, url, and other props -->
     <Button
       text="View Products"
-      url="mailto:example@email.com"
+      url="/products"
+      Internal
+      route
+      to
+      products
+      page
       icon={Mail}
       iconPosition="left"
       type="button"
       class="ml-2"
-      aria-label="Contact via email"
+      aria-label="Go to products page"
     />
   </div>
   {/* Render Notion heading_2 as the main h1 if available */}

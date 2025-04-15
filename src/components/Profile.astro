@@ -13,14 +13,11 @@ interface NotionBlock {
   type: string;
   id: string;
   content: string | Array<{ text: string; bold?: boolean; italic?: boolean }>;
-  imageUrl?: string;
 }
 
 // Initialize state variables
 let profileData: ProfileData | null = null;
 let introBlocks: NotionBlock[] = [];
-let featuredImage: NotionBlock | null = null;
-let featuredHeading: NotionBlock | null = null;
 let isLoading = true;
 let hasError = false;
 let errorMessage = "";
@@ -102,7 +99,6 @@ const processBlockContent = (block: any): NotionBlock | null => {
     if (!block || !block.type) return null;
 
     const blockType = block.type;
-    const blockId = block.id;
 
     // Skip section headings and callouts
     if (blockType === "callout" || blockType === "column_list") {
@@ -112,7 +108,6 @@ const processBlockContent = (block: any): NotionBlock | null => {
     let content:
       | string
       | Array<{ text: string; bold?: boolean; italic?: boolean }> = "";
-    let imageUrl: string | undefined;
 
     // Process different block types
     if (blockType === "paragraph") {
@@ -135,30 +130,12 @@ const processBlockContent = (block: any): NotionBlock | null => {
           italic: textItem.annotations?.italic || false,
         }));
       }
-    } else if (blockType === "image") {
-      // Handle image blocks
-      if (block.image?.type === "external" && block.image.external?.url) {
-        imageUrl = block.image.external.url;
-      } else if (block.image?.type === "file" && block.image.file?.url) {
-        imageUrl = block.image.file.url;
-      }
-
-      // Set content to empty array if no caption
-      content =
-        block.image?.caption?.length > 0
-          ? block.image.caption.map((captionItem: any) => ({
-              text: captionItem.plain_text,
-              bold: captionItem.annotations?.bold || false,
-              italic: captionItem.annotations?.italic || false,
-            }))
-          : [];
     }
 
     return {
-      id: blockId,
+      id: block.id,
       type: blockType,
       content,
-      imageUrl,
     };
   } catch (error) {
     console.error("Error processing block:", error);
@@ -183,11 +160,7 @@ try {
   // Fetch the page data
   const page = await getPageById(pageId);
 
-  if (!page) {
-    hasError = true;
-    errorMessage = "Could not fetch page from Notion API";
-    console.warn(errorMessage);
-  } else {
+  if (page) {
     // Extract the essential profile data
     profileData = extractProfileData(page);
 
@@ -198,52 +171,23 @@ try {
     // Fetch the page blocks
     const blocksResponse = await getBlockChildren(pageId);
 
-    // Log number of blocks for debugging
-    console.log(
-      `Fetched ${blocksResponse.results.length} blocks from Notion page`
-    );
-
-    // IDs of specific blocks we want to display (without hyphens for comparison)
-    const targetImageId = "1d598b9bce6380f7a777c57419a26dfd";
-    const targetHeadingId = "00519ead54ea405e823a6e69b70b0f8d";
-
-    if (blocksResponse && blocksResponse.results.length > 0) {
-      // Process blocks to extract intro content and our specific blocks
+    if (blocksResponse && blocksResponse.results) {
+      // Process blocks to extract intro content before sections
       for (const block of blocksResponse.results) {
         // Check if block is a full BlockObjectResponse (not partial)
-        if ("type" in block) {
-          // Log each block ID and type for debugging
-          console.log(
-            `Block: ${block.id.replace(/-/g, "")} of type ${block.type}`
-          );
+        if ('type' in block) {
+          // Stop processing when we hit the first callout (section heading)
+          if (block.type === "callout") {
+            break;
+          }
 
-          // Normalize block ID by removing hyphens for comparison
-          const normalizedBlockId = block.id.replace(/-/g, "");
-
-          // Process the block content
           const processedBlock = processBlockContent(block);
-
-          if (processedBlock) {
-            // Check for our specific image block
-            if (normalizedBlockId === targetImageId) {
-              console.log(`Found target image block: ${block.id}`);
-              featuredImage = processedBlock;
-            }
-            // Check for our specific heading block
-            else if (normalizedBlockId === targetHeadingId) {
-              console.log(`Found target heading block: ${block.id}`);
-              featuredHeading = processedBlock;
-            }
-            // Add appropriate blocks to intro blocks collection
-            else if (block.type === "callout") {
-              // Stop processing at section boundary
-              break;
-            } else if (
-              processedBlock.type === "paragraph" ||
-              processedBlock.type.startsWith("heading_")
-            ) {
-              introBlocks.push(processedBlock);
-            }
+          if (
+            processedBlock &&
+            (processedBlock.type === "paragraph" ||
+              processedBlock.type.startsWith("heading_"))
+          ) {
+            introBlocks.push(processedBlock);
           }
         }
       }
@@ -251,6 +195,10 @@ try {
 
     console.log("Successfully loaded profile data from Notion");
     console.log(`Loaded ${introBlocks.length} intro blocks`);
+  } else {
+    hasError = true;
+    errorMessage = "Could not fetch page from Notion API";
+    console.warn(errorMessage);
   }
 } catch (error) {
   hasError = true;
@@ -294,50 +242,6 @@ try {
             <h2>{profileData.title}</h2>
           </div>
         </div>
-
-        {/* Featured image block */}
-        {featuredImage && featuredImage.type === "image" && (
-          <div class="profile-featured-image">
-            <img
-              src={featuredImage.imageUrl}
-              alt="Featured image"
-              class="notion-image"
-            />
-            {Array.isArray(featuredImage.content) &&
-              featuredImage.content.length > 0 && (
-                <figcaption class="notion-image-caption">
-                  {featuredImage.content.map((text, i) => (
-                    <span
-                      class:list={{
-                        bold: text.bold,
-                        italic: text.italic,
-                      }}
-                    >
-                      {text.text}
-                    </span>
-                  ))}
-                </figcaption>
-              )}
-          </div>
-        )}
-
-        {/* Featured heading block */}
-        {featuredHeading && featuredHeading.type === "heading_2" && (
-          <h2 class="profile-featured-heading">
-            {Array.isArray(featuredHeading.content)
-              ? featuredHeading.content.map((text, i) => (
-                  <span
-                    class:list={{
-                      bold: text.bold,
-                      italic: text.italic,
-                    }}
-                  >
-                    {text.text}
-                  </span>
-                ))
-              : featuredHeading.content}
-          </h2>
-        )}
 
         {/* Display intro blocks from Notion */}
         <div class="profile-intro">
@@ -496,49 +400,6 @@ try {
 
   .retry-button:hover {
     background-color: #c53030;
-  }
-
-  /* Add styling for the featured elements */
-  .profile-featured-image {
-    margin: 2rem 0;
-    width: 100%;
-  }
-
-  .notion-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
-  }
-
-  .notion-image-caption {
-    text-align: center;
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
-    color: var(--secondary-text-color, #666);
-  }
-
-  .profile-featured-heading {
-    margin: 1.5rem 0;
-    font-size: 1.4rem;
-    color: var(--heading-color, #444);
-  }
-
-  .profile-intro {
-    margin-top: 1rem;
-  }
-
-  .profile-paragraph {
-    margin-bottom: 1rem;
-    line-height: 1.6;
-  }
-
-  .bold {
-    font-weight: bold;
-  }
-
-  .italic {
-    font-style: italic;
   }
 
   /* Responsive adjustments */

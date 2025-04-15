@@ -83,25 +83,45 @@ try {
       <Badge>Open to work</Badge>
     </a>
   </div>
-  <h1
-    class="text-4xl font-bold tracking-tight text-gray-800 sm:text-5xl dark:text-white"
-  >
-    {
-      profileData?.name ? (
-        <>
-          Hi, I'm{" "}
-          <strong class="text-lime-600 dark:text-lime-400">
-            {profileData.name}
-          </strong>
-        </>
-      ) : (
-        <>
-          Hi, I'm{" "}
-          <strong class="text-lime-600 dark:text-lime-400">Your Name</strong>
-        </>
-      )
+  {/* Render Notion heading_2 as the main h1 if available, otherwise fallback to name */}
+  {(() => {
+    const headingBlock = introBlocks.find((block) => block.type === "heading_2");
+    if (headingBlock && Array.isArray(headingBlock.content)) {
+      return (
+        <h1 class="text-4xl font-bold tracking-tight text-gray-800 sm:text-5xl dark:text-white">
+          {(headingBlock.content as RichTextItem[]).map((text, i) => (
+            <span
+              class:list={{
+                "font-bold": text.annotations?.bold,
+                italic: text.annotations?.italic,
+              }}
+              key={i}
+            >
+              {text.text}
+            </span>
+          ))}
+        </h1>
+      );
     }
-  </h1>
+    // Fallback to profileData name if no heading_2 block
+    return (
+      <h1 class="text-4xl font-bold tracking-tight text-gray-800 sm:text-5xl dark:text-white">
+        {profileData?.name ? (
+          <>
+            Hi, I'm{" "}
+            <strong class="text-lime-600 dark:text-lime-400">
+              {profileData.name}
+            </strong>
+          </>
+        ) : (
+          <>
+            Hi, I'm{" "}
+            <strong class="text-lime-600 dark:text-lime-400">Your Name</strong>
+          </>
+        )}
+      </h1>
+    );
+  })()}
   {/* Render all blocks except the first image block (used as avatar) */}
   <div class="flex flex-col gap-4 mt-6 text-xl text-gray-800 dark:text-gray-300">
     {
@@ -151,22 +171,7 @@ try {
               </h1>
             );
           } else if (block.type === "heading_2") {
-            return (
-              <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mt-4 mb-1">
-                {Array.isArray(block.content)
-                  ? (block.content as RichTextItem[]).map((text, i) => (
-                      <span
-                        class:list={{
-                          "font-bold": text.annotations?.bold,
-                          italic: text.annotations?.italic,
-                        }}
-                      >
-                        {text.text}
-                      </span>
-                    ))
-                  : block.content}
-              </h2>
-            );
+            return null; // Skip heading_2, already rendered as main h1
           } else if (block.type === "heading_3") {
             return (
               <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mt-2 mb-1">

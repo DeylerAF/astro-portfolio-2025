@@ -12,7 +12,10 @@ interface ProfileData {
 interface NotionBlock {
   type: string;
   id: string;
-  content: string | Array<{ text: string; bold?: boolean; italic?: boolean }>;
+  content:
+    | string
+    | Array<{ text: string; bold?: boolean; italic?: boolean }>
+    | { url: string; caption?: string };
 }
 
 // Initialize state variables
@@ -107,7 +110,8 @@ const processBlockContent = (block: any): NotionBlock | null => {
 
     let content:
       | string
-      | Array<{ text: string; bold?: boolean; italic?: boolean }> = "";
+      | Array<{ text: string; bold?: boolean; italic?: boolean }>
+      | { url: string; caption?: string } = "";
 
     // Process different block types
     if (blockType === "paragraph") {
@@ -130,6 +134,18 @@ const processBlockContent = (block: any): NotionBlock | null => {
           italic: textItem.annotations?.italic || false,
         }));
       }
+    } else if (blockType === "image") {
+      // Process image blocks
+      content = {
+        url:
+          block.image.type === "external"
+            ? block.image.external.url
+            : block.image.file.url,
+        caption:
+          block.image.caption && block.image.caption.length > 0
+            ? block.image.caption.map((c: any) => c.plain_text).join("")
+            : "",
+      };
     }
 
     return {
@@ -175,7 +191,7 @@ try {
       // Process blocks to extract intro content before sections
       for (const block of blocksResponse.results) {
         // Check if block is a full BlockObjectResponse (not partial)
-        if ('type' in block) {
+        if ("type" in block) {
           // Stop processing when we hit the first callout (section heading)
           if (block.type === "callout") {
             break;
@@ -185,7 +201,8 @@ try {
           if (
             processedBlock &&
             (processedBlock.type === "paragraph" ||
-              processedBlock.type.startsWith("heading_"))
+              processedBlock.type.startsWith("heading_") ||
+              processedBlock.type === "image")
           ) {
             introBlocks.push(processedBlock);
           }
@@ -195,6 +212,9 @@ try {
 
     console.log("Successfully loaded profile data from Notion");
     console.log(`Loaded ${introBlocks.length} intro blocks`);
+    introBlocks.forEach((block) => {
+      console.log(`Block type: ${block.type}, ID: ${block.id}`);
+    });
   } else {
     hasError = true;
     errorMessage = "Could not fetch page from Notion API";
@@ -314,6 +334,25 @@ try {
                     : block.content}
                 </h3>
               );
+            } else if (
+              block.type === "image" &&
+              typeof block.content === "object" &&
+              "url" in block.content
+            ) {
+              return (
+                <figure class="profile-image-container">
+                  <img
+                    src={block.content.url}
+                    alt={block.content.caption || "Profile image"}
+                    class="profile-image"
+                  />
+                  {block.content.caption && (
+                    <figcaption class="profile-image-caption">
+                      {block.content.caption}
+                    </figcaption>
+                  )}
+                </figure>
+              );
             }
             return null;
           })}
@@ -400,6 +439,28 @@ try {
 
   .retry-button:hover {
     background-color: #c53030;
+  }
+
+  /* Estilos para imágenes */
+  .profile-image-container {
+    margin: 1.5rem 0;
+    width: 100%;
+  }
+
+  .profile-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .profile-image-caption {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--secondary-text-color, #666);
+    font-style: italic;
   }
 
   /* Responsive adjustments */

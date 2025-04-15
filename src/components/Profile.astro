@@ -1,24 +1,10 @@
 ---
-import {
-  getPageById,
-  getBlockChildren,
-  parseNotionProperties,
-  processBlocksForRendering,
-  extractIcon,
-} from "../lib/services/notion";
+import { getProfileDataAndIntroBlocks } from "../lib/services/notion";
 import type {
-  BlockObjectResponse,
-  PageObjectResponse,
-} from "@notionhq/client/build/src/api-endpoints";
-import type { ProcessedBlock, RichTextItem } from "../lib/types/notion";
-
-// Define interface for our profile data
-interface ProfileData {
-  name: string;
-  title: string;
-  description: string;
-  avatarUrl: string;
-}
+  ProcessedBlock,
+  RichTextItem,
+  ProfileData,
+} from "../lib/types/notion";
 
 // Initialize state variables
 let profileData: ProfileData | null = null;
@@ -27,92 +13,21 @@ let isLoading = true;
 let hasError = false;
 let errorMessage = "";
 
-/**
- * Extract profile data from Notion page
- */
-const extractProfileData = (page: PageObjectResponse): ProfileData => {
-  // Parse the properties using the existing utility
-  const properties = parseNotionProperties(page.properties);
-
-  // Initialize profile data with empty values
-  const data: ProfileData = {
-    name: "",
-    title: "",
-    description: "",
-    avatarUrl: "",
-  };
-  // Extract name, title and description from parsed properties
-  data.name = (properties.title as string) || (properties.Name as string) || "";
-  data.title = (properties.Title as string) || "";
-  data.description = (properties.Description as string) || "";
-
-  // Extract avatar/profile image (icon or cover)
-  const icon = extractIcon(page);
-  if (icon) {
-    data.avatarUrl = icon.value;
-  } else if (page.cover?.type === "external" && page.cover.external.url) {
-    data.avatarUrl = page.cover.external.url;
-  }
-
-  return data;
-};
-
 try {
-  // Ensure we have the required environment variables
+  // Fetch profile data and intro blocks from Notion service
+  const pageId = import.meta.env.PUBLIC_NOTION_PAGE_ID;
   if (!import.meta.env.PUBLIC_NOTION_TOKEN) {
     throw new Error("Missing PUBLIC_NOTION_TOKEN environment variable");
   }
-
-  if (!import.meta.env.PUBLIC_NOTION_PAGE_ID) {
+  if (!pageId) {
     throw new Error("Missing PUBLIC_NOTION_PAGE_ID environment variable");
   }
-
-  // Use the provided page ID
-  const pageId = import.meta.env.PUBLIC_NOTION_PAGE_ID;
-  console.log("Fetching Notion page with ID:", pageId);
-
-  // Fetch the page data
-  const page = await getPageById(pageId);
-
-  if (page) {
-    // Extract the essential profile data
-    profileData = extractProfileData(page);
-
-    // Fetch the page blocks
-    const blocksResponse = await getBlockChildren(pageId);
-
-    if (blocksResponse && blocksResponse.results) {
-      // Use the existing function to process blocks
-      const allBlocks = blocksResponse.results.filter(
-        (block): block is BlockObjectResponse =>
-          typeof block === "object" && block !== null && "type" in block,
-      );
-
-      // Process blocks for rendering
-      const processedBlocks = processBlocksForRendering(allBlocks);
-
-      // Get intro blocks (stop at first callout which is typically a section heading)
-      for (const block of processedBlocks) {
-        if (block.type === "callout") {
-          break;
-        }
-
-        if (
-          block.type === "paragraph" ||
-          block.type.startsWith("heading_") ||
-          block.type === "image"
-        ) {
-          introBlocks.push(block);
-        }
-      }
-    }
-
-    console.log("Successfully loaded profile data from Notion");
-    console.log(`Loaded ${introBlocks.length} intro blocks`);
-  } else {
+  const result = await getProfileDataAndIntroBlocks(pageId);
+  profileData = result.profileData;
+  introBlocks = result.introBlocks;
+  if (!profileData) {
     hasError = true;
     errorMessage = "Could not fetch page from Notion API";
-    console.warn(errorMessage);
   }
 } catch (error) {
   hasError = true;

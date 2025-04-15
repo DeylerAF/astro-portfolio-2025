@@ -1,4 +1,5 @@
 // Type definitions for Notion API
+import type { BlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 
 export interface NotionPropertyValue {
   type: string;
@@ -94,6 +95,7 @@ export type BlockContent =
         file?: { url: string };
         external?: { url: string };
       } | null;
+      emoji?: string | null;
     }
   | { url: string; caption?: RichTextItem[] | string }
   | { title: string }
@@ -110,3 +112,42 @@ export interface ProcessedBlock {
   hasChildren: boolean;
   level?: number;
 }
+
+// Notion Icon Types
+export interface NotionIconBase {
+  type: string;
+}
+
+export interface NotionEmojiIcon extends NotionIconBase {
+  type: "emoji";
+  emoji: string;
+}
+
+export interface NotionExternalIcon extends NotionIconBase {
+  type: "external";
+  external: { url: string };
+}
+
+export interface NotionFileIcon extends NotionIconBase {
+  type: "file";
+  file: { url: string };
+}
+
+export interface NotionCustomEmojiIcon extends NotionIconBase {
+  type: "custom_emoji";
+  custom_emoji: {
+    url?: string;
+    emoji?: string;
+  };
+}
+
+export type NotionIcon =
+  | NotionEmojiIcon
+  | NotionExternalIcon
+  | NotionFileIcon
+  | NotionCustomEmojiIcon;
+
+// Using intersection type instead of extending BlockObjectResponse
+export type BlockObjectResponseWithIcon = BlockObjectResponse & {
+  icon?: NotionIcon;
+};

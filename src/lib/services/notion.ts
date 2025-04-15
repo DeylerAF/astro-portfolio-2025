@@ -15,6 +15,8 @@ import type {
   NotionFilesProperty,
   ProcessedBlock,
   RichTextItem,
+  NotionIcon,
+  BlockObjectResponseWithIcon,
 } from "../types/notion";
 
 // ===== Notion Client Module =====
@@ -655,7 +657,8 @@ function processBlockContent(
     case "quote":
       baseProcessedBlock.content = processRichTextArray(block.quote.rich_text);
       break;
-    case "callout":
+    case "callout": {
+      // Moved declaration outside case block to fix no-case-declarations error
       const emojiContent = processEmojiContent(block);
       baseProcessedBlock.content = {
         text: processRichTextArray(block.callout.rich_text),
@@ -663,6 +666,7 @@ function processBlockContent(
         emoji: emojiContent,
       };
       break;
+    }
     case "divider":
       baseProcessedBlock.content = null;
       break;
@@ -745,33 +749,43 @@ function processRichTextArray(
  * @param item - A Notion page or block object that might contain an icon
  * @returns The emoji character, image URL, or null if no icon exists
  */
-export function extractIcon(item: any): { type: string; value: string } | null {
-  if (!item || !item.icon) return null;
+export function extractIcon(
+  item:
+    | PageObjectResponse
+    | BlockObjectResponseWithIcon
+    | Record<string, unknown>,
+): { type: string; value: string } | null {
+  if (!item || !("icon" in item) || !item.icon) return null;
 
-  const { icon } = item;
+  const { icon } = item as { icon: NotionIcon };
 
-  if (icon.type === "emoji" && icon.emoji) {
+  if (icon.type === "emoji" && "emoji" in icon) {
     return {
       type: "emoji",
       value: icon.emoji,
     };
-  } else if (icon.type === "external" && icon.external?.url) {
+  } else if (
+    icon.type === "external" &&
+    "external" in icon &&
+    icon.external?.url
+  ) {
     return {
       type: "image",
       value: icon.external.url,
     };
-  } else if (icon.type === "file" && icon.file?.url) {
+  } else if (icon.type === "file" && "file" in icon && icon.file?.url) {
     return {
       type: "image",
       value: icon.file.url,
     };
   } else if (
     icon.type === "custom_emoji" &&
+    "custom_emoji" in icon &&
     (icon.custom_emoji?.url || icon.custom_emoji?.emoji)
   ) {
     return {
       type: "emoji",
-      value: icon.custom_emoji.emoji || icon.custom_emoji.url,
+      value: icon.custom_emoji.emoji || icon.custom_emoji.url || "",
     };
   }
 
@@ -798,8 +812,10 @@ export function processEmojiContent(block: BlockObjectResponse): string | null {
   }
 
   // Extract icon if it exists
-  if (block.icon) {
-    const icon = extractIcon(block);
+  // Use type assertion with a type guard for safety
+  const blockWithIcon = block as unknown as BlockObjectResponseWithIcon;
+  if ("icon" in blockWithIcon && blockWithIcon.icon) {
+    const icon = extractIcon(blockWithIcon);
     return icon?.type === "emoji" ? icon.value : null;
   }
 

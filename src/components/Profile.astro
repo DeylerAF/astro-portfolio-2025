@@ -85,7 +85,7 @@ try {
       // Use the existing function to process blocks
       const allBlocks = blocksResponse.results.filter(
         (block): block is BlockObjectResponse =>
-          typeof block === "object" && block !== null && "type" in block
+          typeof block === "object" && block !== null && "type" in block,
       );
 
       // Process blocks for rendering

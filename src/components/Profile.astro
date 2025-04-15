@@ -4,6 +4,7 @@ import {
   getBlockChildren,
   parseNotionProperties,
   processBlocksForRendering,
+  extractIcon,
 } from "../lib/services/notion";
 import type {
   BlockObjectResponse,
@@ -40,19 +41,15 @@ const extractProfileData = (page: PageObjectResponse): ProfileData => {
     description: "",
     avatarUrl: "",
   };
-
   // Extract name, title and description from parsed properties
   data.name = (properties.title as string) || (properties.Name as string) || "";
   data.title = (properties.Title as string) || "";
   data.description = (properties.Description as string) || "";
 
   // Extract avatar/profile image (icon or cover)
-  if (page.icon) {
-    if (page.icon.type === "emoji" && page.icon.emoji) {
-      data.avatarUrl = page.icon.emoji;
-    } else if (page.icon.type === "external" && page.icon.external?.url) {
-      data.avatarUrl = page.icon.external.url;
-    }
+  const icon = extractIcon(page);
+  if (icon) {
+    data.avatarUrl = icon.value;
   } else if (page.cover?.type === "external" && page.cover.external.url) {
     data.avatarUrl = page.cover.external.url;
   }

@@ -14,25 +14,26 @@ export interface ProfileData {
 }
 
 /**
- * Extracts profile data and intro blocks from a Notion page
+ * Extracts profile data, intro blocks, and all top-level images from a Notion page for fast loading.
+ * Only fetches top-level image blocks and cover image for performance.
  * @param pageId - The Notion page ID
- * @returns { profileData, introBlocks }
+ * @returns { profileData, introBlocks, images }
  */
 export async function getProfileDataAndIntroBlocks(pageId: string): Promise<{
   profileData: ProfileData | null;
   introBlocks: ProcessedBlock[];
+  images: string[];
 }> {
   try {
     const page = await getPageById(pageId);
     if (!page) {
-      return { profileData: null, introBlocks: [] };
+      return { profileData: null, introBlocks: [], images: [] };
     }
     // Parse the properties using the existing utility
     const properties = parseNotionProperties(page.properties);
     // Extract name, title, description
     const name =
       (properties.title as string) || (properties.Name as string) || "";
-    // Improved title extraction: check for 'Title', 'title', then 'Name'
     const title =
       (properties.Title as string) ||
       (properties.title as string) ||
@@ -48,22 +49,18 @@ export async function getProfileDataAndIntroBlocks(pageId: string): Promise<{
       avatarUrl = page.cover.external.url;
     }
     const profileData: ProfileData = { name, title, description, avatarUrl };
-    // Fetch the page blocks
+    // Fetch only the top-level blocks for performance
     const blocksResponse = await getBlockChildren(pageId);
     const introBlocks: ProcessedBlock[] = [];
+    const images: string[] = [];
     if (blocksResponse && Array.isArray(blocksResponse.results)) {
-      // Use the existing function to process blocks
       const allBlocks = blocksResponse.results.filter(
         (block): block is BlockObjectResponse =>
           typeof block === "object" && block !== null && "type" in block,
       );
-      // Process blocks for rendering
       const processedBlocks = processBlocksForRendering(allBlocks);
-      // Get intro blocks (stop at first callout which is typically a section heading)
       for (const block of processedBlocks) {
-        if (block.type === "callout") {
-          break;
-        }
+        if (block.type === "callout") break;
         if (
           block.type === "paragraph" ||
           block.type.startsWith("heading_") ||
@@ -71,11 +68,28 @@ export async function getProfileDataAndIntroBlocks(pageId: string): Promise<{
         ) {
           introBlocks.push(block);
         }
+        // Collect all top-level image block URLs
+        if (
+          block.type === "image" &&
+          typeof block.content === "object" &&
+          block.content !== null &&
+          "url" in block.content
+        ) {
+          images.push(block.content.url as string);
+        }
       }
     }
-    return { profileData, introBlocks };
+    // Add cover image as first if no image blocks found
+    if (
+      images.length === 0 &&
+      page.cover?.type === "external" &&
+      page.cover.external.url
+    ) {
+      images.push(page.cover.external.url);
+    }
+    return { profileData, introBlocks, images };
   } catch (error) {
     console.error("Error in getProfileDataAndIntroBlocks:", error);
-    return { profileData: null, introBlocks: [] };
+    return { profileData: null, introBlocks: [], images: [] };
   }
 }

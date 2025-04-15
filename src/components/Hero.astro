@@ -1,56 +1,34 @@
 ---
 import { getProfileDataAndIntroBlocks } from "../lib/services/notion/notionProfile";
-import type {
-  ProcessedBlock,
-  RichTextItem,
-  ProfileData,
-} from "../lib/types/notion";
+import type { RichTextItem } from "../lib/types/notion";
 import Badge from "./Badge.astro";
 
-// Fetch profile data and intro blocks from Notion service
+// Fetch profile data, intro blocks, and all images from Notion service
 const pageId = import.meta.env.PUBLIC_NOTION_PAGE_ID;
-const { profileData, introBlocks } = await getProfileDataAndIntroBlocks(pageId);
-
-// Helper type guard for image block content
-function isImageContent(
-  content: unknown
-): content is { url: string; caption?: string } {
-  return (
-    typeof content === "object" &&
-    content !== null &&
-    "url" in content &&
-    typeof (content as any).url === "string"
-  );
-}
-
-// Find the first image block to use as the profile image
-const firstImageIdx = introBlocks.findIndex(
-  (block) => block.type === "image" && isImageContent(block.content)
-);
-const profileImageBlock =
-  firstImageIdx !== -1 ? introBlocks[firstImageIdx] : null;
+const { profileData, introBlocks, images } =
+  await getProfileDataAndIntroBlocks(pageId);
 ---
 
 <div class="max-w-xl">
   <div class="flex items-end gap-4 mb-4">
-    {/* Render the first Notion image block as the avatar if available */}
     {
-      profileImageBlock && isImageContent(profileImageBlock.content) && (
+      /* Render the first image from the Notion page (property or block image) as the avatar if available */
+    }
+    {
+      images[0] ? (
         <img
-          src={profileImageBlock.content.url}
+          src={images[0]}
           alt={
-            profileImageBlock.content.caption
-              ? String(profileImageBlock.content.caption)
-              : profileData?.name
-                ? profileData.name + " profile photo"
-                : "Profile image"
+            profileData?.name
+              ? profileData.name + " profile photo"
+              : "Profile image"
           }
           class="size-20 rounded-full object-cover drop-shadow-[0px_0px_5px_rgba(0,0,0,0.5)] dark:drop-shadow-[0px_0px_5px_rgba(255,255,255,0.2)]"
           width={80}
           height={80}
           loading="eager"
         />
-      )
+      ) : null
     }
     <a
       href="#"
@@ -88,33 +66,51 @@ const profileImageBlock =
     })()
   }
   {
-    /* Render all blocks except heading_2 and the first image block (used as avatar) */
+    /* Render all blocks except heading_2 and the first image block (if it matches firstImage) */
   }
   <div
     class="flex flex-col gap-4 mt-6 text-xl text-gray-800 dark:text-gray-300"
   >
     {
-      introBlocks.map((block, idx) => {
-        if (block.type === "heading_2" || idx === firstImageIdx) return null;
+      introBlocks.map((block) => {
+        if (block.type === "heading_2") return null;
+        // Skip the first image block if its url matches images[0]
+        if (
+          block.type === "image" &&
+          typeof block.content === "object" &&
+          block.content !== null &&
+          "url" in block.content &&
+          block.content.url === images[0]
+        ) {
+          return null;
+        }
         if (block.type === "paragraph") {
-          return (
-            <p class="[&>strong]:text-lime-600 dark:[&>strong]:text-lime-400 [&>strong]:font-semibold">
-              {Array.isArray(block.content)
-                ? (block.content as RichTextItem[]).map((text) => (
-                    <span
-                      class:list={{
-                        "font-bold": text.annotations?.bold,
-                        italic: text.annotations?.italic,
-                        "text-lime-600 dark:text-lime-400":
-                          text.annotations?.bold,
-                      }}
-                    >
-                      {text.text}
-                    </span>
-                  ))
-                : block.content}
-            </p>
-          );
+          // Ensure block.content is not null and is an array before mapping
+          if (Array.isArray(block.content)) {
+            return (
+              <p class="[&>strong]:text-lime-600 dark:[&>strong]:text-lime-400 [&>strong]:font-semibold">
+                {(block.content as RichTextItem[]).map((text) => (
+                  <span
+                    class:list={{
+                      "font-bold": text.annotations?.bold,
+                      italic: text.annotations?.italic,
+                      "text-lime-600 dark:text-lime-400":
+                        text.annotations?.bold,
+                    }}
+                  >
+                    {text.text}
+                  </span>
+                ))}
+              </p>
+            );
+          } else if (typeof block.content === "string") {
+            return (
+              <p class="[&>strong]:text-lime-600 dark:[&>strong]:text-lime-400 [&>strong]:font-semibold">
+                {block.content}
+              </p>
+            );
+          }
+          return null;
         } else if (block.type === "heading_1") {
           return (
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white mt-6 mb-2">
@@ -153,26 +149,8 @@ const profileImageBlock =
                 : block.content}
             </h3>
           );
-        } else if (block.type === "image" && isImageContent(block.content)) {
-          return (
-            <figure class="my-6 w-full">
-              <img
-                src={block.content.url}
-                alt={
-                  block.content.caption
-                    ? String(block.content.caption)
-                    : "Profile image"
-                }
-                class="max-w-full h-auto rounded-lg mx-auto shadow"
-              />
-              {block.content.caption && (
-                <figcaption class="text-center mt-2 text-sm text-gray-500 italic">
-                  {String(block.content.caption)}
-                </figcaption>
-              )}
-            </figure>
-          );
         }
+        // Do not render any image blocks (handled by firstImage)
         return null;
       })
     }

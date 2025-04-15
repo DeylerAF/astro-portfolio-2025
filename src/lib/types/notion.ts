@@ -151,3 +151,13 @@ export type NotionIcon =
 export type BlockObjectResponseWithIcon = BlockObjectResponse & {
   icon?: NotionIcon;
 };
+
+/**
+ * Interface for profile data returned to Profile.astro
+ */
+export interface ProfileData {
+  name: string;
+  title: string;
+  description: string;
+  avatarUrl: string;
+}

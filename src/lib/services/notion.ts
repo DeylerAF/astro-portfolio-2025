@@ -866,7 +866,7 @@ export async function getProfileDataAndIntroBlocks(pageId: string): Promise<{
     const profileData: ProfileData = { name, title, description, avatarUrl };
     // Fetch the page blocks
     const blocksResponse = await getBlockChildren(pageId);
-    let introBlocks: ProcessedBlock[] = [];
+    const introBlocks: ProcessedBlock[] = [];
     if (blocksResponse && Array.isArray(blocksResponse.results)) {
       // Use the existing function to process blocks
       const allBlocks = blocksResponse.results.filter(

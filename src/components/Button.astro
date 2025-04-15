@@ -1,10 +1,10 @@
 ---
 // Button.astro
-// A reusable button component that accepts text, icon, and other button props as props.
+// Clean, minimal button component with animated border and optional icon support.
 // Props:
 //   text: string - The button text.
-//   icon: Astro component (optional) - Lucide icon component to render inside the button.
-//   iconPosition: 'left' | 'right' (optional, default: 'left') - Position of the icon.
+//   icon: Astro component (optional) - Icon to render inside the button.
+//   iconPosition: 'left' | 'right' (optional, default: 'left') - Icon position.
 //   type: 'button' | 'submit' | 'reset' (optional, default: 'button') - Button type.
 //   disabled: boolean (optional) - Disables the button.
 //   ...rest: any - Other props to pass to the button.
@@ -28,27 +28,25 @@ const {
 } = Astro.props as ButtonProps;
 ---
 
-<span
-  class="relative inline-block overflow-hidden rounded-lg box-border align-middle"
->
+<span class="relative inline-block overflow-hidden rounded-lg p-[1px]">
   <span
     class="absolute inset-[-1000%] pointer-events-none animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#65A30D_0%,#A3E635_50%,#65A30D_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,#365314_0%,#86CC16_50%,#365314_100%)] rounded-lg"
   ></span>
   <button
     type={type}
     disabled={disabled}
-    class="relative z-10 rounded-lg focus:outline-none bg-transparent p-0 m-0 border-none"
+    class="relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none"
     {...rest}
   >
     <div
-      class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium text-center text-black dark:text-white bg-white/80 dark:bg-black/40 rounded-lg transition-colors duration-200"
+      class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium text-black dark:text-white bg-white/80 dark:bg-black/40 rounded-lg transition-colors duration-200"
     >
       {
         iconPosition === "left" && Icon && (
           <Icon class="w-4 h-4 me-2" aria-hidden="true" />
         )
       }
-      <span class="relative z-30">{text}</span>
+      <span>{text}</span>
       {
         iconPosition === "right" && Icon && (
           <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
@@ -57,9 +55,3 @@ const {
     </div>
   </button>
 </span>
-
-<style>
-  .button {
-    /* fallback for custom properties */
-  }
-</style>

@@ -11,8 +11,8 @@ interface Props {
 
 // Fetch Notion profile data for favicon and title
 let notionProfileData = null;
-let notionTitle = "Astro Portfolio";
-let notionAvatarUrl = "/favicon.svg";
+let notionTitle = "DeylerAF";
+let notionAvatarUrl = "/favicon.ico";
 try {
   const pageId = import.meta.env.PUBLIC_NOTION_PAGE_ID;
   if (import.meta.env.PUBLIC_NOTION_TOKEN && pageId) {
@@ -20,7 +20,8 @@ try {
     if (result.profileData) {
       notionProfileData = result.profileData;
       if (notionProfileData.title) notionTitle = notionProfileData.title;
-      if (notionProfileData.avatarUrl) notionAvatarUrl = notionProfileData.avatarUrl;
+      if (notionProfileData.avatarUrl)
+        notionAvatarUrl = notionProfileData.avatarUrl;
     }
   }
 } catch (e) {
@@ -39,7 +40,7 @@ const themeInitScript = generateInitializationScript();
     <link rel="icon" type="image/png" href={notionAvatarUrl} />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content="My personal portfolio built with Astro" />
-    <title>{title ?? notionTitle}</title>
+    <title>{notionTitle ? `${notionTitle} | ${title}` : title}</title>
     <!-- Theme initialization script with system preference detection -->
     <script is:inline set:html={themeInitScript} />
   </head>

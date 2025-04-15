@@ -11,6 +11,7 @@ This is a modern portfolio website built with Astro and Tailwind CSS, using Noti
 - **Notion API**: Used as a headless CMS
 - **TypeScript**: For type safety
 - **Lucide Icons**: For UI icons
+- **Flowbite (manual integration)**: We use Flowbite UI components by copying their HTML and Tailwind CSS code directly from the Flowbite documentation. We do not install the Flowbite dependency; instead, we manually integrate only the required component markup and styles into our Astro components. This allows us to benefit from Flowbite’s design and patterns without adding extra dependencies or increasing bundle size.
 
 ## Project Structure
 

@@ -5,26 +5,9 @@ import Hero from "../components/Hero.astro";
 
 <Layout title="Profile">
   {/* Main content for the homepage */}
-  <main class="mx-auto px-4 sm:px-6 py-12 max-w-4xl">
-    <section class="py-10">
+  <main class="px-4">
+    <section class="">
       <Hero />
-    </section>
-
-    <section class="py-10">
-      <h2 class="text-3xl font-bold mb-6 text-[var(--text-color)]">
-        My Projects
-      </h2>
-      <p class="mb-6 text-lg text-[var(--sidebar-text)]">
-        Check out some of my work from my Notion database:
-      </p>
-      <div class="mt-6">
-        <a
-          href="/products"
-          class="inline-block bg-[var(--accent-color)] hover:bg-[var(--accent-tertiary)] text-white px-5 py-3 rounded font-medium transition-colors shadow"
-        >
-          View All Projects
-        </a>
-      </div>
     </section>
   </main>
 </Layout>

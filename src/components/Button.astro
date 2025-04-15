@@ -1,0 +1,103 @@
+---
+// Button.astro
+// A reusable button component that accepts url, text, icon, and other button props as props.
+// Props:
+//   url: string (optional) - If provided, renders an anchor tag; otherwise, renders a button.
+//   text: string - The button text.
+//   icon: Astro component (optional) - Lucide icon component to render inside the button.
+//   iconPosition: 'left' | 'right' (optional, default: 'left') - Position of the icon.
+//   type: 'button' | 'submit' | 'reset' (optional, default: 'button') - Button type.
+//   disabled: boolean (optional) - Disables the button.
+//   ...rest: any - Other props to pass to the button or anchor.
+
+interface ButtonProps {
+  url?: string;
+  text: string;
+  icon?: any;
+  iconPosition?: "left" | "right";
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+  [key: string]: any;
+}
+
+const {
+  url,
+  text,
+  icon: Icon,
+  iconPosition = "left",
+  type = "button",
+  disabled = false,
+  ...rest
+} = Astro.props as ButtonProps;
+
+function getButtonClass(baseClass: string, userClass?: string): string {
+  return [
+    baseClass,
+    "px-5",
+    "py-3",
+    "text-base",
+    "font-medium",
+    "text-center",
+    "inline-flex",
+    "items-center",
+    "text-white",
+    "bg-blue-700",
+    "rounded-lg",
+    "hover:bg-blue-800",
+    "focus:ring-4",
+    "focus:outline-none",
+    "focus:ring-blue-300",
+    "dark:bg-blue-600",
+    "dark:hover:bg-blue-700",
+    "dark:focus:ring-blue-800",
+    userClass,
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+// Validate type prop for <button>
+const validTypes = ["button", "submit", "reset"];
+const buttonType = validTypes.includes(type) ? type : "button";
+---
+
+{
+  url ? (
+    <a
+      href={url}
+      class={getButtonClass("button", rest.class)}
+      aria-disabled={disabled ? "true" : undefined}
+      tabindex={disabled ? -1 : undefined}
+      {...rest}
+    >
+      {iconPosition === "left" && Icon && (
+        <Icon class="w-4 h-4 me-2" aria-hidden="true" />
+      )}
+      {text}
+      {iconPosition === "right" && Icon && (
+        <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
+      )}
+    </a>
+  ) : (
+    <button
+      type={buttonType}
+      class={getButtonClass("button", rest.class)}
+      disabled={disabled}
+      {...rest}
+    >
+      {iconPosition === "left" && Icon && (
+        <Icon class="w-4 h-4 me-2" aria-hidden="true" />
+      )}
+      {text}
+      {iconPosition === "right" && Icon && (
+        <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
+      )}
+    </button>
+  )
+}
+
+<style>
+  .button {
+    /* fallback for custom properties */
+  }
+</style>

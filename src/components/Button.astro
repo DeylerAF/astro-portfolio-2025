@@ -63,36 +63,46 @@ const buttonType = validTypes.includes(type) ? type : "button";
 
 {
   url ? (
-    <a
-      href={url}
-      class={getButtonClass("button", rest.class)}
-      aria-disabled={disabled ? "true" : undefined}
-      tabindex={disabled ? -1 : undefined}
-      {...rest}
-    >
-      {iconPosition === "left" && Icon && (
-        <Icon class="w-4 h-4 me-2" aria-hidden="true" />
-      )}
-      {text}
-      {iconPosition === "right" && Icon && (
-        <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
-      )}
-    </a>
+    <span class="relative inline-block overflow-hidden rounded-lg p-[1px] box-border">
+      <span class="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#65A30D_0%,#A3E635_50%,#65A30D_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,#365314_0%,#86CC16_50%,#365314_100%)]" />
+      <a
+        href={url}
+        aria-disabled={disabled ? "true" : undefined}
+        tabindex={disabled ? -1 : undefined}
+        {...rest}
+        class="relative z-10 rounded-lg focus:outline-none bg-transparent align-middle"
+      >
+        <div class="relative z-20 inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-black dark:text-white bg-white/80 dark:bg-black/40 rounded-lg transition-colors duration-200">
+          {iconPosition === "left" && Icon && (
+            <Icon class="w-4 h-4 me-2" aria-hidden="true" />
+          )}
+          <span class="relative z-30">{text}</span>
+          {iconPosition === "right" && Icon && (
+            <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
+          )}
+        </div>
+      </a>
+    </span>
   ) : (
-    <button
-      type={buttonType}
-      class={getButtonClass("button", rest.class)}
-      disabled={disabled}
-      {...rest}
-    >
-      {iconPosition === "left" && Icon && (
-        <Icon class="w-4 h-4 me-2" aria-hidden="true" />
-      )}
-      {text}
-      {iconPosition === "right" && Icon && (
-        <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
-      )}
-    </button>
+    <span class="relative inline-block overflow-hidden rounded-lg p-[1px] box-border">
+      <span class="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#65A30D_0%,#A3E635_50%,#65A30D_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,#365314_0%,#86CC16_50%,#365314_100%)]" />
+      <button
+        type={buttonType}
+        disabled={disabled}
+        {...rest}
+        class="relative z-10 rounded-lg focus:outline-none bg-transparent align-middle"
+      >
+        <div class="relative z-20 inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-black dark:text-white bg-white/80 dark:bg-black/40 rounded-lg transition-colors duration-200">
+          {iconPosition === "left" && Icon && (
+            <Icon class="w-4 h-4 me-2" aria-hidden="true" />
+          )}
+          <span class="relative z-30">{text}</span>
+          {iconPosition === "right" && Icon && (
+            <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
+          )}
+        </div>
+      </button>
+    </span>
   )
 }
 

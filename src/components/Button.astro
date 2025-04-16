@@ -15,6 +15,7 @@ interface ButtonProps {
   iconPosition?: "left" | "right";
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
+  variant?: "spinButton" | "outlineButton";
   [key: string]: any;
 }
 
@@ -24,34 +25,46 @@ const {
   iconPosition = "left",
   type = "button",
   disabled = false,
+  variant = "spinButton",
   ...rest
 } = Astro.props as ButtonProps;
 ---
 
-<span class="relative inline-block overflow-hidden rounded-lg p-[1px]">
-  <span
-    class="absolute inset-[-1000%] pointer-events-none animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#65A30D_0%,#A3E635_50%,#65A30D_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,#365314_0%,#86CC16_50%,#365314_100%)] rounded-lg"
-  ></span>
+{variant === "spinButton" ? (
+  <span class="relative inline-block overflow-hidden rounded-lg p-[1px]">
+    <span
+      class="absolute inset-[-1000%] pointer-events-none animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#65A30D_0%,#A3E635_50%,#65A30D_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,#365314_0%,#86CC16_50%,#365314_100%)] rounded-lg"
+    ></span>
+    <button
+      type={type}
+      disabled={disabled}
+      class="relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none"
+      {...rest}
+    >
+      <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium text-black dark:text-white bg-white/80 dark:bg-black/40 rounded-lg transition-colors duration-200">
+        {iconPosition === "left" && Icon && (
+          <Icon class="w-4 h-4 me-2" aria-hidden="true" />
+        )}
+        <span>{text}</span>
+        {iconPosition === "right" && Icon && (
+          <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
+        )}
+      </div>
+    </button>
+  </span>
+) : (
   <button
     type={type}
     disabled={disabled}
-    class="relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none"
+    class="flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 border-blue-700 dark:border-blue-400 bg-transparent text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200 focus:outline-none"
     {...rest}
   >
-    <div
-      class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium text-black dark:text-white bg-white/80 dark:bg-black/40 rounded-lg transition-colors duration-200"
-    >
-      {
-        iconPosition === "left" && Icon && (
-          <Icon class="w-4 h-4 me-2" aria-hidden="true" />
-        )
-      }
-      <span>{text}</span>
-      {
-        iconPosition === "right" && Icon && (
-          <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
-        )
-      }
-    </div>
+    {iconPosition === "left" && Icon && (
+      <Icon class="w-4 h-4 me-2" aria-hidden="true" />
+    )}
+    <span>{text}</span>
+    {iconPosition === "right" && Icon && (
+      <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
+    )}
   </button>
-</span>
+)}

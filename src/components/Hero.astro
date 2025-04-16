@@ -15,16 +15,18 @@ const { profileData, introBlocks, images } =
 <div class="w-full">
   <div class="flex items-end gap-4 mb-4">
     <Avatar />
-    <a
-      href="#"
-      class="flex items-center transition md:justify-center md:hover:scale-105"
-      tabindex="-1"
-      aria-disabled="true"
-    >
-      <Badge>Open to work</Badge>
-    </a>
-    <!-- Example usage of the Button component with icon, url, and other props -->
     <Button
+      variant="outlineButton"
+      text="Open to work"
+      url="https://www.linkedin.com/in/deyleraf/"
+      icon={Mail}
+      iconPosition="left"
+      type="button"
+      class="m-0"
+      aria-label="Go to products page"
+    />
+    <Button
+      variant="spinButton"
       text="View Products"
       url="/products"
       icon={Mail}

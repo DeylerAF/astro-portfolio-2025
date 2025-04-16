@@ -1,7 +1,11 @@
 ---
 // SpinButton.astro - Animated border button variant
 import type { ButtonProps } from "../../lib/utils/buttonUtils";
-import { getButtonVars, getLinkAttrs } from "../../lib/utils/buttonUtils";
+import {
+  getButtonVars,
+  getLinkAttrs,
+  getConicGradient,
+} from "../../lib/utils/buttonUtils";
 
 const {
   text,
@@ -13,18 +17,37 @@ const {
   url,
   target,
   rel,
+  gradientFrom = "#86CC16", // Default: lime-500
+  gradientMid = "#365314", // Default: lime-900
+  gradientTo = "#86CC16", // Default: lime-500
+  gradientFromDark = "#365314", // Default: lime-900 (dark)
+  gradientMidDark = "#86CC16", // Default: lime-500 (dark)
+  gradientToDark = "#365314", // Default: lime-900 (dark)
   ...rest
 } = Astro.props as ButtonProps;
 
 const buttonVars = getButtonVars(color);
 const { target: linkTarget, rel: linkRel } = getLinkAttrs(url, target, rel);
+
+const gradientStyle = {
+  background: getConicGradient(gradientFrom, gradientMid, gradientTo),
+};
+const gradientStyleDark = {
+  background: getConicGradient(
+    gradientFromDark,
+    gradientMidDark,
+    gradientToDark
+  ),
+};
 ---
 
 <span class="relative inline-block overflow-hidden rounded-lg border-2">
   {/* Animated border background */}
   <span
-    class="absolute inset-[-1000%] pointer-events-none animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#86CC16_0%,#365314_50%,#86CC16_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,#365314_0%,#86CC16_50%,#365314_100%)] rounded-lg"
-  ></span>
+    class="absolute inset-[-1000%] pointer-events-none animate-[spin_2s_linear_infinite] rounded-lg"
+    style={gradientStyle}
+    data-astro-dark="true"
+    data-dark-style={JSON.stringify(gradientStyleDark)}></span>
   {
     url ? (
       <a
@@ -37,11 +60,11 @@ const { target: linkTarget, rel: linkRel } = getLinkAttrs(url, target, rel);
         {...rest}
       >
         <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200">
-          {iconPosition === "left" && Icon && (
+          {iconPosition === "left" && typeof Icon === "function" && (
             <Icon class="w-4 h-4 me-2" aria-hidden="true" />
           )}
           <span>{text}</span>
-          {iconPosition === "right" && Icon && (
+          {iconPosition === "right" && typeof Icon === "function" && (
             <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
           )}
         </div>
@@ -54,11 +77,11 @@ const { target: linkTarget, rel: linkRel } = getLinkAttrs(url, target, rel);
         {...rest}
       >
         <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200">
-          {iconPosition === "left" && Icon && (
+          {iconPosition === "left" && typeof Icon === "function" && (
             <Icon class="w-4 h-4 me-2" aria-hidden="true" />
           )}
           <span>{text}</span>
-          {iconPosition === "right" && Icon && (
+          {iconPosition === "right" && typeof Icon === "function" && (
             <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
           )}
         </div>

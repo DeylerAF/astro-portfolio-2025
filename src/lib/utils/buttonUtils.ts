@@ -1,9 +1,6 @@
-// src/lib/utils/buttonUtils.ts
-// Utility functions and types for button components
-
 export interface ButtonProps {
   text: string;
-  icon?: any;
+  icon?: unknown; // Accepts any Astro/JSX component or element
   iconPosition?: "left" | "right";
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
@@ -12,7 +9,26 @@ export interface ButtonProps {
   url?: string;
   target?: string;
   rel?: string;
-  [key: string]: any;
+  // Gradient props for animated border buttons
+  gradientFrom?: string; // Light mode start color
+  gradientMid?: string; // Light mode middle color
+  gradientTo?: string; // Light mode end color
+  gradientFromDark?: string; // Dark mode start color
+  gradientMidDark?: string; // Dark mode middle color
+  gradientToDark?: string; // Dark mode end color
+  [key: string]: unknown; // Use unknown for index signature
+}
+
+/**
+ * Returns a conic-gradient CSS string for the animated border.
+ * Accepts three color stops for both light and dark mode.
+ */
+export function getConicGradient(
+  from: string,
+  mid: string,
+  to: string,
+): string {
+  return `conic-gradient(from 90deg at 50% 50%,${from} 0%,${mid} 50%,${to} 100%)`;
 }
 
 /**

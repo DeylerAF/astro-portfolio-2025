@@ -126,14 +126,21 @@ const buttonVars = getButtonVars(color);
       class="flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 bg-transparent transition-colors duration-200 focus:outline-none"
       aria-disabled={disabled}
       tabindex={disabled ? -1 : undefined}
-      style={{ borderColor: buttonVars.bg, color: buttonVars.bg }}
-      onMouseOver={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = buttonVars.hoverBg;
-        (e.currentTarget as HTMLElement).style.color = buttonVars.hoverBg;
+      style={{
+        borderColor: `var(--button-${color}-bg)`,
+        color: `var(--button-${color}-bg)`,
       }}
-      onMouseOut={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = buttonVars.bg;
-        (e.currentTarget as HTMLElement).style.color = buttonVars.bg;
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLElement).style.borderColor =
+          `var(--button-${color}-hover)`;
+        (e.currentTarget as HTMLElement).style.color =
+          `var(--button-${color}-hover)`;
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLElement).style.borderColor =
+          `var(--button-${color}-bg)`;
+        (e.currentTarget as HTMLElement).style.color =
+          `var(--button-${color}-bg)`;
       }}
       {...rest}
     >
@@ -150,14 +157,21 @@ const buttonVars = getButtonVars(color);
       type={type}
       disabled={disabled}
       class="flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 bg-transparent transition-colors duration-200 focus:outline-none"
-      style={{ borderColor: buttonVars.bg, color: buttonVars.bg }}
-      onMouseOver={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = buttonVars.hoverBg;
-        (e.currentTarget as HTMLElement).style.color = buttonVars.hoverBg;
+      style={{
+        borderColor: `var(--button-${color}-bg)`,
+        color: `var(--button-${color}-bg)`,
       }}
-      onMouseOut={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = buttonVars.bg;
-        (e.currentTarget as HTMLElement).style.color = buttonVars.bg;
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLElement).style.borderColor =
+          `var(--button-${color}-hover)`;
+        (e.currentTarget as HTMLElement).style.color =
+          `var(--button-${color}-hover)`;
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLElement).style.borderColor =
+          `var(--button-${color}-bg)`;
+        (e.currentTarget as HTMLElement).style.color =
+          `var(--button-${color}-bg)`;
       }}
       {...rest}
     >

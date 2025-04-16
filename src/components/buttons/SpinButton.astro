@@ -36,10 +36,7 @@ const { target: linkTarget, rel: linkRel } = getLinkAttrs(url, target, rel);
         tabindex={disabled ? -1 : undefined}
         {...rest}
       >
-        <div
-          class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200 bg-white/80 dark:bg-black/40"
-          style={{ color: buttonVars.bg }}
-        >
+        <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200 bg-white/90 dark:bg-black/80 shadow-md text-black dark:text-white spin-btn-text-shadow">
           {iconPosition === "left" && Icon && (
             <Icon class="w-4 h-4 me-2" aria-hidden="true" />
           )}
@@ -56,10 +53,7 @@ const { target: linkTarget, rel: linkRel } = getLinkAttrs(url, target, rel);
         class="relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none"
         {...rest}
       >
-        <div
-          class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200 bg-white/80 dark:bg-black/40"
-          style={{ color: buttonVars.bg }}
-        >
+        <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200 bg-white/90 dark:bg-black/80 shadow-md text-black dark:text-white spin-btn-text-shadow">
           {iconPosition === "left" && Icon && (
             <Icon class="w-4 h-4 me-2" aria-hidden="true" />
           )}

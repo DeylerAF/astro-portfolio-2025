@@ -66,6 +66,21 @@ function getButtonVars(color: string) {
   }
 }
 const buttonVars = getButtonVars(color);
+
+// Helper function to map color prop to outline button class
+function getOutlineClass(color: string): string {
+  switch (color) {
+    case "primary":
+      return "btn-outline-primary";
+    case "secondary":
+      return "btn-outline-secondary";
+    case "accent":
+      return "btn-outline-accent";
+    default:
+      return "btn-outline-primary";
+  }
+}
+const outlineClass = getOutlineClass(color);
 ---
 
 {
@@ -123,25 +138,9 @@ const buttonVars = getButtonVars(color);
       href={url}
       target={linkTarget}
       rel={linkRel}
-      class="flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 bg-transparent transition-colors duration-200 focus:outline-none"
+      class={`flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 bg-transparent transition-colors duration-200 focus:outline-none ${outlineClass}`}
       aria-disabled={disabled}
       tabindex={disabled ? -1 : undefined}
-      style={{
-        borderColor: `var(--button-${color}-bg)`,
-        color: `var(--button-${color}-bg)`,
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor =
-          `var(--button-${color}-hover)`;
-        (e.currentTarget as HTMLElement).style.color =
-          `var(--button-${color}-hover)`;
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor =
-          `var(--button-${color}-bg)`;
-        (e.currentTarget as HTMLElement).style.color =
-          `var(--button-${color}-bg)`;
-      }}
       {...rest}
     >
       {iconPosition === "left" && Icon && (
@@ -156,23 +155,7 @@ const buttonVars = getButtonVars(color);
     <button
       type={type}
       disabled={disabled}
-      class="flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 bg-transparent transition-colors duration-200 focus:outline-none"
-      style={{
-        borderColor: `var(--button-${color}-bg)`,
-        color: `var(--button-${color}-bg)`,
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor =
-          `var(--button-${color}-hover)`;
-        (e.currentTarget as HTMLElement).style.color =
-          `var(--button-${color}-hover)`;
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor =
-          `var(--button-${color}-bg)`;
-        (e.currentTarget as HTMLElement).style.color =
-          `var(--button-${color}-bg)`;
-      }}
+      class={`flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 bg-transparent transition-colors duration-200 focus:outline-none ${outlineClass}`}
       {...rest}
     >
       {iconPosition === "left" && Icon && (

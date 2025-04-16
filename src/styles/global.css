@@ -79,3 +79,41 @@ body {
     background-color 0.3s,
     color 0.3s;
 }
+
+/*
+  Outline button color classes for each color variant.
+  These classes use CSS variables for color values and are referenced by the Button component
+  via a helper function. This avoids inline styles and enables easy extension for new variants.
+*/
+.btn-outline-primary {
+  border-color: var(--button-primary-bg);
+  color: var(--button-primary-bg);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  border-color: var(--button-primary-hover);
+  color: var(--button-primary-hover);
+}
+
+.btn-outline-secondary {
+  border-color: var(--button-secondary-bg);
+  color: var(--button-secondary-bg);
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+  border-color: var(--button-secondary-hover);
+  color: var(--button-secondary-hover);
+}
+
+.btn-outline-accent {
+  border-color: var(--button-accent-bg);
+  color: var(--button-accent-bg);
+}
+
+.btn-outline-accent:hover,
+.btn-outline-accent:focus {
+  border-color: var(--button-accent-hover);
+  color: var(--button-accent-hover);
+}

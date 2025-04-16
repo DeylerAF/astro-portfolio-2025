@@ -86,25 +86,27 @@
   --neutral-950: #09090b;
 
   /* Sidebar colors */
-  --sidebar-bg: #fff;
-  --sidebar-text: #71717a; /* zinc-500 */
-  --sidebar-hover: #f4f4f5; /* zinc-100 */
+  --sidebar-bg: #e4e4e7; /* zinc-200, more contrast for sidebar in light mode */
+  --sidebar-text: #27272a; /* zinc-800, much darker for readability */
+  --sidebar-hover: #d4d4d8; /* zinc-300, more visible hover */
 
   /* UI elements */
-  --border-color: #3f3f46; /* zinc-700 */
-  --card-bg: #fafafa;
-  --card-shadow: rgb(0 0 0 / 10%);
+  --border-color: #a1a1aa; /* zinc-400, more visible border */
+  --card-bg: #fff; /* pure white for card background */
+  --card-shadow: rgb(0 0 0 / 12%);
 
   /* Button color variables */
-  --button-primary-bg: var(--accent-500);
+  --button-primary-bg: var(
+    --accent-600
+  ); /* slightly darker for more contrast */
   --button-primary-text: #fff;
-  --button-primary-hover: var(--accent-600);
-  --button-secondary-bg: #e0e7ff; /* indigo-100 */
-  --button-secondary-text: #3730a3; /* indigo-800 */
-  --button-secondary-hover: #c7d2fe; /* indigo-200 */
-  --button-accent-bg: var(--accent-400);
-  --button-accent-text: #365314; /* lime-900 */
-  --button-accent-hover: var(--accent-500);
+  --button-primary-hover: var(--accent-700);
+  --button-secondary-bg: #3730a3; /* indigo-800, much darker for contrast */
+  --button-secondary-text: #fff; /* white text for contrast */
+  --button-secondary-hover: #312e81; /* indigo-900 */
+  --button-accent-bg: var(--accent-500);
+  --button-accent-text: #fff;
+  --button-accent-hover: var(--accent-700);
 }
 
 html.dark,

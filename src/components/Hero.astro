@@ -81,9 +81,7 @@ const { profileData, introBlocks, images } =
   {
     /* Render all blocks except heading_2 and the first image block (if it matches images[0]) */
   }
-  <div
-    class="flex flex-col gap-4 mt-6 text-xl text-[var(--text-color)] dark:text-gray-300"
-  >
+  <div class="flex flex-col gap-4 mt-6 text-xl text-[var(--text-color)]">
     {
       introBlocks.map((block) => {
         if (block.type === "heading_2") return null;

@@ -21,8 +21,7 @@ const { pathname } = Astro.url;
       <li>
         <a
           href="/"
-          class={`flex items-center py-2 px-4 rounded-lg transition-colors relative font-medium
-            ${pathname === "/" ? "text-[var(--accent-500)] bg-[var(--sidebar-hover)]" : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--accent-500)]"}`}
+          class={`flex items-center py-2 px-4 rounded-lg transition-colors relative font-medium ${pathname === "/" ? "text-[var(--accent-500)] bg-[var(--sidebar-hover)]" : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--accent-500)]"}`}
           aria-current={pathname === "/" ? "page" : undefined}
         >
           <Home class="w-5 h-5" />
@@ -40,8 +39,7 @@ const { pathname } = Astro.url;
       <li>
         <a
           href="/products"
-          class={`flex items-center py-2 px-4 rounded-lg transition-colors relative font-medium
-            ${pathname === "/products" ? "text-[var(--accent-500)] bg-[var(--sidebar-hover)]" : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--accent-500)]"}`}
+          class={`flex items-center py-2 px-4 rounded-lg transition-colors relative font-medium ${pathname === "/products" ? "text-[var(--accent-500)] bg-[var(--sidebar-hover)]" : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--accent-500)]"}`}
           aria-current={pathname === "/products" ? "page" : undefined}
         >
           <FolderKanban class="w-5 h-5" />
@@ -56,7 +54,7 @@ const { pathname } = Astro.url;
           }
         </a>
       </li>
-      <!-- Add more navigation links as needed -->
+      {/* Add more navigation links as needed */}
     </ul>
   </nav>
 </aside>

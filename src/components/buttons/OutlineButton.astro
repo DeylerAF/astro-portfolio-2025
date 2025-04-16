@@ -1,0 +1,58 @@
+---
+// OutlineButton.astro - Outline style button variant
+import type { ButtonProps } from "../../lib/utils/buttonUtils";
+import { getOutlineClass, getLinkAttrs } from "../../lib/utils/buttonUtils";
+
+const {
+  text,
+  icon: Icon,
+  iconPosition = "left",
+  type = "button",
+  disabled = false,
+  color = "primary",
+  url,
+  target,
+  rel,
+  ...rest
+} = Astro.props as ButtonProps;
+
+const outlineClass = getOutlineClass(color);
+const { target: linkTarget, rel: linkRel } = getLinkAttrs(url, target, rel);
+---
+
+{
+  url ? (
+    <a
+      href={url}
+      target={linkTarget}
+      rel={linkRel}
+      class={`flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 bg-transparent transition-colors duration-200 focus:outline-none ${outlineClass}`}
+      aria-disabled={disabled}
+      tabindex={disabled ? -1 : undefined}
+      {...rest}
+    >
+      {iconPosition === "left" && Icon && (
+        <Icon class="w-4 h-4 me-2" aria-hidden="true" />
+      )}
+      <span>{text}</span>
+      {iconPosition === "right" && Icon && (
+        <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
+      )}
+    </a>
+  ) : (
+    <button
+      type={type}
+      disabled={disabled}
+      class={`flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 bg-transparent transition-colors duration-200 focus:outline-none ${outlineClass}`}
+      {...rest}
+    >
+      {iconPosition === "left" && Icon && (
+        <Icon class="w-4 h-4 me-2" aria-hidden="true" />
+      )}
+      <span>{text}</span>
+      {iconPosition === "right" && Icon && (
+        <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
+      )}
+    </button>
+  )
+}

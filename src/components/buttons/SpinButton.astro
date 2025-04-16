@@ -1,0 +1,74 @@
+---
+// SpinButton.astro - Animated border button variant
+import type { ButtonProps } from "../../lib/utils/buttonUtils";
+import { getButtonVars, getLinkAttrs } from "../../lib/utils/buttonUtils";
+
+const {
+  text,
+  icon: Icon,
+  iconPosition = "left",
+  type = "button",
+  disabled = false,
+  color = "primary",
+  url,
+  target,
+  rel,
+  ...rest
+} = Astro.props as ButtonProps;
+
+const buttonVars = getButtonVars(color);
+const { target: linkTarget, rel: linkRel } = getLinkAttrs(url, target, rel);
+---
+
+<span class="relative inline-block overflow-hidden rounded-lg p-[1px]">
+  {/* Animated border background */}
+  <span
+    class="absolute inset-[-1000%] pointer-events-none animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#65A30D_0%,#A3E635_50%,#65A30D_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,#365314_0%,#86CC16_50%,#365314_100%)] rounded-lg"
+  ></span>
+  {
+    url ? (
+      <a
+        href={url}
+        target={linkTarget}
+        rel={linkRel}
+        class="relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none"
+        aria-disabled={disabled}
+        tabindex={disabled ? -1 : undefined}
+        {...rest}
+      >
+        <div
+          class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200 bg-white/80 dark:bg-black/40"
+          style={{ color: buttonVars.bg }}
+        >
+          {iconPosition === "left" && Icon && (
+            <Icon class="w-4 h-4 me-2" aria-hidden="true" />
+          )}
+          <span>{text}</span>
+          {iconPosition === "right" && Icon && (
+            <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
+          )}
+        </div>
+      </a>
+    ) : (
+      <button
+        type={type}
+        disabled={disabled}
+        class="relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none"
+        {...rest}
+      >
+        <div
+          class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200 bg-white/80 dark:bg-black/40"
+          style={{ color: buttonVars.bg }}
+        >
+          {iconPosition === "left" && Icon && (
+            <Icon class="w-4 h-4 me-2" aria-hidden="true" />
+          )}
+          <span>{text}</span>
+          {iconPosition === "right" && Icon && (
+            <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
+          )}
+        </div>
+      </button>
+    )
+  }
+</span>

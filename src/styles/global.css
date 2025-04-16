@@ -79,31 +79,3 @@ body {
     background-color 0.3s,
     color 0.3s;
 }
-
-/* Button color classes */
-.button-primary {
-  background-color: var(--button-primary-bg);
-  color: var(--button-primary-text);
-}
-
-.button-primary:hover {
-  background-color: var(--button-primary-hover);
-}
-
-.button-secondary {
-  background-color: var(--button-secondary-bg);
-  color: var(--button-secondary-text);
-}
-
-.button-secondary:hover {
-  background-color: var(--button-secondary-hover);
-}
-
-.button-accent {
-  background-color: var(--button-accent-bg);
-  color: var(--button-accent-text);
-}
-
-.button-accent:hover {
-  background-color: var(--button-accent-hover);
-}

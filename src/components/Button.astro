@@ -36,8 +36,36 @@ const isExternal = url && /^https?:\/\//.test(url);
 const linkTarget = target || (isExternal ? "_blank" : undefined);
 const linkRel = rel || (isExternal ? "noopener noreferrer" : undefined);
 
-// Compute button color class
-const colorClass = `button-${color}`;
+// Utility to get the correct CSS variable for each color
+function getButtonVars(color: string) {
+  switch (color) {
+    case "primary":
+      return {
+        bg: "var(--button-primary-bg)",
+        text: "var(--button-primary-text)",
+        hoverBg: "var(--button-primary-hover)",
+      };
+    case "secondary":
+      return {
+        bg: "var(--button-secondary-bg)",
+        text: "var(--button-secondary-text)",
+        hoverBg: "var(--button-secondary-hover)",
+      };
+    case "accent":
+      return {
+        bg: "var(--button-accent-bg)",
+        text: "var(--button-accent-text)",
+        hoverBg: "var(--button-accent-hover)",
+      };
+    default:
+      return {
+        bg: "var(--button-primary-bg)",
+        text: "var(--button-primary-text)",
+        hoverBg: "var(--button-primary-hover)",
+      };
+  }
+}
+const buttonVars = getButtonVars(color);
 ---
 
 {
@@ -46,40 +74,38 @@ const colorClass = `button-${color}`;
       {/* Animated border background */}
       <span class="absolute inset-[-1000%] pointer-events-none animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#65A30D_0%,#A3E635_50%,#65A30D_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,#365314_0%,#86CC16_50%,#365314_100%)] rounded-lg" />
       {url ? (
-        // Render as anchor if url is provided
         <a
           href={url}
           target={linkTarget}
           rel={linkRel}
-          class={`relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none`}
+          class="relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none"
           aria-disabled={disabled}
           tabindex={disabled ? -1 : undefined}
           {...rest}
         >
           <div
-            class={`relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200 ${colorClass}`}
+            class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200 bg-white/80 dark:bg-black/40"
+            style={{ color: buttonVars.bg }}
           >
-            {/* Render icon on the left if provided */}
             {iconPosition === "left" && Icon && (
               <Icon class="w-4 h-4 me-2" aria-hidden="true" />
             )}
             <span>{text}</span>
-            {/* Render icon on the right if provided */}
             {iconPosition === "right" && Icon && (
               <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
             )}
           </div>
         </a>
       ) : (
-        // Render as button if no url is provided
         <button
           type={type}
           disabled={disabled}
-          class={`relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none`}
+          class="relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none"
           {...rest}
         >
           <div
-            class={`relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200 ${colorClass}`}
+            class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200 bg-white/80 dark:bg-black/40"
+            style={{ color: buttonVars.bg }}
           >
             {iconPosition === "left" && Icon && (
               <Icon class="w-4 h-4 me-2" aria-hidden="true" />
@@ -93,14 +119,22 @@ const colorClass = `button-${color}`;
       )}
     </span>
   ) : url ? (
-    // OutlineButton variant rendered as anchor
     <a
       href={url}
       target={linkTarget}
       rel={linkRel}
-      class={`flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200 focus:outline-none ${colorClass}`}
+      class="flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 bg-transparent transition-colors duration-200 focus:outline-none"
       aria-disabled={disabled}
       tabindex={disabled ? -1 : undefined}
+      style={{ borderColor: buttonVars.bg, color: buttonVars.bg }}
+      onMouseOver={(e) => {
+        (e.currentTarget as HTMLElement).style.borderColor = buttonVars.hoverBg;
+        (e.currentTarget as HTMLElement).style.color = buttonVars.hoverBg;
+      }}
+      onMouseOut={(e) => {
+        (e.currentTarget as HTMLElement).style.borderColor = buttonVars.bg;
+        (e.currentTarget as HTMLElement).style.color = buttonVars.bg;
+      }}
       {...rest}
     >
       {iconPosition === "left" && Icon && (
@@ -112,11 +146,19 @@ const colorClass = `button-${color}`;
       )}
     </a>
   ) : (
-    // OutlineButton variant rendered as button
     <button
       type={type}
       disabled={disabled}
-      class={`flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200 focus:outline-none ${colorClass}`}
+      class="flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 bg-transparent transition-colors duration-200 focus:outline-none"
+      style={{ borderColor: buttonVars.bg, color: buttonVars.bg }}
+      onMouseOver={(e) => {
+        (e.currentTarget as HTMLElement).style.borderColor = buttonVars.hoverBg;
+        (e.currentTarget as HTMLElement).style.color = buttonVars.hoverBg;
+      }}
+      onMouseOut={(e) => {
+        (e.currentTarget as HTMLElement).style.borderColor = buttonVars.bg;
+        (e.currentTarget as HTMLElement).style.color = buttonVars.bg;
+      }}
       {...rest}
     >
       {iconPosition === "left" && Icon && (

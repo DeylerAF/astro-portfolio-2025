@@ -5,7 +5,7 @@
   /* Main colors */
   --text-color: #1a202c;
   --bg-color: #fff;
-  --hover-bg: #f7fafc;
+  --hover-bg: #d4d4d8;
 
   /* Accent colors - lime palette */
   --accent-50: #f7fee7;
@@ -91,9 +91,8 @@
   --sidebar-hover: #d4d4d8; /* zinc-300, more visible hover */
 
   /* UI elements */
-  --border-color: var(--neutral-700); /* zinc-700 */
-  --card-bg: var(--neutral-800); /* zinc-800 */
-  --card-shadow: rgb(0 0 0 / 12%); /* shadow color using variable notation */
+  --border-color: var(--neutral-900); /* almost black for light mode borders */
+  --card-bg: #e4e4e7;
 
   /* Button color variables */
   --button-primary-bg: var(

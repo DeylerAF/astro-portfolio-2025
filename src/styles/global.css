@@ -21,6 +21,17 @@
   --border-color: #e4e4e7; /* zinc-200 */
   --card-bg: #fafafa;
   --card-shadow: rgb(0 0 0 / 10%);
+
+  /* Button color variables */
+  --button-primary-bg: var(--accent-color);
+  --button-primary-text: #fff;
+  --button-primary-hover: var(--accent-tertiary);
+  --button-secondary-bg: #e0e7ff; /* indigo-100 */
+  --button-secondary-text: #3730a3; /* indigo-800 */
+  --button-secondary-hover: #c7d2fe; /* indigo-200 */
+  --button-accent-bg: var(--accent-secondary);
+  --button-accent-text: #365314; /* lime-900 */
+  --button-accent-hover: var(--accent-color);
 }
 
 html.dark,
@@ -44,6 +55,17 @@ html[data-theme="dark"] {
   --border-color: #3f3f46; /* zinc-700 */
   --card-bg: #27272a; /* zinc-800 */
   --card-shadow: rgb(0 0 0 / 25%);
+
+  /* Button color variables for dark mode */
+  --button-primary-bg: var(--accent-color);
+  --button-primary-text: #18181b;
+  --button-primary-hover: var(--accent-secondary);
+  --button-secondary-bg: #3730a3; /* indigo-800 */
+  --button-secondary-text: #e0e7ff; /* indigo-100 */
+  --button-secondary-hover: #312e81; /* indigo-900 */
+  --button-accent-bg: var(--accent-tertiary);
+  --button-accent-text: #f7fee7; /* lime-50 */
+  --button-accent-hover: var(--accent-color);
 }
 
 html,
@@ -56,4 +78,32 @@ body {
   transition:
     background-color 0.3s,
     color 0.3s;
+}
+
+/* Button color classes */
+.button-primary {
+  background-color: var(--button-primary-bg);
+  color: var(--button-primary-text);
+}
+
+.button-primary:hover {
+  background-color: var(--button-primary-hover);
+}
+
+.button-secondary {
+  background-color: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+}
+
+.button-secondary:hover {
+  background-color: var(--button-secondary-hover);
+}
+
+.button-accent {
+  background-color: var(--button-accent-bg);
+  color: var(--button-accent-text);
+}
+
+.button-accent:hover {
+  background-color: var(--button-accent-hover);
 }

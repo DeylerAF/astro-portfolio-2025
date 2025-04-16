@@ -9,6 +9,7 @@ interface ButtonProps {
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
   variant?: "spinButton" | "outlineButton";
+  color?: "primary" | "secondary" | "accent";
   url?: string;
   target?: string;
   rel?: string;
@@ -23,6 +24,7 @@ const {
   type = "button",
   disabled = false,
   variant = "spinButton",
+  color = "primary",
   url,
   target,
   rel,
@@ -33,9 +35,11 @@ const {
 const isExternal = url && /^https?:\/\//.test(url);
 const linkTarget = target || (isExternal ? "_blank" : undefined);
 const linkRel = rel || (isExternal ? "noopener noreferrer" : undefined);
+
+// Compute button color class
+const colorClass = `button-${color}`;
 ---
 
-// Render the button or anchor based on props and variant.
 {
   variant === "spinButton" ? (
     <span class="relative inline-block overflow-hidden rounded-lg p-[1px]">
@@ -47,12 +51,14 @@ const linkRel = rel || (isExternal ? "noopener noreferrer" : undefined);
           href={url}
           target={linkTarget}
           rel={linkRel}
-          class="relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none"
+          class={`relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none`}
           aria-disabled={disabled}
           tabindex={disabled ? -1 : undefined}
           {...rest}
         >
-          <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium text-black dark:text-white bg-white/80 dark:bg-black/40 rounded-lg transition-colors duration-200">
+          <div
+            class={`relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200 ${colorClass}`}
+          >
             {/* Render icon on the left if provided */}
             {iconPosition === "left" && Icon && (
               <Icon class="w-4 h-4 me-2" aria-hidden="true" />
@@ -69,10 +75,12 @@ const linkRel = rel || (isExternal ? "noopener noreferrer" : undefined);
         <button
           type={type}
           disabled={disabled}
-          class="relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none"
+          class={`relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none`}
           {...rest}
         >
-          <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium text-black dark:text-white bg-white/80 dark:bg-black/40 rounded-lg transition-colors duration-200">
+          <div
+            class={`relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200 ${colorClass}`}
+          >
             {iconPosition === "left" && Icon && (
               <Icon class="w-4 h-4 me-2" aria-hidden="true" />
             )}
@@ -90,7 +98,7 @@ const linkRel = rel || (isExternal ? "noopener noreferrer" : undefined);
       href={url}
       target={linkTarget}
       rel={linkRel}
-      class="flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 border-blue-700 dark:border-blue-400 bg-transparent text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200 focus:outline-none"
+      class={`flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200 focus:outline-none ${colorClass}`}
       aria-disabled={disabled}
       tabindex={disabled ? -1 : undefined}
       {...rest}
@@ -108,7 +116,7 @@ const linkRel = rel || (isExternal ? "noopener noreferrer" : undefined);
     <button
       type={type}
       disabled={disabled}
-      class="flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 border-blue-700 dark:border-blue-400 bg-transparent text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200 focus:outline-none"
+      class={`flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200 focus:outline-none ${colorClass}`}
       {...rest}
     >
       {iconPosition === "left" && Icon && (

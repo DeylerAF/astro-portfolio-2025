@@ -118,6 +118,64 @@ body {
   color: var(--button-accent-hover);
 }
 
+/* SpinButton animated border gradients for each color variant */
+.spin-btn-primary {
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    var(--accent-color) 0%,
+    var(--accent-tertiary) 50%,
+    var(--accent-color) 100%
+  );
+}
+
+html.dark .spin-btn-primary,
+html[data-theme="dark"] .spin-btn-primary {
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    var(--accent-tertiary) 0%,
+    var(--accent-color) 50%,
+    var(--accent-tertiary) 100%
+  );
+}
+
+.spin-btn-secondary {
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    var(--button-secondary-bg) 0%,
+    var(--button-secondary-hover) 50%,
+    var(--button-secondary-bg) 100%
+  );
+}
+
+html.dark .spin-btn-secondary,
+html[data-theme="dark"] .spin-btn-secondary {
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    var(--button-secondary-bg) 0%,
+    var(--button-secondary-hover) 50%,
+    var(--button-secondary-bg) 100%
+  );
+}
+
+.spin-btn-accent {
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    var(--accent-secondary) 0%,
+    var(--accent-tertiary) 50%,
+    var(--accent-secondary) 100%
+  );
+}
+
+html.dark .spin-btn-accent,
+html[data-theme="dark"] .spin-btn-accent {
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    var(--accent-tertiary) 0%,
+    var(--accent-secondary) 50%,
+    var(--accent-tertiary) 100%
+  );
+}
+
 /* Custom text shadow for SpinButton for better readability on animated backgrounds */
 .spin-btn-text-shadow {
   text-shadow: 0 1px 6px rgb(0 0 0 / 40%);

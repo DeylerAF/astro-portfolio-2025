@@ -1,22 +1,16 @@
 export interface ButtonProps {
   text: string;
-  icon?: unknown; // Accepts any Astro/JSX component or element
+  icon?: unknown;
   iconPosition?: "left" | "right";
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
   variant?: "spinButton" | "outlineButton";
   color?: "primary" | "secondary" | "accent";
+  // Remove gradient props, use CSS classes/variables instead
   url?: string;
   target?: string;
   rel?: string;
-  // Gradient props for animated border buttons
-  gradientFrom?: string; // Light mode start color
-  gradientMid?: string; // Light mode middle color
-  gradientTo?: string; // Light mode end color
-  gradientFromDark?: string; // Dark mode start color
-  gradientMidDark?: string; // Dark mode middle color
-  gradientToDark?: string; // Dark mode end color
-  [key: string]: unknown; // Use unknown for index signature
+  [key: string]: unknown;
 }
 
 /**

@@ -1,11 +1,7 @@
 ---
 // SpinButton.astro - Animated border button variant
 import type { ButtonProps } from "../../lib/utils/buttonUtils";
-import {
-  getButtonVars,
-  getLinkAttrs,
-  getConicGradient,
-} from "../../lib/utils/buttonUtils";
+import { getButtonVars, getLinkAttrs } from "../../lib/utils/buttonUtils";
 
 const {
   text,
@@ -17,37 +13,21 @@ const {
   url,
   target,
   rel,
-  gradientFrom = "#86CC16", // Default: lime-500
-  gradientMid = "#365314", // Default: lime-900
-  gradientTo = "#86CC16", // Default: lime-500
-  gradientFromDark = "#365314", // Default: lime-900 (dark)
-  gradientMidDark = "#86CC16", // Default: lime-500 (dark)
-  gradientToDark = "#365314", // Default: lime-900 (dark)
   ...rest
 } = Astro.props as ButtonProps;
 
 const buttonVars = getButtonVars(color);
 const { target: linkTarget, rel: linkRel } = getLinkAttrs(url, target, rel);
 
-const gradientStyle = {
-  background: getConicGradient(gradientFrom, gradientMid, gradientTo),
-};
-const gradientStyleDark = {
-  background: getConicGradient(
-    gradientFromDark,
-    gradientMidDark,
-    gradientToDark
-  ),
-};
+// Select the gradient class based on the color prop
+const gradientClass = `spin-btn-${color}`;
 ---
 
 <span class="relative inline-block overflow-hidden rounded-lg border-2">
   {/* Animated border background */}
   <span
-    class="absolute inset-[-1000%] pointer-events-none animate-[spin_2s_linear_infinite] rounded-lg"
-    style={gradientStyle}
-    data-astro-dark="true"
-    data-dark-style={JSON.stringify(gradientStyleDark)}></span>
+    class={`absolute inset-[-1000%] pointer-events-none animate-[spin_2s_linear_infinite] rounded-lg ${gradientClass}`}
+  ></span>
   {
     url ? (
       <a

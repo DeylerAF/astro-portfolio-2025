@@ -270,9 +270,9 @@ body {
 .spin-btn-primary {
   background: conic-gradient(
     from 90deg at 50% 50%,
-    var(--accent-tertiary) 0%,
-    var(--accent-color) 50%,
-    var(--accent-tertiary) 100%
+    var(--accent-400) 0%,
+    var(--accent-600) 50%,
+    var(--accent-400) 100%
   );
 }
 
@@ -280,9 +280,9 @@ html.dark .spin-btn-primary,
 html[data-theme="dark"] .spin-btn-primary {
   background: conic-gradient(
     from 90deg at 50% 50%,
-    var(--accent-color) 0%,
-    var(--accent-tertiary) 50%,
-    var(--accent-color) 100%
+    var(--accent-600) 0%,
+    var(--accent-400) 50%,
+    var(--accent-600) 100%
   );
 }
 
@@ -308,9 +308,9 @@ html[data-theme="dark"] .spin-btn-secondary {
 .spin-btn-accent {
   background: conic-gradient(
     from 90deg at 50% 50%,
-    var(--accent-secondary) 0%,
-    var(--accent-tertiary) 50%,
-    var(--accent-secondary) 100%
+    var(--accent-300) 0%,
+    var(--accent-500) 50%,
+    var(--accent-300) 100%
   );
 }
 
@@ -318,9 +318,9 @@ html.dark .spin-btn-accent,
 html[data-theme="dark"] .spin-btn-accent {
   background: conic-gradient(
     from 90deg at 50% 50%,
-    var(--accent-tertiary) 0%,
-    var(--accent-secondary) 50%,
-    var(--accent-tertiary) 100%
+    var(--accent-500) 0%,
+    var(--accent-300) 50%,
+    var(--accent-500) 100%
   );
 }
 

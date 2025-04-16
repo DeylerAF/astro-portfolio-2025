@@ -2,7 +2,7 @@
 import { getProfileDataAndIntroBlocks } from "../lib/services/notion/notionProfile";
 import type { RichTextItem } from "../lib/types/notion";
 import Avatar from "./Avatar.astro";
-import { Mail } from "lucide-astro";
+import { Linkedin, ShoppingCart } from "lucide-astro";
 import Button from "./buttons/Button.astro";
 
 // Fetch profile data, intro blocks, and all images from Notion service
@@ -15,33 +15,33 @@ const { profileData, introBlocks, images } =
   <div class="flex items-end gap-4 mb-4">
     <Avatar />
     <Button
-      variant="outlineButton"
+      variant="spinButton"
       text="Open to work"
       url="https://www.linkedin.com/in/deyleraf/"
-      icon={Mail}
+      icon={Linkedin}
       iconPosition="left"
       type="button"
       class="m-0"
-      aria-label="Go to products page"
-      color="secondary"
+      aria-label="Go to LinkedIn profile"
+      color="primary"
     />
     <Button
-      variant="spinButton"
+      variant="outlineButton"
       text="View Products"
       url="/products"
-      icon={Mail}
+      icon={ShoppingCart}
       iconPosition="left"
       type="button"
       class="m-0"
       aria-label="Go to products page"
-      color="secondary"
+      color="primary"
     />
   </div>
   {/* Render Notion heading_2 as the main h1 if available */}
   {
     (() => {
       const headingBlock = introBlocks.find(
-        (block) => block.type === "heading_2",
+        (block) => block.type === "heading_2"
       );
       if (headingBlock && Array.isArray(headingBlock.content)) {
         return (

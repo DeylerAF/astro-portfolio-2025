@@ -1,0 +1,22 @@
+---
+// Centralized Button component imports all button variants
+import OutlineButton from "./OutlineButton.astro";
+import SpinButton from "./SpinButton.astro";
+import type { ButtonProps } from "../../lib/utils/buttonUtils";
+
+const { variant = "outlineButton", ...rest } = Astro.props as ButtonProps;
+---
+
+{
+  /*
+  Render the correct button variant based on the 'variant' prop.
+  Add more variants as needed.
+*/
+}
+{
+  variant === "spinButton" ? (
+    <SpinButton {...rest} />
+  ) : (
+    <OutlineButton {...rest} />
+  )
+}

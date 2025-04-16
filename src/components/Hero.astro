@@ -3,8 +3,7 @@ import { getProfileDataAndIntroBlocks } from "../lib/services/notion/notionProfi
 import type { RichTextItem } from "../lib/types/notion";
 import Avatar from "./Avatar.astro";
 import { Mail } from "lucide-astro";
-import OutlineButton from "./buttons/OutlineButton.astro";
-import SpinButton from "./buttons/SpinButton.astro";
+import Button from "./buttons/Button.astro";
 
 // Fetch profile data, intro blocks, and all images from Notion service
 const pageId = import.meta.env.PUBLIC_NOTION_PAGE_ID;
@@ -15,7 +14,7 @@ const { profileData, introBlocks, images } =
 <div class="w-full">
   <div class="flex items-end gap-4 mb-4">
     <Avatar />
-    <OutlineButton
+    <Button
       variant="outlineButton"
       text="Open to work"
       url="https://www.linkedin.com/in/deyleraf/"
@@ -26,7 +25,7 @@ const { profileData, introBlocks, images } =
       aria-label="Go to products page"
       color="secondary"
     />
-    <SpinButton
+    <Button
       variant="spinButton"
       text="View Products"
       url="/products"

@@ -20,10 +20,10 @@ const buttonVars = getButtonVars(color);
 const { target: linkTarget, rel: linkRel } = getLinkAttrs(url, target, rel);
 ---
 
-<span class="relative inline-block overflow-hidden rounded-lg p-[1px]">
+<span class="relative inline-block overflow-hidden rounded-lg border-2">
   {/* Animated border background */}
   <span
-    class="absolute inset-[-1000%] pointer-events-none animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#65A30D_0%,#A3E635_50%,#65A30D_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,#365314_0%,#86CC16_50%,#365314_100%)] rounded-lg"
+    class="absolute inset-[-1000%] pointer-events-none animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#86CC16_0%,#365314_50%,#86CC16_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,#365314_0%,#86CC16_50%,#365314_100%)] rounded-lg"
   ></span>
   {
     url ? (
@@ -36,7 +36,7 @@ const { target: linkTarget, rel: linkRel } = getLinkAttrs(url, target, rel);
         tabindex={disabled ? -1 : undefined}
         {...rest}
       >
-        <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200 bg-white/90 dark:bg-black/80 shadow-md text-black dark:text-white spin-btn-text-shadow">
+        <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200">
           {iconPosition === "left" && Icon && (
             <Icon class="w-4 h-4 me-2" aria-hidden="true" />
           )}
@@ -53,7 +53,7 @@ const { target: linkTarget, rel: linkRel } = getLinkAttrs(url, target, rel);
         class="relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none"
         {...rest}
       >
-        <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200 bg-white/90 dark:bg-black/80 shadow-md text-black dark:text-white spin-btn-text-shadow">
+        <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200">
           {iconPosition === "left" && Icon && (
             <Icon class="w-4 h-4 me-2" aria-hidden="true" />
           )}

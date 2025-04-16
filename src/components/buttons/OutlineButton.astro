@@ -31,11 +31,11 @@ const { target: linkTarget, rel: linkRel } = getLinkAttrs(url, target, rel);
       tabindex={disabled ? -1 : undefined}
       {...rest}
     >
-      {iconPosition === "left" && Icon && (
+      {iconPosition === "left" && typeof Icon === "function" && (
         <Icon class="w-4 h-4 me-2" aria-hidden="true" />
       )}
       <span>{text}</span>
-      {iconPosition === "right" && Icon && (
+      {iconPosition === "right" && typeof Icon === "function" && (
         <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
       )}
     </a>
@@ -46,11 +46,11 @@ const { target: linkTarget, rel: linkRel } = getLinkAttrs(url, target, rel);
       class={`flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 bg-transparent transition-colors duration-200 focus:outline-none ${outlineClass}`}
       {...rest}
     >
-      {iconPosition === "left" && Icon && (
+      {iconPosition === "left" && typeof Icon === "function" && (
         <Icon class="w-4 h-4 me-2" aria-hidden="true" />
       )}
       <span>{text}</span>
-      {iconPosition === "right" && Icon && (
+      {iconPosition === "right" && typeof Icon === "function" && (
         <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
       )}
     </button>

@@ -91,22 +91,23 @@
   --sidebar-hover: #d4d4d8; /* zinc-300, more visible hover */
 
   /* UI elements */
-  --border-color: #a1a1aa; /* zinc-400, more visible border */
-  --card-bg: #fff; /* pure white for card background */
-  --card-shadow: rgb(0 0 0 / 12%);
+  --border-color: var(--neutral-700); /* zinc-700 */
+  --card-bg: var(--neutral-800); /* zinc-800 */
+  --card-shadow: rgb(0 0 0 / 12%); /* shadow color using variable notation */
 
   /* Button color variables */
   --button-primary-bg: var(
     --accent-600
   ); /* slightly darker for more contrast */
-  --button-primary-text: #fff;
+
+  --button-primary-text: var(--neutral-50); /* white */
   --button-primary-hover: var(--accent-700);
-  --button-secondary-bg: #3730a3; /* indigo-800, much darker for contrast */
-  --button-secondary-text: #fff; /* white text for contrast */
-  --button-secondary-hover: #312e81; /* indigo-900 */
-  --button-accent-bg: var(--accent-500);
-  --button-accent-text: #fff;
-  --button-accent-hover: var(--accent-700);
+  --button-secondary-bg: var(--info-800); /* indigo-800 */
+  --button-secondary-text: var(--info-100); /* indigo-100 */
+  --button-secondary-hover: var(--info-900); /* indigo-900 */
+  --button-accent-bg: var(--accent-400);
+  --button-accent-text: var(--accent-900); /* lime-900 */
+  --button-accent-hover: var(--accent-500);
 }
 
 html.dark,
@@ -200,19 +201,19 @@ html[data-theme="dark"] {
   --sidebar-hover: #3f3f46; /* zinc-700 */
 
   /* UI elements */
-  --border-color: #3f3f46; /* zinc-700 */
-  --card-bg: #27272a; /* zinc-800 */
+  --border-color: var(--neutral-700); /* zinc-700 */
+  --card-bg: var(--neutral-800); /* zinc-800 */
   --card-shadow: rgb(0 0 0 / 25%);
 
   /* Button color variables for dark mode */
   --button-primary-bg: var(--accent-500);
-  --button-primary-text: #fff;
+  --button-primary-text: var(--neutral-50); /* white */
   --button-primary-hover: var(--accent-600);
-  --button-secondary-bg: #3730a3; /* indigo-800 */
-  --button-secondary-text: #e0e7ff; /* indigo-100 */
-  --button-secondary-hover: #312e81; /* indigo-900 */
+  --button-secondary-bg: var(--info-800); /* indigo-800 */
+  --button-secondary-text: var(--info-100); /* indigo-100 */
+  --button-secondary-hover: var(--info-900); /* indigo-900 */
   --button-accent-bg: var(--accent-400);
-  --button-accent-text: #365314; /* lime-900 */
+  --button-accent-text: var(--accent-900); /* lime-900 */
   --button-accent-hover: var(--accent-500);
 }
 

@@ -19,9 +19,6 @@
   --accent-800: #3f6212;
   --accent-900: #365314;
   --accent-950: #1a2e05;
-  --accent-color: var(--accent-500); /* lime-500 */
-  --accent-secondary: var(--accent-400); /* lime-400 */
-  --accent-tertiary: var(--accent-600); /* lime-600 */
 
   /* Warning (amber) color palette */
   --warning-50: #fefce8;
@@ -99,15 +96,15 @@
   --card-shadow: rgb(0 0 0 / 10%);
 
   /* Button color variables */
-  --button-primary-bg: var(--accent-color);
+  --button-primary-bg: var(--accent-500);
   --button-primary-text: #fff;
-  --button-primary-hover: var(--accent-tertiary);
+  --button-primary-hover: var(--accent-600);
   --button-secondary-bg: #e0e7ff; /* indigo-100 */
   --button-secondary-text: #3730a3; /* indigo-800 */
   --button-secondary-hover: #c7d2fe; /* indigo-200 */
-  --button-accent-bg: var(--accent-secondary);
+  --button-accent-bg: var(--accent-400);
   --button-accent-text: #365314; /* lime-900 */
-  --button-accent-hover: var(--accent-color);
+  --button-accent-hover: var(--accent-500);
 }
 
 html.dark,
@@ -129,9 +126,6 @@ html[data-theme="dark"] {
   --accent-800: #3f6212;
   --accent-900: #365314;
   --accent-950: #1a2e05;
-  --accent-color: var(--accent-500); /* lime-500 */
-  --accent-secondary: var(--accent-400); /* lime-400 */
-  --accent-tertiary: var(--accent-600); /* lime-600 */
 
   /* Warning (amber) color palette */
   --warning-50: #fefce8;
@@ -209,15 +203,15 @@ html[data-theme="dark"] {
   --card-shadow: rgb(0 0 0 / 25%);
 
   /* Button color variables for dark mode */
-  --button-primary-bg: var(--accent-color);
-  --button-primary-text: #18181b;
-  --button-primary-hover: var(--accent-secondary);
+  --button-primary-bg: var(--accent-500);
+  --button-primary-text: #fff;
+  --button-primary-hover: var(--accent-600);
   --button-secondary-bg: #3730a3; /* indigo-800 */
   --button-secondary-text: #e0e7ff; /* indigo-100 */
   --button-secondary-hover: #312e81; /* indigo-900 */
-  --button-accent-bg: var(--accent-tertiary);
-  --button-accent-text: #f7fee7; /* lime-50 */
-  --button-accent-hover: var(--accent-color);
+  --button-accent-bg: var(--accent-400);
+  --button-accent-text: #365314; /* lime-900 */
+  --button-accent-hover: var(--accent-500);
 }
 
 html,

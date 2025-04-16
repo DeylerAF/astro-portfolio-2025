@@ -35,7 +35,7 @@ const products = await Promise.all(
     parsedProduct.ContentImages = images.blockImages;
     parsedProduct.AllImages = images.allImages;
     return parsedProduct;
-  }),
+  })
 );
 ---
 
@@ -93,7 +93,7 @@ const products = await Promise.all(
                     href={product.URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="inline-block bg-[var(--accent-color)] hover:bg-[var(--accent-tertiary)] text-white px-4 py-2 rounded font-medium mt-4 transition-colors"
+                    class="inline-block bg-[var(--accent-500)] hover:bg-[var(--accent-600)] text-white px-4 py-2 rounded font-medium mt-4 transition-colors"
                   >
                     View Product
                   </a>

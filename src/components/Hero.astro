@@ -51,7 +51,7 @@ const { profileData, introBlocks, images } =
                 class:list={{
                   "font-bold": text.annotations?.bold,
                   italic: text.annotations?.italic,
-                  "text-[var(--accent-color)]": text.annotations?.bold,
+                  "text-[var(--accent-500)]": text.annotations?.bold,
                 }}
               >
                 {text.text}
@@ -100,13 +100,13 @@ const { profileData, introBlocks, images } =
         if (block.type === "paragraph") {
           if (Array.isArray(block.content)) {
             return (
-              <p class="[&>strong]:text-[var(--accent-color)] [&>strong]:font-semibold">
+              <p class="[&>strong]:text-[var(--accent-500)] [&>strong]:font-semibold">
                 {(block.content as RichTextItem[]).map((text) => (
                   <span
                     class:list={{
                       "font-bold": text.annotations?.bold,
                       italic: text.annotations?.italic,
-                      "text-[var(--accent-color)]": text.annotations?.bold,
+                      "text-[var(--accent-500)]": text.annotations?.bold,
                     }}
                   >
                     {text.text}
@@ -116,7 +116,7 @@ const { profileData, introBlocks, images } =
             );
           } else if (typeof block.content === "string") {
             return (
-              <p class="[&>strong]:text-[var(--accent-color)] [&>strong]:font-semibold">
+              <p class="[&>strong]:text-[var(--accent-500)] [&>strong]:font-semibold">
                 {block.content}
               </p>
             );
@@ -131,7 +131,7 @@ const { profileData, introBlocks, images } =
                       class:list={{
                         "font-bold": text.annotations?.bold,
                         italic: text.annotations?.italic,
-                        "text-[var(--accent-color)]": text.annotations?.bold,
+                        "text-[var(--accent-500)]": text.annotations?.bold,
                       }}
                     >
                       {text.text}
@@ -149,7 +149,7 @@ const { profileData, introBlocks, images } =
                       class:list={{
                         "font-bold": text.annotations?.bold,
                         italic: text.annotations?.italic,
-                        "text-[var(--accent-color)]": text.annotations?.bold,
+                        "text-[var(--accent-500)]": text.annotations?.bold,
                       }}
                     >
                       {text.text}

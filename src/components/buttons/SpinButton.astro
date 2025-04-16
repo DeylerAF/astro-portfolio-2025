@@ -23,7 +23,9 @@ const { target: linkTarget, rel: linkRel } = getLinkAttrs(url, target, rel);
 const gradientClass = `spin-btn-${color}`;
 ---
 
-<span class="relative inline-block overflow-hidden rounded-lg border-2">
+<span
+  class="relative inline-block overflow-hidden rounded-lg border-2 border-[var(--border-color)]"
+>
   {/* Animated border background */}
   <span
     class={`absolute inset-[-1000%] pointer-events-none animate-[spin_2s_linear_infinite] rounded-lg ${gradientClass}`}

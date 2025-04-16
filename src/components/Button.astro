@@ -1,14 +1,7 @@
 ---
-// Button.astro
-// Clean, minimal button component with animated border and optional icon support.
-// Props:
-//   text: string - The button text.
-//   icon: Astro component (optional) - Icon to render inside the button.
-//   iconPosition: 'left' | 'right' (optional, default: 'left') - Icon position.
-//   type: 'button' | 'submit' | 'reset' (optional, default: 'button') - Button type.
-//   disabled: boolean (optional) - Disables the button.
-//   ...rest: any - Other props to pass to the button.
+// Button.astro - Clean, minimal button component with animated border and optional icon support.
 
+// ButtonProps defines the accepted properties for the Button component.
 interface ButtonProps {
   text: string;
   icon?: any;
@@ -16,12 +9,13 @@ interface ButtonProps {
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
   variant?: "spinButton" | "outlineButton";
-  url?: string; // Optional URL for link behavior
-  target?: string; // Optional target for <a>
-  rel?: string; // Optional rel for <a>
+  url?: string;
+  target?: string;
+  rel?: string;
   [key: string]: any;
 }
 
+// Destructure and provide default values for props.
 const {
   text,
   icon: Icon,
@@ -35,17 +29,20 @@ const {
   ...rest
 } = Astro.props as ButtonProps;
 
-// Determine if the link is external
+// Determine if the link is external and set default target/rel for security.
 const isExternal = url && /^https?:\/\//.test(url);
 const linkTarget = target || (isExternal ? "_blank" : undefined);
 const linkRel = rel || (isExternal ? "noopener noreferrer" : undefined);
 ---
 
+// Render the button or anchor based on props and variant.
 {
   variant === "spinButton" ? (
     <span class="relative inline-block overflow-hidden rounded-lg p-[1px]">
+      {/* Animated border background */}
       <span class="absolute inset-[-1000%] pointer-events-none animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#65A30D_0%,#A3E635_50%,#65A30D_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,#365314_0%,#86CC16_50%,#365314_100%)] rounded-lg" />
       {url ? (
+        // Render as anchor if url is provided
         <a
           href={url}
           target={linkTarget}
@@ -56,16 +53,19 @@ const linkRel = rel || (isExternal ? "noopener noreferrer" : undefined);
           {...rest}
         >
           <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium text-black dark:text-white bg-white/80 dark:bg-black/40 rounded-lg transition-colors duration-200">
+            {/* Render icon on the left if provided */}
             {iconPosition === "left" && Icon && (
               <Icon class="w-4 h-4 me-2" aria-hidden="true" />
             )}
             <span>{text}</span>
+            {/* Render icon on the right if provided */}
             {iconPosition === "right" && Icon && (
               <Icon class="w-4 h-4 ms-2" aria-hidden="true" />
             )}
           </div>
         </a>
       ) : (
+        // Render as button if no url is provided
         <button
           type={type}
           disabled={disabled}
@@ -85,6 +85,7 @@ const linkRel = rel || (isExternal ? "noopener noreferrer" : undefined);
       )}
     </span>
   ) : url ? (
+    // OutlineButton variant rendered as anchor
     <a
       href={url}
       target={linkTarget}
@@ -103,6 +104,7 @@ const linkRel = rel || (isExternal ? "noopener noreferrer" : undefined);
       )}
     </a>
   ) : (
+    // OutlineButton variant rendered as button
     <button
       type={type}
       disabled={disabled}

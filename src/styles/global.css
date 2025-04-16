@@ -12,6 +12,71 @@
   --accent-secondary: #a3e635; /* lime-400 */
   --accent-tertiary: #65a30d; /* lime-600 */
 
+  /* Warning (amber) color palette */
+  --warning-50: #fefce8;
+  --warning-100: #fef9c3;
+  --warning-200: #fef08a;
+  --warning-300: #fde047;
+  --warning-400: #facc15;
+  --warning-500: #eab308;
+  --warning-600: #ca8a04;
+  --warning-700: #a16207;
+  --warning-800: #854d0e;
+  --warning-900: #713f12;
+  --warning-950: #422006;
+
+  /* Danger (red) color palette */
+  --danger-50: #fef2f2;
+  --danger-100: #fee2e2;
+  --danger-200: #fecaca;
+  --danger-300: #fca5a5;
+  --danger-400: #f87171;
+  --danger-500: #ef4444;
+  --danger-600: #dc2626;
+  --danger-700: #b91c1c;
+  --danger-800: #991b1b;
+  --danger-900: #7f1d1d;
+  --danger-950: #450a0a;
+
+  /* Info (blue) color palette */
+  --info-50: #eff6ff;
+  --info-100: #dbeafe;
+  --info-200: #bfdbfe;
+  --info-300: #93c5fd;
+  --info-400: #60a5fa;
+  --info-500: #3b82f6;
+  --info-600: #2563eb;
+  --info-700: #1d4ed8;
+  --info-800: #1e40af;
+  --info-900: #1e3a8a;
+  --info-950: #172554;
+
+  /* Success (green) color palette */
+  --success-50: #f0fdf4;
+  --success-100: #dcfce7;
+  --success-200: #bbf7d0;
+  --success-300: #86efac;
+  --success-400: #4ade80;
+  --success-500: #22c55e;
+  --success-600: #16a34a;
+  --success-700: #15803d;
+  --success-800: #166534;
+  --success-900: #14532d;
+  --success-950: #052e16;
+
+  /* Neutral (gray) color palette */
+  --neutral-50: #fafafa;
+  --neutral-100: #f4f4f5;
+  --neutral-200: #e4e4e7;
+  --neutral-300: #d4d4d8;
+  --neutral-400: #a1a1aa;
+  --neutral-500: #71717a;
+  --neutral-600: #52525b;
+  --neutral-700: #3f3f46;
+  --neutral-800: #27272a;
+  --neutral-900: #18181b;
+  --neutral-950: #09090b;
+
   /* Sidebar colors */
   --sidebar-bg: #fff;
   --sidebar-text: #71717a; /* zinc-500 */
@@ -45,6 +110,71 @@ html[data-theme="dark"] {
   --accent-color: #84cc16; /* lime-500 */
   --accent-secondary: #a3e635; /* lime-400 */
   --accent-tertiary: #65a30d; /* lime-600 */
+
+  /* Warning (amber) color palette */
+  --warning-50: #fefce8;
+  --warning-100: #fef9c3;
+  --warning-200: #fef08a;
+  --warning-300: #fde047;
+  --warning-400: #facc15;
+  --warning-500: #eab308;
+  --warning-600: #ca8a04;
+  --warning-700: #a16207;
+  --warning-800: #854d0e;
+  --warning-900: #713f12;
+  --warning-950: #422006;
+
+  /* Danger (red) color palette */
+  --danger-50: #fef2f2;
+  --danger-100: #fee2e2;
+  --danger-200: #fecaca;
+  --danger-300: #fca5a5;
+  --danger-400: #f87171;
+  --danger-500: #ef4444;
+  --danger-600: #dc2626;
+  --danger-700: #b91c1c;
+  --danger-800: #991b1b;
+  --danger-900: #7f1d1d;
+  --danger-950: #450a0a;
+
+  /* Info (blue) color palette */
+  --info-50: #eff6ff;
+  --info-100: #dbeafe;
+  --info-200: #bfdbfe;
+  --info-300: #93c5fd;
+  --info-400: #60a5fa;
+  --info-500: #3b82f6;
+  --info-600: #2563eb;
+  --info-700: #1d4ed8;
+  --info-800: #1e40af;
+  --info-900: #1e3a8a;
+  --info-950: #172554;
+
+  /* Success (green) color palette */
+  --success-50: #f0fdf4;
+  --success-100: #dcfce7;
+  --success-200: #bbf7d0;
+  --success-300: #86efac;
+  --success-400: #4ade80;
+  --success-500: #22c55e;
+  --success-600: #16a34a;
+  --success-700: #15803d;
+  --success-800: #166534;
+  --success-900: #14532d;
+  --success-950: #052e16;
+
+  /* Neutral (gray) color palette */
+  --neutral-50: #fafafa;
+  --neutral-100: #f4f4f5;
+  --neutral-200: #e4e4e7;
+  --neutral-300: #d4d4d8;
+  --neutral-400: #a1a1aa;
+  --neutral-500: #71717a;
+  --neutral-600: #52525b;
+  --neutral-700: #3f3f46;
+  --neutral-800: #27272a;
+  --neutral-900: #18181b;
+  --neutral-950: #09090b;
 
   /* Sidebar colors */
   --sidebar-bg: #27272a; /* zinc-800 */
@@ -122,9 +252,9 @@ body {
 .spin-btn-primary {
   background: conic-gradient(
     from 90deg at 50% 50%,
-    var(--accent-color) 0%,
-    var(--accent-tertiary) 50%,
-    var(--accent-color) 100%
+    var(--accent-tertiary) 0%,
+    var(--accent-color) 50%,
+    var(--accent-tertiary) 100%
   );
 }
 
@@ -132,9 +262,9 @@ html.dark .spin-btn-primary,
 html[data-theme="dark"] .spin-btn-primary {
   background: conic-gradient(
     from 90deg at 50% 50%,
-    var(--accent-tertiary) 0%,
-    var(--accent-color) 50%,
-    var(--accent-tertiary) 100%
+    var(--accent-color) 0%,
+    var(--accent-tertiary) 50%,
+    var(--accent-color) 100%
   );
 }
 

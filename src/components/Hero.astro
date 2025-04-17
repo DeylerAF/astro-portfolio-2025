@@ -20,8 +20,12 @@ const { profileData, introBlocks, images } =
     class="div1 col-span-1 row-span-1 order-1 flex flex-col items-center justify-center gap-2
       md:col-span-2 md:row-span-5 md:order-1 md:gap-8"
   >
-    <div class="flex items-center justify-center w-full">
-      <Avatar width={128} height={128} class="w-32 h-32 md:w-56 md:h-56" />
+    <div class="w-full h-full flex items-center justify-center">
+      <Avatar
+        width="100%"
+        height="100%"
+        class="w-full h-full max-w-xs max-h-xs md:max-w-[320px] md:max-h-[320px] object-cover"
+      />
     </div>
     {/* Render all images except the first one (used as avatar) */}
     {

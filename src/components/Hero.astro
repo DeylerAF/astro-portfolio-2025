@@ -11,9 +11,150 @@ const { profileData, introBlocks, images } =
   await getProfileDataAndIntroBlocks(pageId);
 ---
 
-<div class="w-full">
-  <div class="flex items-end gap-4 mb-4">
+<div class="grid grid-cols-5 grid-rows-5 gap-2 w-full
+    md:gap-2">
+  {/* Image section (Avatar + extra images) */}
+  <div
+    class="div1 col-span-5 row-span-2 md:col-span-2 md:row-span-5 flex flex-col items-center justify-center gap-6"
+  >
     <Avatar />
+    {/* Render all images except the first one (used as avatar) */}
+    {
+      images.length > 1 && (
+        <div class="flex flex-col gap-6 w-full">
+          {images.slice(1).map((imgUrl, idx) => (
+            <img
+              src={imgUrl}
+              alt={`Notion image ${idx + 2}`}
+              class="max-w-full h-auto rounded-lg mx-auto shadow"
+              loading="lazy"
+            />
+          ))}
+        </div>
+      )
+    }
+  </div>
+
+  {/* Text section (heading and intro blocks) */}
+  <div
+    class="div2 col-span-5 row-start-3 md:col-span-3 md:col-start-3 md:row-span-4 md:row-start-1 flex flex-col justify-end"
+  >
+    {/* Render Notion heading_2 as the main h1 if available */}
+    {
+      (() => {
+        const headingBlock = introBlocks.find(
+          (block) => block.type === "heading_2"
+        );
+        if (headingBlock && Array.isArray(headingBlock.content)) {
+          return (
+            <h1 class="text-4xl font-bold tracking-tight text-[var(--text-color)] sm:text-5xl mb-4">
+              {(headingBlock.content as RichTextItem[]).map((text) => (
+                <span
+                  class:list={{
+                    "font-bold": text.annotations?.bold,
+                    italic: text.annotations?.italic,
+                    "text-[var(--accent-500)]": text.annotations?.bold,
+                  }}
+                >
+                  {text.text}
+                </span>
+              ))}
+            </h1>
+          );
+        }
+        return null;
+      })()
+    }
+    {
+      /* Render all blocks except heading_2 and the first image block (if it matches images[0]) */
+    }
+    <div class="flex flex-col gap-4 text-xl text-[var(--text-color)]">
+      {
+        introBlocks.map((block) => {
+          if (block.type === "heading_2") return null;
+          // Skip the first image block if its url matches images[0]
+          if (
+            block.type === "image" &&
+            typeof block.content === "object" &&
+            block.content !== null &&
+            "url" in block.content &&
+            block.content.url === images[0]
+          ) {
+            return null;
+          }
+          if (block.type === "paragraph") {
+            if (Array.isArray(block.content)) {
+              return (
+                <p class="[&>strong]:text-[var(--accent-500)] [&>strong]:font-semibold">
+                  {(block.content as RichTextItem[]).map((text) => (
+                    <span
+                      class:list={{
+                        "font-bold": text.annotations?.bold,
+                        italic: text.annotations?.italic,
+                        "text-[var(--accent-500)]": text.annotations?.bold,
+                      }}
+                    >
+                      {text.text}
+                    </span>
+                  ))}
+                </p>
+              );
+            } else if (typeof block.content === "string") {
+              return (
+                <p class="[&>strong]:text-[var(--accent-500)] [&>strong]:font-semibold">
+                  {block.content}
+                </p>
+              );
+            }
+            return null;
+          } else if (block.type === "heading_1") {
+            return (
+              <h1 class="text-2xl font-bold text-[var(--text-color)] mt-6 mb-2">
+                {Array.isArray(block.content)
+                  ? (block.content as RichTextItem[]).map((text) => (
+                      <span
+                        class:list={{
+                          "font-bold": text.annotations?.bold,
+                          italic: text.annotations?.italic,
+                          "text-[var(--accent-500)]": text.annotations?.bold,
+                        }}
+                      >
+                        {text.text}
+                      </span>
+                    ))
+                  : block.content}
+              </h1>
+            );
+          } else if (block.type === "heading_3") {
+            return (
+              <h3 class="text-lg font-medium text-[var(--sidebar-text)] dark:text-gray-300 mt-2 mb-1">
+                {Array.isArray(block.content)
+                  ? (block.content as RichTextItem[]).map((text) => (
+                      <span
+                        class:list={{
+                          "font-bold": text.annotations?.bold,
+                          italic: text.annotations?.italic,
+                          "text-[var(--accent-500)]": text.annotations?.bold,
+                        }}
+                      >
+                        {text.text}
+                      </span>
+                    ))
+                  : block.content}
+              </h3>
+            );
+          }
+          // Do not render any image blocks (handled by firstImage)
+          return null;
+        })
+      }
+    </div>
+  </div>
+
+  {/* Buttons section */}
+  <div
+    class="div3 col-span-5 row-span-2 row-start-4 md:col-span-3 md:col-start-3 md:row-span-1 md:row-start-5 flex items-end gap-4 mb-4"
+  >
     <Button
       variant="outlineButton"
       text="Open to work"
@@ -36,130 +177,5 @@ const { profileData, introBlocks, images } =
       aria-label="Go to products page"
       color="accent"
     />
-  </div>
-  {/* Render Notion heading_2 as the main h1 if available */}
-  {
-    (() => {
-      const headingBlock = introBlocks.find(
-        (block) => block.type === "heading_2"
-      );
-      if (headingBlock && Array.isArray(headingBlock.content)) {
-        return (
-          <h1 class="text-4xl font-bold tracking-tight text-[var(--text-color)] sm:text-5xl mb-4">
-            {(headingBlock.content as RichTextItem[]).map((text) => (
-              <span
-                class:list={{
-                  "font-bold": text.annotations?.bold,
-                  italic: text.annotations?.italic,
-                  "text-[var(--accent-500)]": text.annotations?.bold,
-                }}
-              >
-                {text.text}
-              </span>
-            ))}
-          </h1>
-        );
-      }
-      return null;
-    })()
-  }
-  {/* Render all images except the first one (used as avatar) */}
-  {
-    images.length > 1 && (
-      <div class="flex flex-col gap-6 mt-6">
-        {images.slice(1).map((imgUrl, idx) => (
-          <img
-            src={imgUrl}
-            alt={`Notion image ${idx + 2}`}
-            class="max-w-full h-auto rounded-lg mx-auto shadow"
-            loading="lazy"
-          />
-        ))}
-      </div>
-    )
-  }
-  {
-    /* Render all blocks except heading_2 and the first image block (if it matches images[0]) */
-  }
-  <div class="flex flex-col gap-4 mt-6 text-xl text-[var(--text-color)]">
-    {
-      introBlocks.map((block) => {
-        if (block.type === "heading_2") return null;
-        // Skip the first image block if its url matches images[0]
-        if (
-          block.type === "image" &&
-          typeof block.content === "object" &&
-          block.content !== null &&
-          "url" in block.content &&
-          block.content.url === images[0]
-        ) {
-          return null;
-        }
-        if (block.type === "paragraph") {
-          if (Array.isArray(block.content)) {
-            return (
-              <p class="[&>strong]:text-[var(--accent-500)] [&>strong]:font-semibold">
-                {(block.content as RichTextItem[]).map((text) => (
-                  <span
-                    class:list={{
-                      "font-bold": text.annotations?.bold,
-                      italic: text.annotations?.italic,
-                      "text-[var(--accent-500)]": text.annotations?.bold,
-                    }}
-                  >
-                    {text.text}
-                  </span>
-                ))}
-              </p>
-            );
-          } else if (typeof block.content === "string") {
-            return (
-              <p class="[&>strong]:text-[var(--accent-500)] [&>strong]:font-semibold">
-                {block.content}
-              </p>
-            );
-          }
-          return null;
-        } else if (block.type === "heading_1") {
-          return (
-            <h1 class="text-2xl font-bold text-[var(--text-color)] mt-6 mb-2">
-              {Array.isArray(block.content)
-                ? (block.content as RichTextItem[]).map((text) => (
-                    <span
-                      class:list={{
-                        "font-bold": text.annotations?.bold,
-                        italic: text.annotations?.italic,
-                        "text-[var(--accent-500)]": text.annotations?.bold,
-                      }}
-                    >
-                      {text.text}
-                    </span>
-                  ))
-                : block.content}
-            </h1>
-          );
-        } else if (block.type === "heading_3") {
-          return (
-            <h3 class="text-lg font-medium text-[var(--sidebar-text)] dark:text-gray-300 mt-2 mb-1">
-              {Array.isArray(block.content)
-                ? (block.content as RichTextItem[]).map((text) => (
-                    <span
-                      class:list={{
-                        "font-bold": text.annotations?.bold,
-                        italic: text.annotations?.italic,
-                        "text-[var(--accent-500)]": text.annotations?.bold,
-                      }}
-                    >
-                      {text.text}
-                    </span>
-                  ))
-                : block.content}
-            </h3>
-          );
-        }
-        // Do not render any image blocks (handled by firstImage)
-        return null;
-      })
-    }
   </div>
 </div>

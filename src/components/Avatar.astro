@@ -1,6 +1,13 @@
 ---
 import { getProfileDataAndIntroBlocks } from "../lib/services/notion/notionProfile";
 
+// Props for controlling avatar size
+const {
+  width = 224, // default 224px
+  height = 224, // default 224px
+  class: className = "",
+} = Astro.props;
+
 // Get the Notion page ID from environment variable
 const pageId = import.meta.env.PUBLIC_NOTION_PAGE_ID;
 
@@ -23,20 +30,27 @@ try {
 
 {
   isError ? (
-    <div class="size-56 rounded-sm bg-[var(--hover-bg)] dark:bg-gray-700 flex items-center justify-center text-[var(--border-color)] text-xs">
+    <div
+      class={`rounded-sm bg-[var(--hover-bg)] dark:bg-gray-700 flex items-center justify-center text-[var(--border-color)] text-xs ${className}`}
+      style={`width:${width}px;height:${height}px;`}
+    >
       Error
     </div>
   ) : imageUrl ? (
     <img
-      class="size-56 rounded-sm object-cover"
+      class={`rounded-sm object-cover ${className}`}
       src={imageUrl}
       alt={alt}
-      width={224}
-      height={224}
+      width={width}
+      height={height}
+      style={`width:${width}px;height:${height}px;`}
       loading="eager"
     />
   ) : (
-    <div class="size-56 rounded-sm bg-[var(--hover-bg)] dark:bg-gray-700 flex items-center justify-center text-[var(--border-color)] text-xs">
+    <div
+      class={`rounded-sm bg-[var(--hover-bg)] dark:bg-gray-700 flex items-center justify-center text-[var(--border-color)] text-xs ${className}`}
+      style={`width:${width}px;height:${height}px;`}
+    >
       N/A
     </div>
   )

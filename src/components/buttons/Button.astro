@@ -3,20 +3,101 @@
 import OutlineButton from "./OutlineButton.astro";
 import SpinButton from "./SpinButton.astro";
 import type { ButtonProps } from "../../lib/utils/buttonUtils";
+import { getButtonSizeClass } from "../../lib/utils/buttonUtils";
+import { breakpoints } from "../../lib/utils/responsive";
 
-const { variant = "outlineButton", ...rest } = Astro.props as ButtonProps;
+const {
+  variant = "outlineButton",
+  size = "normal",
+  responsiveSize = false,
+  responsiveSizeConfig = {
+    mobile: "small",
+    tablet: "normal",
+    desktop: "normal", 
+    largeDesktop: "large"
+  },
+  ...rest
+} = Astro.props as ButtonProps;
+
+// Use the default size for SSR rendering
+// Client-side JS will update the size based on viewport if responsiveSize is true
+const initialSize = size;
+
+// These values will be available to the client-side script
+const { sm, md, lg, xl } = breakpoints;
 ---
 
 {
-  /*
-  Render the correct button variant based on the 'variant' prop.
-  Add more variants as needed.
-*/
-}
-{
   variant === "spinButton" ? (
-    <SpinButton {...rest} />
+    <SpinButton 
+      size={initialSize} 
+      {...rest} 
+      data-responsive-button={responsiveSize ? "true" : null}
+      data-responsive-config={responsiveSize ? JSON.stringify(responsiveSizeConfig) : null}
+    />
   ) : (
-    <OutlineButton {...rest} />
+    <OutlineButton 
+      size={initialSize} 
+      {...rest} 
+      data-responsive-button={responsiveSize ? "true" : null}
+      data-responsive-config={responsiveSize ? JSON.stringify(responsiveSizeConfig) : null}
+    />
   )
 }
+
+{/* Add client-side script for responsive sizing only when needed */}
+{responsiveSize && (
+  <script define:vars={{ breakpoints: { sm, md, lg, xl } }}>
+    // Client-side script to update button size based on viewport width
+    function updateButtonSizes() {
+      const responsiveButtons = document.querySelectorAll('[data-responsive-button]');
+      
+      responsiveButtons.forEach(button => {
+        const configData = button.getAttribute('data-responsive-config');
+        
+        if (!configData) return;
+        
+        try {
+          const config = JSON.parse(configData);
+          const { mobile = "small", tablet = "normal", desktop = "normal", largeDesktop = "large" } = config;
+          const width = window.innerWidth;
+          
+          // Determine current size based on viewport width
+          let currentSize;
+          
+          if (width < breakpoints.md) {
+            // Mobile
+            currentSize = mobile;
+          } else if (width >= breakpoints.md && width < breakpoints.lg) {
+            // Tablet
+            currentSize = tablet;
+          } else if (width >= breakpoints.lg && width < breakpoints.xl) {
+            // Desktop
+            currentSize = desktop;
+          } else {
+            // Large Desktop
+            currentSize = largeDesktop;
+          }
+          
+          // Remove existing size classes
+          button.classList.remove("btn-size-small", "btn-size-normal", "btn-size-large");
+          
+          // Add appropriate size class
+          button.classList.add(`btn-size-${currentSize}`);
+        } catch (error) {
+          console.error("Failed to parse responsive button configuration:", error);
+        }
+      });
+    }
+    
+    // Initialize on load
+    updateButtonSizes();
+    
+    // Update on window resize (with debounce for performance)
+    let resizeTimer;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(updateButtonSizes, 100);
+    });
+  </script>
+)}

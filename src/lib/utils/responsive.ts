@@ -27,7 +27,7 @@ export enum DeviceType {
  * Check if the code is running in a browser environment
  * @returns Boolean indicating if window is defined
  */
-const isBrowser = (): boolean => typeof window !== "undefined";
+export const isBrowser = (): boolean => typeof window !== "undefined";
 
 /**
  * Safely get viewport width accounting for SSR

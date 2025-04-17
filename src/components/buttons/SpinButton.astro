@@ -1,7 +1,7 @@
 ---
 // SpinButton.astro - Animated border button variant
 import type { ButtonProps } from "../../lib/utils/buttonUtils";
-import { getButtonVars, getLinkAttrs } from "../../lib/utils/buttonUtils";
+import { getButtonVars, getLinkAttrs, getButtonSizeClass } from "../../lib/utils/buttonUtils";
 
 const {
   text,
@@ -20,14 +20,12 @@ const {
 const buttonVars = getButtonVars(color);
 const { target: linkTarget, rel: linkRel } = getLinkAttrs(url, target, rel);
 const gradientClass = `spin-btn-${color}`;
-import { getButtonSizeClass } from "../../lib/utils/buttonUtils";
 const sizeClass = getButtonSizeClass(size);
 ---
 
 <span
-  class={`relative inline-block overflow-hidden rounded-lg border-2 border-[var(--text-color)]
-hover:border-[var(--text-color)]
-disabled:border-[var(--neutral-200)]`}
+  class={`relative inline-block overflow-hidden rounded-lg border-2 border-[var(--button-accent-bg)]
+${disabled ? "border-[var(--neutral-200)]" : "hover:border-[var(--button-accent-bg)]"}`}
 >
   {/* Animated border background */}
   <span
@@ -39,14 +37,12 @@ disabled:border-[var(--neutral-200)]`}
         href={url}
         target={linkTarget}
         rel={linkRel}
-        class={`flex items-center justify-center font-medium rounded-lg  bg-transparent transition-colors duration-200 focus:outline-none ${sizeClass} text-[var(--text-color)] hover:text-[var(--text-color)] disabled:text-[var(--neutral-400)]`}
+        class={`flex items-center justify-center rounded-lg backdrop-blur-xl bg-transparent focus:outline-none spin-btn-text-shadow ${sizeClass} ${disabled ? "text-[var(--neutral-400)]" : "text-[var(--text-color)]"}`}
         aria-disabled={disabled}
         tabindex={disabled ? -1 : undefined}
         {...rest}
       >
-        <div
-          class={`relative z-20 flex items-center justify-center font-medium rounded-lg transition-colors duration-200`}
-        >
+        <div class="relative z-20 flex items-center justify-center">
           {iconPosition === "left" && typeof Icon === "function" && (
             <Icon class="w-4 h-4 me-2" aria-hidden="true" />
           )}
@@ -60,12 +56,10 @@ disabled:border-[var(--neutral-200)]`}
       <button
         type={type}
         disabled={disabled}
-        class={`flex items-center justify-center font-medium rounded-lg  bg-transparent transition-colors duration-200 focus:outline-none ${sizeClass} text-[var(--text-color)] hover:text-[var(--text-color)] disabled:text-[var(--neutral-400)]`}
+        class={`flex items-center justify-center rounded-lg backdrop-blur-xl bg-transparent focus:outline-none spin-btn-text-shadow ${sizeClass} ${disabled ? "text-[var(--neutral-400)]" : "text-[var(--text-color)]"}`}
         {...rest}
       >
-        <div
-          class={`relative z-20 flex items-center justify-center font-medium rounded-lg transition-colors duration-200`}
-        >
+        <div class="relative z-20 flex items-center justify-center">
           {iconPosition === "left" && typeof Icon === "function" && (
             <Icon class="w-4 h-4 me-2" aria-hidden="true" />
           )}

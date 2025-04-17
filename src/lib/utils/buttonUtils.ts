@@ -241,14 +241,17 @@ export function getButtonInitialSize(
 ): ButtonProps["size"] {
   if (!responsiveSize) return size || "normal";
   // For SSR, default to desktop size (or config override)
-  const config = {
+  const defaultConfig: Required<ButtonProps["responsiveSizeConfig"]> = {
     mobile: "small",
     tablet: "normal",
     desktop: "normal",
     largeDesktop: "large",
+  };
+  const config: Required<ButtonProps["responsiveSizeConfig"]> = {
+    ...defaultConfig,
     ...responsiveSizeConfig,
   };
-  return config.desktop || "normal";
+  return config.desktop;
 }
 
 /**

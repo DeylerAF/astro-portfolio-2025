@@ -69,5 +69,12 @@ const themeInitScript = generateInitializationScript();
         &copy; {new Date().getFullYear()} My Portfolio. Built with Astro.
       </footer>
     </div>
+
+    <!-- Initialize responsive button sizing on client -->
+    <script is:inline type="module">
+      // Use the built JS module path for import
+      import { initResponsiveButtonSizing } from "/src/lib/utils/buttonUtils.js";
+      initResponsiveButtonSizing();
+    </script>
   </body>
 </html>

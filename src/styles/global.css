@@ -95,18 +95,12 @@
   --card-bg: #e4e4e7;
 
   /* Button color variables */
-  --button-primary-bg: var(
-    --accent-600
-  ); /* slightly darker for more contrast */
-
-  --button-primary-text: var(--neutral-50); /* white */
-  --button-primary-hover: var(--accent-700);
-  --button-secondary-bg: var(--info-800); /* indigo-800 */
-  --button-secondary-text: var(--info-100); /* indigo-100 */
-  --button-secondary-hover: var(--info-900); /* indigo-900 */
-  --button-accent-bg: var(--accent-400);
+  --button-accent-bg: var(--accent-500);
   --button-accent-text: var(--accent-900); /* lime-900 */
-  --button-accent-hover: var(--accent-500);
+  --button-accent-hover: var(--accent-600);
+  --button-default-bg: var(--info-800); /* indigo-800 */
+  --button-default-text: var(--info-100); /* indigo-100 */
+  --button-default-hover: var(--info-900); /* indigo-900 */
 }
 
 html.dark,
@@ -205,15 +199,12 @@ html[data-theme="dark"] {
   --card-shadow: rgb(0 0 0 / 25%);
 
   /* Button color variables for dark mode */
-  --button-primary-bg: var(--accent-500);
-  --button-primary-text: var(--neutral-50); /* white */
-  --button-primary-hover: var(--accent-600);
-  --button-secondary-bg: var(--info-800); /* indigo-800 */
-  --button-secondary-text: var(--info-100); /* indigo-100 */
-  --button-secondary-hover: var(--info-900); /* indigo-900 */
-  --button-accent-bg: var(--accent-400);
-  --button-accent-text: var(--accent-900); /* lime-900 */
-  --button-accent-hover: var(--accent-500);
+  --button-accent-bg: var(--accent-600);
+  --button-accent-text: var(--accent-600); /* lime-900 */
+  --button-accent-hover: var(--accent-50);
+  --button-default-bg: var(--info-600); /* indigo-800 */
+  --button-default-text: var(--info-600); /* indigo-100 */
+  --button-default-hover: var(--info-50); /* indigo-900 */
 }
 
 html,
@@ -233,26 +224,16 @@ body {
   These classes use CSS variables for color values and are referenced by the Button component
   via a helper function. This avoids inline styles and enables easy extension for new variants.
 */
-.btn-outline-primary {
-  border-color: var(--button-primary-bg);
-  color: var(--button-primary-bg);
+.btn-outline-default {
+  border-color: var(--button-default-bg);
+  color: var(--button-default-bg);
 }
 
-.btn-outline-primary:hover,
-.btn-outline-primary:focus {
-  border-color: var(--button-primary-hover);
-  color: var(--button-primary-hover);
-}
-
-.btn-outline-secondary {
-  border-color: var(--button-secondary-bg);
-  color: var(--button-secondary-bg);
-}
-
-.btn-outline-secondary:hover,
-.btn-outline-secondary:focus {
-  border-color: var(--button-secondary-hover);
-  color: var(--button-secondary-hover);
+.btn-outline-default:hover,
+.btn-outline-default:focus {
+  border-color: var(--button-default-hover);
+  color: var(--button-default-hover);
+  background-color: var(--button-default-bg);
 }
 
 .btn-outline-accent {
@@ -264,51 +245,33 @@ body {
 .btn-outline-accent:focus {
   border-color: var(--button-accent-hover);
   color: var(--button-accent-hover);
+  background-color: var(--button-accent-bg);
 }
 
 /* SpinButton animated border gradients for each color variant */
-.spin-btn-primary {
+.spin-btn-default {
   background: conic-gradient(
     from 90deg at 50% 50%,
-    var(--accent-100) 0%,
-    var(--accent-500) 50%,
-    var(--accent-200) 100%
+    var(--info-200) 0%,
+    var(--info-500) 50%,
+    var(--info-300) 100%
   );
 }
 
-html.dark .spin-btn-primary,
-html[data-theme="dark"] .spin-btn-primary {
+html.dark .spin-btn-default,
+html[data-theme="dark"] .spin-btn-default {
   background: conic-gradient(
     from 90deg at 50% 50%,
-    var(--accent-800) 0%,
-    var(--accent-950) 50%,
-    var(--accent-900) 100%
-  );
-}
-
-.spin-btn-secondary {
-  background: conic-gradient(
-    from 90deg at 50% 50%,
-    var(--button-secondary-bg) 0%,
-    var(--button-secondary-hover) 50%,
-    var(--button-secondary-bg) 100%
-  );
-}
-
-html.dark .spin-btn-secondary,
-html[data-theme="dark"] .spin-btn-secondary {
-  background: conic-gradient(
-    from 90deg at 50% 50%,
-    var(--button-secondary-bg) 0%,
-    var(--button-secondary-hover) 50%,
-    var(--button-secondary-bg) 100%
+    var(--info-600) 0%,
+    var(--info-950) 50%,
+    var(--info-700) 100%
   );
 }
 
 .spin-btn-accent {
   background: conic-gradient(
     from 90deg at 50% 50%,
-    var(--accent-300) 0%,
+    var(--accent-200) 0%,
     var(--accent-500) 50%,
     var(--accent-300) 100%
   );
@@ -318,9 +281,9 @@ html.dark .spin-btn-accent,
 html[data-theme="dark"] .spin-btn-accent {
   background: conic-gradient(
     from 90deg at 50% 50%,
-    var(--accent-800) 0%,
-    var(--accent-300) 50%,
-    var(--accent-800) 100%
+    var(--accent-600) 0%,
+    var(--accent-950) 50%,
+    var(--accent-700) 100%
   );
 }
 

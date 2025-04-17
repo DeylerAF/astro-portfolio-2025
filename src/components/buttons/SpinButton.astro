@@ -10,6 +10,7 @@ const {
   type = "button",
   disabled = false,
   color = "accent",
+  size = "normal",
   url,
   target,
   rel,
@@ -18,13 +19,13 @@ const {
 
 const buttonVars = getButtonVars(color);
 const { target: linkTarget, rel: linkRel } = getLinkAttrs(url, target, rel);
-
-// Select the gradient class based on the color prop
 const gradientClass = `spin-btn-${color}`;
+import { getButtonSizeClass } from "../../lib/utils/buttonUtils";
+const sizeClass = getButtonSizeClass(size);
 ---
 
 <span
-  class="relative inline-block overflow-hidden rounded-lg border-2 border-[var(--border-color)]"
+  class={`relative inline-block overflow-hidden rounded-lg border-2 border-[var(--border-color)]`}
 >
   {/* Animated border background */}
   <span
@@ -36,12 +37,14 @@ const gradientClass = `spin-btn-${color}`;
         href={url}
         target={linkTarget}
         rel={linkRel}
-        class="relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none text-[var(--text-color)] hover:text-[var(--text-color)] disabled:text-[var(--neutral-400)]"
+        class={`relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none text-[var(--text-color)] hover:text-[var(--text-color)] disabled:text-[var(--neutral-400)]`}
         aria-disabled={disabled}
         tabindex={disabled ? -1 : undefined}
         {...rest}
       >
-        <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg backdrop-blur-xl transition-colors duration-200">
+        <div
+          class={`relative z-20 flex items-center justify-center font-medium rounded-lg backdrop-blur-xl transition-colors duration-200 ${sizeClass}`}
+        >
           {iconPosition === "left" && typeof Icon === "function" && (
             <Icon class="w-4 h-4 me-2" aria-hidden="true" />
           )}
@@ -55,10 +58,12 @@ const gradientClass = `spin-btn-${color}`;
       <button
         type={type}
         disabled={disabled}
-        class="relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none text-[var(--text-color)] hover:text-[var(--text-color)] disabled:text-[var(--neutral-400)]"
+        class={`relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none text-[var(--text-color)] hover:text-[var(--text-color)] disabled:text-[var(--neutral-400)]`}
         {...rest}
       >
-        <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg backdrop-blur-xl transition-colors duration-200">
+        <div
+          class={`relative z-20 flex items-center justify-center font-medium rounded-lg backdrop-blur-xl transition-colors duration-200 ${sizeClass}`}
+        >
           {iconPosition === "left" && typeof Icon === "function" && (
             <Icon class="w-4 h-4 me-2" aria-hidden="true" />
           )}

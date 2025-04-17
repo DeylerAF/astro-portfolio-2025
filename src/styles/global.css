@@ -291,3 +291,40 @@ html[data-theme="dark"] .spin-btn-accent {
 .spin-btn-text-shadow {
   text-shadow: 0 1px 6px rgb(0 0 0 / 40%);
 }
+
+/*
+  Button size utility classes
+  These classes control padding, font size, and icon size for each button size variant.
+*/
+.btn-size-small {
+  padding: 0.375rem 0.75rem !important; /* py-1.5 px-3 */
+  font-size: 0.875rem !important; /* text-sm */
+}
+
+.btn-size-small .w-4,
+.btn-size-small .h-4 {
+  width: 1rem !important;
+  height: 1rem !important;
+}
+
+.btn-size-normal {
+  padding: 0.75rem 1.25rem !important; /* py-3 px-5 */
+  font-size: 1rem !important; /* text-base */
+}
+
+.btn-size-normal .w-4,
+.btn-size-normal .h-4 {
+  width: 1rem !important;
+  height: 1rem !important;
+}
+
+.btn-size-large {
+  padding: 1.25rem 2rem !important; /* py-5 px-8 */
+  font-size: 1.25rem !important; /* text-xl */
+}
+
+.btn-size-large .w-4,
+.btn-size-large .h-4 {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+}

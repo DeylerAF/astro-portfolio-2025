@@ -9,6 +9,11 @@ export interface ButtonProps {
   url?: string;
   target?: string;
   rel?: string;
+  /**
+   * Size of the button: 'small', 'normal', or 'large'.
+   * Default is 'normal'.
+   */
+  size?: "small" | "normal" | "large";
   [key: string]: unknown;
 }
 
@@ -62,4 +67,19 @@ export function getLinkAttrs(url?: string, target?: string, rel?: string) {
     target: target || (external ? "_blank" : undefined),
     rel: rel || (external ? "noopener noreferrer" : undefined),
   };
+}
+
+/**
+ * Returns the size class for the given button size.
+ */
+export function getButtonSizeClass(size: string = "normal"): string {
+  switch (size) {
+    case "small":
+      return "btn-size-small";
+    case "large":
+      return "btn-size-large";
+    case "normal":
+    default:
+      return "btn-size-normal";
+  }
 }

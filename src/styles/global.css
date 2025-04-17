@@ -220,9 +220,7 @@ body {
 }
 
 /*
-  Outline button color classes for each color variant.
-  These classes use CSS variables for color values and are referenced by the Button component
-  via a helper function. This avoids inline styles and enables easy extension for new variants.
+  Outline Button.
 */
 .btn-outline-default {
   border-color: var(--button-default-bg);
@@ -248,7 +246,7 @@ body {
   background-color: var(--button-accent-bg);
 }
 
-/* SpinButton animated border gradients for each color variant */
+/* Spin Button */
 .spin-btn-default {
   background: conic-gradient(
     from 90deg at 50% 50%,
@@ -256,6 +254,15 @@ body {
     var(--info-500) 50%,
     var(--info-300) 100%
   );
+  border-color: var(--button-default-bg);
+  color: var(--button-default-bg);
+}
+
+.spin-btn-default:hover,
+.spin-btn-default:focus {
+  border-color: var(--button-default-hover);
+  color: var(--button-default-hover);
+  background-color: var(--button-default-bg);
 }
 
 html.dark .spin-btn-default,
@@ -275,6 +282,15 @@ html[data-theme="dark"] .spin-btn-default {
     var(--accent-500) 50%,
     var(--accent-300) 100%
   );
+  border-color: var(--button-accent-bg);
+  color: var(--button-accent-bg);
+}
+
+.spin-btn-accent:hover,
+.spin-btn-accent:focus {
+  border-color: var(--button-accent-hover);
+  color: var(--button-accent-hover);
+  background-color: var(--button-accent-bg);
 }
 
 html.dark .spin-btn-accent,

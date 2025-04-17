@@ -1,7 +1,11 @@
 ---
 // SpinButton.astro - Animated border button variant
 import type { ButtonProps } from "../../lib/utils/buttonUtils";
-import { getButtonVars, getLinkAttrs, getButtonSizeClass } from "../../lib/utils/buttonUtils";
+import {
+  getButtonVars,
+  getLinkAttrs,
+  getButtonSizeClass,
+} from "../../lib/utils/buttonUtils";
 
 const {
   text,
@@ -25,7 +29,7 @@ const sizeClass = getButtonSizeClass(size);
 
 <span
   class={`relative inline-block overflow-hidden rounded-lg border-2 border-[var(--button-accent-bg)]
-${disabled ? "border-[var(--neutral-200)]" : "hover:border-[var(--button-accent-bg)]"}`}
+${disabled ? "border-[var(--neutral-200)]" : "hover:border-[var(--button-accent-hover)]"}`}
 >
   {/* Animated border background */}
   <span

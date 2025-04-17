@@ -45,7 +45,7 @@ const { profileData, introBlocks, images } =
       );
       if (headingBlock && Array.isArray(headingBlock.content)) {
         return (
-          <h1 class="text-4xl font-bold tracking-tight text-[var(--text-color)] sm:text-5xl dark:text-white mb-4">
+          <h1 class="text-4xl font-bold tracking-tight text-[var(--text-color)] sm:text-5xl mb-4">
             {(headingBlock.content as RichTextItem[]).map((text) => (
               <span
                 class:list={{
@@ -122,7 +122,7 @@ const { profileData, introBlocks, images } =
           return null;
         } else if (block.type === "heading_1") {
           return (
-            <h1 class="text-2xl font-bold text-[var(--text-color)] dark:text-white mt-6 mb-2">
+            <h1 class="text-2xl font-bold text-[var(--text-color)] mt-6 mb-2">
               {Array.isArray(block.content)
                 ? (block.content as RichTextItem[]).map((text) => (
                     <span

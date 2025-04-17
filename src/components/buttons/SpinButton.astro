@@ -29,7 +29,6 @@ const gradientClass = `spin-btn-${color}`;
   {/* Animated border background */}
   <span
     class={`absolute inset-[-1000%] pointer-events-none animate-[spin_2s_linear_infinite] rounded-lg ${gradientClass}`}
-    style="background: conic-gradient(from 90deg at 50% 50%, var(--accent-400) 0%, var(--accent-600) 50%, var(--accent-400) 100%);"
   ></span>
   {
     url ? (
@@ -42,7 +41,7 @@ const gradientClass = `spin-btn-${color}`;
         tabindex={disabled ? -1 : undefined}
         {...rest}
       >
-        <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200">
+        <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg backdrop-blur-xl transition-colors duration-200">
           {iconPosition === "left" && typeof Icon === "function" && (
             <Icon class="w-4 h-4 me-2" aria-hidden="true" />
           )}
@@ -59,7 +58,7 @@ const gradientClass = `spin-btn-${color}`;
         class="relative z-10 rounded-lg bg-transparent p-0 border-none focus:outline-none text-[var(--text-color)] hover:text-[var(--text-color)] disabled:text-[var(--neutral-400)]"
         {...rest}
       >
-        <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg transition-colors duration-200">
+        <div class="relative z-20 flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg backdrop-blur-xl transition-colors duration-200">
           {iconPosition === "left" && typeof Icon === "function" && (
             <Icon class="w-4 h-4 me-2" aria-hidden="true" />
           )}

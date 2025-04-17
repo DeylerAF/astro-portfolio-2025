@@ -114,7 +114,7 @@ html[data-theme="dark"] {
   /* Main colors */
   --text-color: #e4e4e7; /* zinc-200 */
   --bg-color: #18181b; /* zinc-900 */
-  --hover-bg: #27272a; /* zinc-800 */
+  --hover-bg: #3f3f46; /* zinc-700 */
 
   /* Accent colors - lime palette (consistent with light theme) */
   --accent-50: #f7fee7;
@@ -200,7 +200,7 @@ html[data-theme="dark"] {
   --sidebar-hover: #3f3f46; /* zinc-700 */
 
   /* UI elements */
-  --border-color: var(--neutral-700); /* zinc-700 */
+  --border-color: var(--neutral-400); /* zinc-400 */
   --card-bg: var(--neutral-800); /* zinc-800 */
   --card-shadow: rgb(0 0 0 / 25%);
 
@@ -270,9 +270,9 @@ body {
 .spin-btn-primary {
   background: conic-gradient(
     from 90deg at 50% 50%,
-    var(--accent-400) 0%,
-    var(--accent-600) 50%,
-    var(--accent-400) 100%
+    var(--accent-100) 0%,
+    var(--accent-500) 50%,
+    var(--accent-200) 100%
   );
 }
 
@@ -280,9 +280,9 @@ html.dark .spin-btn-primary,
 html[data-theme="dark"] .spin-btn-primary {
   background: conic-gradient(
     from 90deg at 50% 50%,
-    var(--accent-600) 0%,
-    var(--accent-400) 50%,
-    var(--accent-600) 100%
+    var(--accent-800) 0%,
+    var(--accent-950) 50%,
+    var(--accent-900) 100%
   );
 }
 
@@ -318,9 +318,9 @@ html.dark .spin-btn-accent,
 html[data-theme="dark"] .spin-btn-accent {
   background: conic-gradient(
     from 90deg at 50% 50%,
-    var(--accent-500) 0%,
+    var(--accent-800) 0%,
     var(--accent-300) 50%,
-    var(--accent-500) 100%
+    var(--accent-800) 100%
   );
 }
 

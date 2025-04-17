@@ -98,7 +98,7 @@ const { profileData, introBlocks, images } =
     {
       (() => {
         const headingBlock = introBlocks.find(
-          (block) => block.type === "heading_2"
+          (block) => block.type === "heading_2",
         );
         if (headingBlock && Array.isArray(headingBlock.content)) {
           return (

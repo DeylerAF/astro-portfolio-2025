@@ -225,3 +225,50 @@ export function getResponsiveButtonSize(
   // Fallback to static size
   return staticSize;
 }
+
+/**
+ * Returns the initial button size for SSR or static rendering.
+ * If responsiveSize is true, returns the default size for desktop (or config override).
+ * @param size The static size (default: 'normal')
+ * @param responsiveSize Whether responsive sizing is enabled
+ * @param responsiveSizeConfig Optional config for responsive sizes
+ * @returns The initial size string
+ */
+export function getButtonInitialSize(
+  size: ButtonProps["size"] = "normal",
+  responsiveSize: boolean = false,
+  responsiveSizeConfig?: ButtonProps["responsiveSizeConfig"],
+): ButtonProps["size"] {
+  if (!responsiveSize) return size || "normal";
+  // For SSR, default to desktop size (or config override)
+  const config = {
+    mobile: "small",
+    tablet: "normal",
+    desktop: "normal",
+    largeDesktop: "large",
+    ...responsiveSizeConfig,
+  };
+  return config.desktop || "normal";
+}
+
+/**
+ * Returns the data attributes for a responsive button.
+ * Use this to spread on the button element for client-side JS to pick up.
+ */
+export function getResponsiveButtonDataAttrs(
+  responsiveSize: boolean,
+  responsiveSizeConfig?: ButtonProps["responsiveSizeConfig"],
+) {
+  return responsiveSize
+    ? {
+        "data-responsive-button": "true",
+        "data-responsive-config": JSON.stringify({
+          mobile: "small",
+          tablet: "normal",
+          desktop: "normal",
+          largeDesktop: "large",
+          ...responsiveSizeConfig,
+        }),
+      }
+    : {};
+}
